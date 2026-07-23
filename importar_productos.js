@@ -138,6 +138,31 @@ async function migrar() {
       }
     }
 
+    // Mapear y normalizar categorías al nuevo esquema de la web
+    let normalizedCategory = 'JUGUETES';
+    const rawCat = (categoria || '').toUpperCase().trim();
+    const cleanName = (nombre || '').toUpperCase();
+    
+    if (rawCat === 'COSMÉTICA SENSORIAL' || rawCat === 'MASAJES Y COSMÉTICA') {
+      normalizedCategory = 'COSMÉTICA SENSORIAL';
+    } else if (rawCat === 'SALUD Y BIENESTAR' || rawCat === 'SALUD ÍNTIMA') {
+      normalizedCategory = 'SALUD ÍNTIMA';
+    } else if (rawCat === 'BDSM' || rawCat === 'FETISH Y BDSM') {
+      if (cleanName.includes('PLUG') || cleanName.includes('BEADS') || cleanName.includes('BOLAS')) {
+        normalizedCategory = 'JUGUETES';
+      } else {
+        normalizedCategory = 'BDSM';
+      }
+    } else {
+      if (cleanName.includes('ACEITE DE MASAJE ORGÁNICO NATURAL')) {
+        normalizedCategory = 'SALUD ÍNTIMA';
+      } else if (cleanName.includes('ACEITE') || cleanName.includes('VELA')) {
+        normalizedCategory = 'COSMÉTICA SENSORIAL';
+      } else {
+        normalizedCategory = 'JUGUETES';
+      }
+    }
+
     // Crear el documento del producto para Sanity
     const doc = {
       _type: 'product',
@@ -146,7 +171,7 @@ async function migrar() {
         _type: 'slug',
         current: slug || nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
       },
-      category: categoria || 'Juguetes',
+      category: normalizedCategory,
       description: descripcion,
       price: precio,
       stock: stock,
