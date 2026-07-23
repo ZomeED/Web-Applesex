@@ -731,16 +731,29 @@ function formatCategoryName(str) {
       font-weight: 700;
     }
 
-    .pagination-ellipsis {
-      color: #727586;
-      width: 40px;
-      height: 40px;
-      display: inline-flex;
+    .pagination-numbers-scroll {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      font-weight: 600;
-      font-size: 1rem;
-      user-select: none;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+      gap: 6px;
+      max-width: 320px; /* Ancho máximo en tabletas/escritorio */
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 10px;
+      /* Máscara de desvanecimiento premium en los bordes izquierdo y derecho */
+      mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+      -webkit-mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+    }
+
+    .pagination-numbers-scroll::-webkit-scrollbar {
+      display: none; /* Chrome/Safari */
+    }
+
+    .pagination-numbers-scroll .pagination-btn {
+      flex-shrink: 0; /* Evita que los botones se deformen al encogerse */
+      scroll-snap-align: center;
     }
 
     /* Ajustes responsivos para pantallas móviles muy pequeñas */
@@ -748,7 +761,12 @@ function formatCategoryName(str) {
       .pagination-container {
         gap: 4px;
       }
-      .pagination-btn, .pagination-ellipsis {
+      .pagination-numbers-scroll {
+        max-width: 170px; /* Ancho acotado para centrar y destacar el efecto ruleta en móvil */
+        gap: 4px;
+        padding: 4px 6px;
+      }
+      .pagination-btn {
         width: 34px;
         height: 34px;
         border-radius: 8px;
@@ -1224,37 +1242,20 @@ function formatCategoryName(str) {
         </button>
       `;
 
-      // Números de Página (paginación inteligente con elipsis y ventana deslizante)
-      const pagesToShow = [];
-      if (totalPages <= 7) {
-        for (let i = 1; i <= totalPages; i++) {
-          pagesToShow.push(i);
-        }
-      } else {
-        if (currentPage <= 4) {
-          pagesToShow.push(1, 2, 3, 4, 5, '...', totalPages);
-        } else if (currentPage >= totalPages - 3) {
-          pagesToShow.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
-        } else {
-          pagesToShow.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
-        }
+      // Contenedor scrollable de números (ruleta interactiva)
+      html += `<div class="pagination-numbers-scroll" id="pagination-scroll-container">`;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button 
+            class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+            data-page="${i}"
+            aria-label="Ir a la página ${i}"
+          >
+            ${i}
+          </button>
+        `;
       }
-
-      pagesToShow.forEach(page => {
-        if (page === '...') {
-          html += `<span class="pagination-ellipsis">&hellip;</span>`;
-        } else {
-          html += `
-            <button 
-              class="pagination-btn ${page === currentPage ? 'active' : ''}" 
-              data-page="${page}"
-              aria-label="Ir a la página ${page}"
-            >
-              ${page}
-            </button>
-          `;
-        }
-      });
+      html += `</div>`;
 
       // Botón Siguiente
       html += `
@@ -1269,6 +1270,15 @@ function formatCategoryName(str) {
       `;
 
       paginationContainer.innerHTML = html;
+
+      // Autocentrar el botón activo dentro de la ruleta scrollable
+      const activeBtn = paginationContainer.querySelector('.pagination-btn.active');
+      const scrollContainer = paginationContainer.querySelector('#pagination-scroll-container');
+      if (activeBtn && scrollContainer) {
+        setTimeout(() => {
+          activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }, 50);
+      }
 
       // Escuchar eventos en los botones de paginación
       paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
