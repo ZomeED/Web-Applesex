@@ -1757,6 +1757,42 @@ const { title, description } = Astro.props;
         });
       });
 
+      // Escuchar clicks de burbujas de categoría en la Home para abrir el buscador modal
+      document.querySelectorAll('.category-bubble-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          const isHomepage = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('/');
+          const cat = item.getAttribute('data-category') || 'all';
+
+          if (!isHomepage) {
+            sessionStorage.setItem('open_catalog', 'true');
+            sessionStorage.setItem('active_category', cat);
+            sessionStorage.setItem('active_subcategory', 'all');
+            window.location.href = '/';
+            return;
+          }
+
+          e.preventDefault();
+          closeMobileDrawer();
+
+          activeCategory = cat;
+          activeSubcategory = 'all';
+
+          document.querySelectorAll('.modal-cat-btn').forEach(btn => {
+            if (btn.getAttribute('data-cat') === activeCategory) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+
+          if (searchInput) searchInput.value = '';
+
+          openModal();
+          updateModalSubcategoriesUI();
+          renderSearchResults();
+        });
+      });
+
       // Escuchar clicks en todos los enlaces de "Catálogo Completo" para abrir el buscador modal completo
       document.querySelectorAll('a[href="/#catalogo"], a[href="#catalogo"], #nav-catalogo-link').forEach(btn => {
         btn.addEventListener('click', (e) => {

@@ -118,8 +118,7 @@ function formatCategoryName(str) {
             )}
             
             <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-              <a href="#catalogo" class="btn btn-primary">Ver {allProducts.length} Productos</a>
-              <button id="trigger-hero-search-btn" class="btn btn-secondary">Buscar Producto</button>
+              <a href="#catalogo" class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem; border-radius: 12px;">Explorar Catálogo</a>
             </div>
           </div>
         ) : (
@@ -131,8 +130,7 @@ function formatCategoryName(str) {
               {heroSettings.subtitle}
             </p>
             <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-              <a href="#catalogo" class="btn btn-primary" id="hero-explore-btn">{heroSettings.buttonText}</a>
-              <a href="#recogida" class="btn btn-secondary" id="hero-pickup-btn">Recogida en Churra (2h)</a>
+              <a href="#catalogo" class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem; border-radius: 12px;" id="hero-explore-btn">Explorar Catálogo</a>
             </div>
           </div>
         )}
@@ -158,102 +156,131 @@ function formatCategoryName(str) {
     </div>
   </section>
 
-  <!-- Sección Catálogo de Productos con Buscador Inteligente Integrado -->
-  <section id="catalogo" style="padding: 80px 0;">
-    <div class="container">
+  <!-- Banda Fina de Garantías (Trust Badges) -->
+  <div style="background: #fdfafb; border-bottom: 1px solid var(--border-color); padding: 12px 0;">
+    <div class="container" style="display: flex; justify-content: center; align-items: center; gap: 24px; flex-wrap: wrap; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="color: var(--primary);">🔒</span> Compra 100% Segura</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="color: var(--primary);">📦</span> Envíos 100% Discretos</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px;"><span style="color: var(--primary);">📍</span> Recogida en Churra (2h)</span>
+    </div>
+  </div>
+
+  <!-- Burbujas de Categorías estilo Instagram Stories -->
+  <section style="padding: 24px 0 10px 0; background: #ffffff;">
+    <div class="categories-bubbles-container">
       
-      <div style="text-align: center; margin-bottom: 40px;">
-        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">NUESTRA SELECCIÓN</span>
-        <h2 style="font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 12px;">Recomendaciones</h2>
-        <p style="color: var(--text-secondary); max-width: 650px; margin: 0 auto; font-size: 1.05rem;">
-          Una selección exclusiva de nuestros mejores artículos eróticos y de bienestar íntimo, recomendados para tu disfrute.
-        </p>
-      </div>
-
-      <!-- Barra de Control del Catálogo -->
-      <div class="catalog-toolbar">
-        
-        <!-- Fila de Búsqueda y Ordenación -->
-        <div class="catalog-toolbar-filters">
-          
-          <div style="position: relative; width: 100%;">
-            <input 
-              type="text" 
-              id="grid-search-input" 
-              placeholder="Buscar productos..."
-              style="width: 100%; padding: 12px 16px 12px 44px; background: #f7f7fa; border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 16px; outline: none; transition: border-color 0.2s;"
-            />
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <button id="clear-grid-search-btn" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem;">✕</button>
-          </div>
-
-          <div class="sort-select-wrapper">
-            <label for="grid-sort-select" class="sort-label">Ordenar por:</label>
-            <select id="grid-sort-select" class="sort-select-input">
-              <option value="default">Recomendados</option>
-              <option value="price-asc">Precio: de menor a mayor</option>
-              <option value="price-desc">Precio: de mayor a menor</option>
-              <option value="name-asc">Nombre: A - Z</option>
-            </select>
-          </div>
-
-        </div>
-
-
-        <!-- Chips de Categorías con Scroll Horizontal Táctil -->
-        <div class="category-filter-chips">
-          <button class="grid-cat-btn active" data-category="all">
-            Todas ({allProducts.length})
-          </button>
-          {categories.map(cat => {
-            const count = allProducts.filter(p => p.category === cat).length;
-            return (
-              <button class="grid-cat-btn" data-category={cat}>
-                {formatCategoryName(cat)} ({count})
-              </button>
-            );
-          })}
-        </div>
-
-        <!-- Subcategorías Desplegables con Transición Suave -->
-        <div class="subcategory-filter-wrapper" id="subcategory-filter-wrapper">
-          <div class="subcategory-filter-chips" id="subcategory-filter-chips"></div>
-        </div>
-
-      </div>
-
-      <!-- Contador de Productos Filtrados -->
-      <div id="grid-counter-text" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; font-weight: 500;">
-        Mostrando <strong style="color: var(--primary);">{allProducts.length}</strong> de <strong>{allProducts.length}</strong> productos
-      </div>
-
-      <!-- Parrilla de Productos Renderizada -->
-      <div id="main-products-grid" class="products-grid">
-        <!-- Inyectado por JS client-side -->
-      </div>
-
-      <!-- Controles de Paginación del Catálogo -->
-      <div id="catalog-pagination-container" class="pagination-container">
-        <!-- Inyectado por JS client-side -->
-      </div>
-
-      <!-- Estado Vacío cuando no hay resultados -->
-      <div id="no-products-found" style="display: none; text-align: center; padding: 60px 20px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; margin-top: 20px;">
-        <div style="width: 64px; height: 64px; background: rgba(216, 75, 140, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--primary);">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      <button class="category-bubble-item" data-category="JUGUETES" style="background: transparent; border: none; padding: 0; font-family: inherit;">
+        <div class="category-bubble-img" style="color: #e45b9a; background: #fdfafb;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
         </div>
-        <h3 style="font-size: 1.4rem; margin-bottom: 10px;">No se encontraron productos</h3>
-        <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px auto;">
-          No coincide ningún producto con tu criterio de búsqueda o categoría seleccionada.
+        <span class="category-bubble-label">Juguetes</span>
+      </button>
+
+      <button class="category-bubble-item" data-category="COSMÉTICA SENSORIAL" style="background: transparent; border: none; padding: 0; font-family: inherit;">
+        <div class="category-bubble-img" style="color: #885df1; background: #fbf9ff;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+          </svg>
+        </div>
+        <span class="category-bubble-label">Cosmética</span>
+      </button>
+
+      <button class="category-bubble-item" data-category="BDSM" style="background: transparent; border: none; padding: 0; font-family: inherit;">
+        <div class="category-bubble-img" style="color: #3b3759; background: #f7f6f9;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <span class="category-bubble-label">BDSM</span>
+      </button>
+
+      <button class="category-bubble-item" data-category="SALUD ÍNTIMA" style="background: transparent; border: none; padding: 0; font-family: inherit;">
+        <div class="category-bubble-img" style="color: #10b981; background: #f2faf7;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <span class="category-bubble-label">Salud Íntima</span>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- Sección Catálogo de Productos con Buscador Inteligente Integrado -->
+  <!-- Sección Catálogo de Productos (Recomendados) -->
+  <section id="catalogo" style="padding: 90px 0; background: #ffffff;">
+    <div class="container">
+      
+      <div style="text-align: center; margin-bottom: 48px;">
+        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">NUESTRA SELECCIÓN</span>
+        <h2 style="font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 12px; font-family: var(--font-title); font-weight: 800;">Recomendaciones</h2>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem; line-height: 1.5;">
+          Una cuidada selección de nuestros mejores artículos eróticos y bienestar íntimo para disfrutar a solas o en pareja.
         </p>
-        <button id="reset-grid-filters-btn" class="btn btn-primary">
-          Restablecer Filtros y Ver Todos ({allProducts.length})
+      </div>
+
+      <!-- Parrilla de Productos Recomendados (Estática y veloz) -->
+      <div class="products-grid">
+        {allProducts.slice(0, 8).map(product => (
+          <article class="product-card">
+            {product.oldPrice ? (
+              <span style="position: absolute; top: 16px; left: 16px; background-color: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 10;">
+                Oferta
+              </span>
+            ) : null}
+
+            <a href={`/producto/${product.slug}`} class="product-image-container" aria-label={`Ver detalles de ${product.name}`}>
+              <img 
+                src={product.image} 
+                alt={product.name}
+                class="product-image-zoom"
+                loading="lazy"
+              />
+            </a>
+
+            <div class="product-card-body" style="padding: 22px; display: flex; flex-direction: column; flex-grow: 1;">
+              <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">{product.category}</span>
+              <a href={`/producto/${product.slug}`} style="color: inherit; text-decoration: none;">
+                <h3 style="font-size: 1.15rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; transition: color 0.2s;" class="product-title-link">{product.name}</h3>
+              </a>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                {product.description || ''}
+              </p>
+              
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: baseline; gap: 6px;">
+                  {product.oldPrice ? (
+                    <span style="font-size: 0.9rem; text-decoration: line-through; color: var(--text-secondary);">{product.oldPrice}€</span>
+                  ) : null}
+                  <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary);">{product.price}€</span>
+                </div>
+                <button 
+                  class="btn btn-primary add-to-cart-btn" 
+                  data-id={product.id}
+                  data-name={product.name}
+                  data-price={product.price}
+                  data-image={product.image}
+                  style="padding: 8px 14px; font-size: 0.85rem; border-radius: 8px;"
+                >
+                  Comprar
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Gran CTA central para abrir el Catálogo Completo en el Buscador Modal -->
+      <div style="text-align: center; margin-top: 48px;">
+        <button 
+          id="open-catalog-full-btn"
+          class="btn btn-primary" 
+          style="padding: 16px 36px; font-size: 1rem; font-weight: 700; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; background: linear-gradient(135deg, #e45b9a, #c43b7a); border: none; box-shadow: var(--shadow-glow);"
+        >
+          Ver Catálogo Completo ({allProducts.length} artículos)
         </button>
       </div>
 
@@ -408,6 +435,104 @@ function formatCategoryName(str) {
       grid-template-columns: 1.1fr 0.9fr;
       gap: 48px;
       align-items: center;
+    }
+
+    /* Burbujas de categorías estilo Instagram */
+    .categories-bubbles-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 28px;
+      padding: 24px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .categories-bubbles-container::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .category-bubble-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.23s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      scroll-snap-align: start;
+    }
+    .category-bubble-item:hover {
+      transform: translateY(-4px);
+    }
+    
+    .category-bubble-img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      margin-bottom: 8px;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .category-bubble-item:hover .category-bubble-img {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-glow);
+    }
+    
+    /* Anillo exterior premium estilo Stories */
+    .category-bubble-img::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      background: linear-gradient(135deg, #ff7eb3, #ff758c) border-box;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .category-bubble-item:hover .category-bubble-img::before {
+      opacity: 1;
+    }
+
+    .category-bubble-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-primary);
+    }
+
+    @media (max-width: 480px) {
+      .categories-bubbles-container {
+        justify-content: flex-start;
+        gap: 20px;
+        padding: 16px;
+      }
+      .category-bubble-img {
+        width: 64px;
+        height: 64px;
+      }
+      .category-bubble-label {
+        font-size: 0.72rem;
+      }
     }
 
     /* Banner de la tienda física responsivo */
@@ -828,566 +953,8 @@ function formatCategoryName(str) {
     }
   </style>
 
-  <!-- Script del cliente para filtrado en tiempo real de los 30 productos -->
-  <script define:vars={{ initialProducts: allProducts }}>
-    // Helper para formatear categorías a Camel Case
-    function formatCategoryName(str) {
-      if (!str) return '';
-      const words = str.toLowerCase().split(' ');
-      const formattedWords = words.map((word, index) => {
-        const lowerWords = ['y', 'e', 'o', 'u', 'de', 'del', 'con', 'para', 'en'];
-        if (lowerWords.includes(word) && index > 0) {
-          return word;
-        }
-        return word.charAt(0).toUpperCase() + word.slice(1);
-      });
-      return formattedWords.join(' ');
-    }
-
-    // Algoritmo de distancia de Levenshtein para tolerancia a erratas
-    function levenshtein(a, b) {
-      const matrix = [];
-      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
-      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-      for (let i = 1; i <= b.length; i++) {
-        for (let j = 1; j <= a.length; j++) {
-          if (b.charAt(i - 1) === a.charAt(j - 1)) {
-            matrix[i][j] = matrix[i - 1][j - 1];
-          } else {
-            matrix[i][j] = Math.min(
-              matrix[i - 1][j - 1] + 1,
-              matrix[i][j - 1] + 1,
-              matrix[i - 1][j] + 1
-            );
-          }
-        }
-      }
-      return matrix[b.length][a.length];
-    }
-
-    // Comprobar coincidencia fuzzy
-    function matchProductFuzzy(product, query) {
-      if (!query) return true;
-      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
-      if (queryWords.length === 0) return true;
-      
-      const searchFields = [
-        product.name,
-        product.description || '',
-        product.category
-      ].join(' ').toLowerCase();
-
-      const productWords = searchFields.split(/[\s,.:;?!()""']+/).filter(w => w.length >= 2);
-
-      return queryWords.every(qw => {
-        return productWords.some(pw => {
-          if (pw.includes(qw) || qw.includes(pw)) return true;
-          if (qw.length < 4) return pw === qw;
-          const maxEdits = qw.length <= 6 ? 1 : 2;
-          return levenshtein(qw, pw) <= maxEdits;
-        });
-      });
-    }
-
-    // Resaltar coincidencias de forma inteligente
-    function highlightText(text, query) {
-      if (!query) return text;
-      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
-      if (queryWords.length === 0) return text;
-
-      const textWords = text.split(/(\s+)/);
-      
-      const highlightedWords = textWords.map(part => {
-        if (/^\s+$/.test(part)) return part;
-        const cleanWord = part.toLowerCase().replace(/[,.:;?!()""']/g, '');
-        
-        const matches = queryWords.some(qw => {
-          if (cleanWord.includes(qw) || qw.includes(cleanWord)) return true;
-          if (qw.length < 4) return cleanWord === qw;
-          const maxEdits = qw.length <= 6 ? 1 : 2;
-          return levenshtein(qw, cleanWord) <= maxEdits;
-        });
-
-        if (matches) {
-          return `<mark class="search-highlight">${part}</mark>`;
-        }
-        return part;
-      });
-
-      return highlightedWords.join('');
-    }
-
-    // Clasificar productos en subcategorías de forma determinista y extensible
-    function getProductSubcategory(product) {
-      const idMap = {
-        "prod-1": "Efecto Calor",
-        "prod-2": "Efecto Calor",
-        "prod-3": "Cuidado Natural",
-        "prod-4": "Aceites de Masaje",
-        "prod-5": "Aceites de Masaje",
-        "prod-6": "Velas de Masaje",
-        "prod-7": "Masculinos",
-        "prod-8": "Masculinos",
-        "prod-9": "Vibradores",
-        "prod-10": "Vibradores",
-        "prod-11": "Vibradores",
-        "prod-12": "Vibradores",
-        "prod-13": "Vibradores",
-        "prod-14": "Vibradores",
-        "prod-15": "Vibradores",
-        "prod-16": "Vibradores",
-        "prod-17": "Parejas",
-        "prod-18": "Vibradores",
-        "prod-19": "Plugs",
-        "prod-20": "Plugs",
-        "prod-21": "Plugs",
-        "prod-22": "Plugs",
-        "prod-23": "Anal",
-        "prod-24": "Plugs",
-        "prod-25": "Plugs",
-        "prod-26": "Plugs",
-        "prod-27": "Plugs",
-        "prod-28": "Plugs",
-        "prod-29": "Plugs",
-        "prod-30": "Plugs"
-      };
-      
-      if (idMap[product.id]) return idMap[product.id];
-      
-      const name = (product.name || '').toLowerCase();
-      const desc = (product.description || '').toLowerCase();
-      const cat = (product.category || '').toUpperCase();
-      
-      if (cat.includes('JUGUETES')) {
-        if (name.includes('plug')) return 'Plugs';
-        if (name.includes('beads') || name.includes('anal') || name.includes('bolas anales')) return 'Anal';
-        if (name.includes('pareja') || name.includes('doble')) return 'Parejas';
-        if (name.includes('masculino') || name.includes('hombre') || name.includes('pene') || name.includes('perineal') || name.includes('próstata')) return 'Masculinos';
-        return 'Vibradores';
-      }
-      if (cat.includes('COSMÉTICA') || cat.includes('COSMETICA') || cat.includes('SENSORIAL')) {
-        if (name.includes('calor') || desc.includes('calor')) return 'Efecto Calor';
-        if (name.includes('vela')) return 'Velas de Masaje';
-        return 'Aceites de Masaje';
-      }
-      if (cat.includes('BDSM')) {
-        return 'Bondage';
-      }
-      if (cat.includes('SALUD') || cat.includes('BIENESTAR') || cat.includes('ÍNTIMA') || cat.includes('INTIMA')) {
-        return 'Cuidado Natural';
-      }
-      return 'Otros';
-    }
-
-    const subcategoriesData = {
-      "JUGUETES": ["Vibradores", "Masculinos", "Anal", "Parejas", "Plugs"],
-      "COSMÉTICA SENSORIAL": ["Efecto Calor", "Aceites de Masaje", "Velas de Masaje"],
-      "BDSM": ["Bondage"],
-      "SALUD ÍNTIMA": ["Cuidado Natural"]
-    };
-
-    // Cargar categoría inicial desde URL si existe
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlCategory = urlParams.get('category');
-    const urlSubcategory = urlParams.get('subcategory');
-    
-    let currentCategory = 'all';
-    if (urlCategory) {
-      currentCategory = urlCategory;
-    }
-    let currentSubcategory = 'all';
-    if (urlSubcategory) {
-      currentSubcategory = urlSubcategory;
-    }
-    let currentQuery = '';
-    let currentSort = 'default';
-
-    // Paginación
-    let currentPage = 1;
-    const ITEMS_PER_PAGE = 16;
-    const paginationContainer = document.getElementById('catalog-pagination-container');
-
-    const gridSearchInput = document.getElementById('grid-search-input');
-    const clearGridSearchBtn = document.getElementById('clear-grid-search-btn');
-    const sortSelect = document.getElementById('grid-sort-select');
-    const productsGrid = document.getElementById('main-products-grid');
-    const noProductsBox = document.getElementById('no-products-found');
-    const counterText = document.getElementById('grid-counter-text');
-    const resetFiltersBtn = document.getElementById('reset-grid-filters-btn');
-    const triggerHeroSearchBtn = document.getElementById('trigger-hero-search-btn');
-    const subcategoryWrapper = document.getElementById('subcategory-filter-wrapper');
-    const subcategoryChips = document.getElementById('subcategory-filter-chips');
-
-    // Botón del Hero para abrir el buscador global
-    if (triggerHeroSearchBtn) {
-      triggerHeroSearchBtn.addEventListener('click', () => {
-        document.getElementById('open-search-modal-btn')?.click();
-      });
-    }
-
-    // Actualizar la interfaz de subcategorías desplegables con transiciones
-    function updateSubcategoriesUI() {
-      if (!subcategoryWrapper || !subcategoryChips) return;
-
-      const subCats = subcategoriesData[currentCategory];
-
-      if (!subCats || subCats.length === 0) {
-        // Ocultar y contraer
-        subcategoryChips.style.opacity = '0';
-        subcategoryChips.style.transform = 'translateY(-8px)';
-        subcategoryWrapper.style.height = '0px';
-        return;
-      }
-
-      // Generar los chips HTML
-      let html = `
-        <button class="grid-sub-cat-btn ${currentSubcategory === 'all' ? 'active' : ''}" data-subcat="all">
-          Todos los artículos
-        </button>
-      `;
-
-      subCats.forEach(sub => {
-        const count = initialProducts.filter(p => p.category === currentCategory && getProductSubcategory(p) === sub).length;
-        html += `
-          <button class="grid-sub-cat-btn ${currentSubcategory === sub ? 'active' : ''}" data-subcat="${sub}">
-            ${sub} (${count})
-          </button>
-        `;
-      });
-
-      subcategoryChips.innerHTML = html;
-
-      // Click listeners para subcategorías
-      subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(subBtn => {
-        subBtn.addEventListener('click', (e) => {
-          subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(b => b.classList.remove('active'));
-          const target = e.currentTarget;
-          target.classList.add('active');
-          currentSubcategory = target.getAttribute('data-subcat') || 'all';
-          currentPage = 1;
-          renderProducts();
-        });
-      });
-
-      // Transición suave: calcular scrollHeight
-      subcategoryWrapper.style.height = 'auto';
-      const height = subcategoryChips.scrollHeight + 'px';
-      subcategoryWrapper.style.height = '0px';
-      
-      // Forzar repaint para que se aplique la transición
-      subcategoryWrapper.offsetHeight;
-
-      subcategoryWrapper.style.height = height;
-      subcategoryChips.style.opacity = '1';
-      subcategoryChips.style.transform = 'translateY(0)';
-    }
-
-    // Filtrar por categoría principal
-    document.querySelectorAll('.grid-cat-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.grid-cat-btn').forEach(b => b.classList.remove('active'));
-        const target = e.currentTarget;
-        target.classList.add('active');
-        currentCategory = target.getAttribute('data-category') || 'all';
-        currentSubcategory = 'all'; // Restablecer subcategoría
-        currentPage = 1;
-        
-        updateSubcategoriesUI();
-        renderProducts();
-      });
-    });
-
-    // Búsqueda en vivo
-    if (gridSearchInput && clearGridSearchBtn) {
-      gridSearchInput.addEventListener('input', () => {
-        currentQuery = gridSearchInput.value.trim().toLowerCase();
-        clearGridSearchBtn.style.display = currentQuery ? 'inline-flex' : 'none';
-        currentPage = 1;
-        renderProducts();
-      });
-
-      clearGridSearchBtn.addEventListener('click', () => {
-        gridSearchInput.value = '';
-        currentQuery = '';
-        clearGridSearchBtn.style.display = 'none';
-        currentPage = 1;
-        renderProducts();
-        gridSearchInput.focus();
-      });
-    }
-
-    // Ordenación
-    if (sortSelect) {
-      sortSelect.addEventListener('change', () => {
-        currentSort = sortSelect.value;
-        currentPage = 1;
-        renderProducts();
-      });
-    }
-
-    // Resetear filtros
-    if (resetFiltersBtn) {
-      resetFiltersBtn.addEventListener('click', () => {
-        currentCategory = 'all';
-        currentSubcategory = 'all';
-        currentQuery = '';
-        currentSort = 'default';
-        currentPage = 1;
-        if (gridSearchInput) gridSearchInput.value = '';
-        if (clearGridSearchBtn) clearGridSearchBtn.style.display = 'none';
-        if (sortSelect) sortSelect.value = 'default';
-
-        document.querySelectorAll('.grid-cat-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector('.grid-cat-btn[data-category="all"]')?.classList.add('active');
-
-        updateSubcategoriesUI();
-        renderProducts();
-      });
-    }
-
-    function renderProducts() {
-      if (!productsGrid || !counterText || !noProductsBox) return;
-
-      // Actualizar texto de los chips de categoría según si hay búsqueda activa o no
-      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
-        const catName = btn.getAttribute('data-category');
-        if (currentQuery) {
-          // Ocultar contador entre paréntesis si se busca por texto
-          if (catName === 'all') {
-            btn.textContent = 'Todas';
-          } else {
-            btn.textContent = formatCategoryName(catName);
-          }
-        } else {
-          // Restaurar contador de productos
-          if (catName === 'all') {
-            btn.textContent = `Todas (${initialProducts.length})`;
-          } else {
-            const count = initialProducts.filter(p => p.category === catName).length;
-            btn.textContent = `${formatCategoryName(catName)} (${count})`;
-          }
-        }
-      });
-
-      // 1. Filtrar con soporte fuzzy y subcategorías
-      let filtered = initialProducts.filter(p => {
-        const matchCat = currentCategory === 'all' || p.category === currentCategory;
-        if (!matchCat) return false;
-        
-        const matchSubcat = currentSubcategory === 'all' || getProductSubcategory(p) === currentSubcategory;
-        if (!matchSubcat) return false;
-        
-        return matchProductFuzzy(p, currentQuery);
-      });
-
-      // 2. Ordenar con soporte robusto para valores numéricos
-      if (currentSort === 'price-asc') {
-        filtered.sort((a, b) => {
-          const priceA = parseFloat(a.price) || 0;
-          const priceB = parseFloat(b.price) || 0;
-          return priceA - priceB;
-        });
-      } else if (currentSort === 'price-desc') {
-        filtered.sort((a, b) => {
-          const priceA = parseFloat(a.price) || 0;
-          const priceB = parseFloat(b.price) || 0;
-          return priceB - priceA;
-        });
-      } else if (currentSort === 'name-asc') {
-        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
-      }
-
-      // 3. Paginación
-      const totalItems = filtered.length;
-      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-
-      if (totalItems === 0) {
-        productsGrid.style.display = 'none';
-        noProductsBox.style.display = 'block';
-        counterText.innerHTML = `Mostrando <strong style="color: var(--primary);">0</strong> de <strong>${initialProducts.length}</strong> productos`;
-        if (paginationContainer) paginationContainer.innerHTML = '';
-        return;
-      }
-
-      // Ajustar página activa si está fuera de límites
-      if (currentPage > totalPages) {
-        currentPage = Math.max(1, totalPages);
-      }
-
-      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
-      const paginatedProducts = filtered.slice(startIndex, endIndex);
-
-      productsGrid.style.display = 'grid';
-      noProductsBox.style.display = 'none';
-      counterText.innerHTML = `Mostrando <strong style="color: var(--accent);">${startIndex + 1}-${endIndex}</strong> de <strong style="color: var(--accent);">${totalItems}</strong> productos`;
-
-      productsGrid.innerHTML = paginatedProducts.map(product => {
-        const highlightedTitle = highlightText(product.name, currentQuery);
-        const highlightedDesc = highlightText(product.description || '', currentQuery);
-
-        return `
-          <article class="product-card">
-            ${product.oldPrice ? `
-              <span style="position: absolute; top: 16px; left: 16px; background-color: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 10;">
-                Oferta
-              </span>
-            ` : ''}
-
-            <a href="/producto/${product.slug}" class="product-image-container" aria-label="Ver detalles de ${product.name}">
-              <img 
-                src="${product.image}" 
-                alt="${product.name}"
-                class="product-image-zoom"
-                loading="lazy"
-              />
-            </a>
-
-            <div class="product-card-body" style="padding: 22px; display: flex; flex-direction: column; flex-grow: 1;">
-              <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">${product.category}</span>
-              <a href="/producto/${product.slug}" style="color: inherit; text-decoration: none;">
-                <h3 style="font-size: 1.15rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; transition: color 0.2s;" class="product-title-link">${highlightedTitle}</h3>
-              </a>
-              <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 20px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                ${highlightedDesc}
-              </p>
-              
-              <div class="product-card-footer" style="display: flex; align-items: center; justify-content: center; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                <div style="display: flex; align-items: baseline; gap: 8px; justify-content: center; width: 100%;">
-                  <span style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">${product.price}€</span>
-                  ${product.oldPrice ? `
-                    <span style="font-size: 0.9rem; text-decoration: line-through; color: var(--text-secondary);">${product.oldPrice}€</span>
-                  ` : ''}
-                </div>
-              </div>
-            </div>
-
-          </article>
-        `;
-      }).join('');
-
-      // Renderizar controles de paginación
-      renderPaginationControls(totalPages);
-    }
-
-    function renderPaginationControls(totalPages) {
-      if (!paginationContainer) return;
-
-      if (totalPages <= 1) {
-        paginationContainer.innerHTML = '';
-        return;
-      }
-
-      let html = '';
-
-      // Botón Anterior
-      html += `
-        <button 
-          class="pagination-btn pagination-arrow" 
-          ${currentPage === 1 ? 'disabled' : ''} 
-          data-page="${currentPage - 1}"
-          aria-label="Página anterior"
-        >
-          &larr;
-        </button>
-      `;
-
-      // Contenedor scrollable de números (ruleta interactiva)
-      html += `<div class="pagination-numbers-scroll" id="pagination-scroll-container">`;
-      for (let i = 1; i <= totalPages; i++) {
-        html += `
-          <button 
-            class="pagination-btn ${i === currentPage ? 'active' : ''}" 
-            data-page="${i}"
-            aria-label="Ir a la página ${i}"
-          >
-            ${i}
-          </button>
-        `;
-      }
-      html += `</div>`;
-
-      // Botón Siguiente
-      html += `
-        <button 
-          class="pagination-btn pagination-arrow" 
-          ${currentPage === totalPages ? 'disabled' : ''} 
-          data-page="${currentPage + 1}"
-          aria-label="Página siguiente"
-        >
-          &rarr;
-        </button>
-      `;
-
-      paginationContainer.innerHTML = html;
-
-      // Autocentrar el botón activo dentro de la ruleta scrollable
-      const activeBtn = paginationContainer.querySelector('.pagination-btn.active');
-      const scrollContainer = paginationContainer.querySelector('#pagination-scroll-container');
-      if (activeBtn && scrollContainer) {
-        setTimeout(() => {
-          activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }, 50);
-      }
-
-      // Escuchar eventos en los botones de paginación
-      paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const target = e.currentTarget;
-          const page = parseInt(target.getAttribute('data-page') || '1');
-          
-          if (page !== currentPage && page >= 1 && page <= totalPages) {
-            currentPage = page;
-            renderProducts();
-            
-            // Scroll suave al inicio del catálogo
-            document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      });
-    }
-
-    // Inicializar la primera renderización al cargar la página
-    if (urlCategory) {
-      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
-        if (btn.getAttribute('data-category')?.toUpperCase() === urlCategory.toUpperCase()) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      // Scroll automático al catálogo si viene con categoría desde URL
-      setTimeout(() => {
-        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
-    updateSubcategoriesUI();
-    renderProducts();
-
-    // Escuchar eventos personalizados del menú hamburguesa / navegación global
-    window.addEventListener('filter-category-subcategory', (e) => {
-      const { category, subcategory } = e.detail;
-      currentCategory = category || 'all';
-      currentSubcategory = subcategory || 'all';
-      currentPage = 1;
-
-      // Actualizar clases activas en los botones de categoría principal
-      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
-        const catVal = btn.getAttribute('data-category');
-        if (catVal === currentCategory) {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-
-      updateSubcategoriesUI();
-      renderProducts();
-
-      // Scroll suave al catálogo
-      document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
-    });
-
+  <!-- Script del cliente para interactividad y adición al carrito -->
+  <script>
     // Evento del botón de añadir al carrito del Hero
     document.querySelector('.hero-add-cart-btn')?.addEventListener('click', (e) => {
       const target = e.currentTarget;
@@ -1420,6 +987,47 @@ function formatCategoryName(str) {
         target.style.backgroundColor = '';
         target.style.borderColor = '';
       }, 1500);
+    });
+
+    // Lógica para añadir productos de la parrilla de recomendados al carrito
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('.add-to-cart-btn');
+      if (!target) return;
+
+      const id = target.getAttribute('data-id');
+      const name = target.getAttribute('data-name');
+      const price = parseFloat(target.getAttribute('data-price') || '0');
+      const image = target.getAttribute('data-image');
+
+      if (!id || !name) return;
+
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItem = cart.find(item => item.id === id);
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ id, name, price, image, quantity: 1 });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('cart-updated'));
+
+      const origText = target.textContent || 'Comprar';
+      target.textContent = '✓';
+      target.style.backgroundColor = 'var(--success)';
+      target.style.borderColor = 'var(--success)';
+
+      setTimeout(() => {
+        target.textContent = origText;
+        target.style.backgroundColor = '';
+        target.style.borderColor = '';
+      }, 1500);
+    });
+
+    // Abrir el catálogo completo al pulsar el CTA principal
+    document.getElementById('open-catalog-full-btn')?.addEventListener('click', () => {
+      document.getElementById('nav-catalogo-link')?.click();
     });
 
     // Copiar cupón en Hero
