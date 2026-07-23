@@ -684,8 +684,8 @@ function formatCategoryName(str) {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      gap: 6px;
+      flex-wrap: nowrap; /* Garantiza que las flechas y botones permanezcan en una sola fila */
     }
     
     .pagination-btn {
@@ -741,6 +741,22 @@ function formatCategoryName(str) {
       font-weight: 600;
       font-size: 1rem;
       user-select: none;
+    }
+
+    /* Ajustes responsivos para pantallas móviles muy pequeñas */
+    @media (max-width: 480px) {
+      .pagination-container {
+        gap: 4px;
+      }
+      .pagination-btn, .pagination-ellipsis {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+      }
+      .pagination-arrow {
+        font-size: 1rem;
+      }
     }
   </style>
 
