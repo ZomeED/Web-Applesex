@@ -1340,7 +1340,7 @@ const { title, description } = Astro.props;
 
         return queryWords.every(qw => {
           return productWords.some(pw => {
-            if (pw.includes(qw) || qw.includes(pw)) return true;
+            if (pw.includes(qw)) return true;
             if (qw.length < 4) return pw === qw;
             const maxEdits = qw.length <= 6 ? 1 : 2;
             return levenshtein(qw, pw) <= maxEdits;
@@ -1361,7 +1361,7 @@ const { title, description } = Astro.props;
           const cleanWord = part.toLowerCase().replace(/[,.:;?!()""']/g, '');
           
           const matches = queryWords.some(qw => {
-            if (cleanWord.includes(qw) || qw.includes(cleanWord)) return true;
+            if (cleanWord.includes(qw)) return true;
             if (qw.length < 4) return cleanWord === qw;
             const maxEdits = qw.length <= 6 ? 1 : 2;
             return levenshtein(qw, cleanWord) <= maxEdits;
