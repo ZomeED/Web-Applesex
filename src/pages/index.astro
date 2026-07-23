@@ -8,14 +8,14 @@ const allProducts = await getAllProducts();
 // Configuración local del Banner Principal
 const localHeroSettings = {
   isPromoActive: true,
-  tag: 'Promoción Exclusiva Catálogo 2026',
-  title: 'Redefine tu Bienestar Íntimo',
-  subtitle: 'Explora nuestro catálogo exclusivo de alta gama. Productos de las mejores marcas internacionales con la máxima calidad y discreción.',
-  promoCode: 'REBAJAS15',
-  promoDetails: '15% de Descuento en toda la web',
-  promoExclusions: '*Descuento automático aplicando el cupón en la cesta',
+  tag: 'Descuento de lanzamiento',
+  title: 'Juguetes eróticos y cosmética para disfrutar',
+  subtitle: 'Encuentra las mejores marcas internacionales de bienestar íntimo. Envíos 100% discretos en 24h o recogida local en nuestro almacén en Churra, Murcia.',
+  promoCode: 'APPLE20',
+  promoDetails: '20% de descuento en la web (excepto afrodisíacos)',
+  promoExclusions: '*Aplica el código en la cesta de compra para beneficiarte del descuento (excluye categoría de afrodisíacos).',
   image: allProducts[0]?.image || '/images/vibrador_minimalista.jpg',
-  buttonText: 'Explorar 30 Productos',
+  buttonText: 'Ver recomendaciones',
   productName: allProducts[0]?.name || 'ACEITE DE MASAJE EFECTO CALOR',
   productDescription: allProducts[0]?.description || 'Formulado con ingredientes naturales para estimular los sentidos de forma sensual.',
   productPrice: `${allProducts[0]?.price || 29.95}€`
