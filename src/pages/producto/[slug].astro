@@ -1,0 +1,1150 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getProductBySlug, getAllProducts } from '../../lib/products';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/');
+}
+
+const product = await getProductBySlug(slug);
+
+if (!product) {
+  return Astro.redirect('/');
+}
+
+const allProducts = await getAllProducts();
+
+// Productos relacionados de la misma categoría
+const relatedProducts = allProducts
+  .filter(p => p.id !== product.id && p.category === product.category)
+  .slice(0, 4);
+
+// Si no hay suficientes de la misma categoría, rellenar con otros
+if (relatedProducts.length < 4) {
+  const fillers = allProducts.filter(p => p.id !== product.id && !relatedProducts.includes(p));
+  relatedProducts.push(...fillers.slice(0, 4 - relatedProducts.length));
+}
+
+const imagesList = product.images && product.images.length > 0 ? product.images : [product.image];
+
+// Mapeo exacto de las variantes según la foto correspondiente
+function getProductVariants(prod: any) {
+  const s = prod.slug.toLowerCase();
+  
+  // 1. Aceites de Masaje Efecto Calor (Shunga 100ml)
+  if (s.includes('efecto-calor') && !s.includes('te-verde')) {
+    return [
+      { name: 'Sorbete de menta', imageIndex: 0 },
+      { name: 'Caramelo', imageIndex: 1 },
+      { name: 'Café latte', imageIndex: 2 },
+      { name: 'Coco', imageIndex: 3 },
+      { name: 'Chocolate', imageIndex: 4 },
+      { name: 'Vino de fresa', imageIndex: 5 },
+      { name: 'Vainilla', imageIndex: 6 },
+      { name: 'Frutas exóticas', imageIndex: 7 },
+      { name: 'Fresa', imageIndex: 8 },
+      { name: 'Cereza', imageIndex: 9 }
+    ];
+  }
+
+  // 2. Aceite de Masaje Orgánico (240ml)
+  if (s === 'aceite-de-masaje-organico') {
+    return [
+      { name: 'Almendra Dulce', imageIndex: 0 },
+      { name: 'Té Verde', imageIndex: 1 },
+      { name: 'Mango Silvestre', imageIndex: 2 },
+      { name: 'Frambuesa', imageIndex: 3 }
+    ];
+  }
+
+  // 3. Aceite de Masaje Erótico (240ml)
+  if (s === 'aceite-de-masaje-erotico') {
+    return [
+      { name: 'Ylang-Ylang & Yohimbe', imageIndex: 0 },
+      { name: 'Almendra Dulce', imageIndex: 1 },
+      { name: 'Semillas de Uva', imageIndex: 2 },
+      { name: 'Sésamo & Aguacate', imageIndex: 3 }
+    ];
+  }
+
+  // 4. Vela de Masaje Shunga (170ml)
+  if (s.includes('vela-masaje')) {
+    return [
+      { name: 'Té Verde', imageIndex: 0 },
+      { name: 'Flor de Cerezos', imageIndex: 1 },
+      { name: 'Vainilla Sensual', imageIndex: 2 },
+      { name: 'Frutas Exóticas', imageIndex: 3 }
+    ];
+  }
+
+  // 5. Genérico si hay múltiples imágenes
+  if (imagesList.length > 1) {
+    return imagesList.map((_, i) => ({
+      name: `Opción ${i + 1}`,
+      imageIndex: i
+    }));
+  }
+
+  return [];
+}
+
+const variants = getProductVariants(product);
+---
+
+<Layout title={product.name} description={product.description}>
+  <!-- Migas de Pan / Breadcrumbs Compactos Mobile-First -->
+  <div class="pdp-breadcrumbs-bar">
+    <div class="container">
+      <nav class="pdp-breadcrumbs-nav">
+        <a href="/#catalogo" class="pdp-back-link">← Volver al catálogo</a>
+        <span class="pdp-crumb-sep">/</span>
+        <span class="pdp-crumb-category">{product.category}</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Vista Principal de Detalle de Producto -->
+  <section class="pdp-main-section">
+    <div class="container">
+      <div class="pdp-grid">
+        
+        <!-- Galería de Imágenes Mobile-First -->
+        <div class="pdp-gallery-container">
+          <div class="pdp-main-image-box">
+            <img 
+              id="pdp-main-img" 
+              src={imagesList[0]} 
+              alt={product.name} 
+              class="pdp-main-img"
+            />
+          </div>
+
+          {imagesList.length > 1 && (
+            <div class="pdp-thumbnails-list">
+              {imagesList.map((imgUrl, index) => {
+                const matchedVariant = variants.find(v => v.imageIndex === index);
+                return (
+                  <button 
+                    class={`pdp-thumb-btn ${index === 0 ? 'active' : ''}`}
+                    data-img={imgUrl}
+                    data-index={index}
+                    data-variant={matchedVariant ? matchedVariant.name : ''}
+                    aria-label={`Ver imagen ${index + 1}`}
+                  >
+                    <img src={imgUrl} alt={`${product.name} ${matchedVariant ? matchedVariant.name : ''}`} />
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <!-- Información y Opciones de Compra -->
+        <div class="pdp-info-box">
+          <span class="pdp-category-badge">{product.category}</span>
+          <h1 class="pdp-title">{product.name}</h1>
+
+          <!-- Bloque de Precio -->
+          <div class="pdp-price-box">
+            <span class="pdp-price">{product.price}€</span>
+            {product.oldPrice && (
+              <span class="pdp-old-price">{product.oldPrice}€</span>
+            )}
+            <span class="pdp-vat-tag">IVA incluido</span>
+          </div>
+
+          <!-- Selector de Variantes / Aromas / Sabores con coincidencia exactísima -->
+          {variants.length > 0 && (
+            <div class="pdp-variant-selector-box">
+              <div class="variant-label-row">
+                <span class="variant-title-label">Aroma / Sabor disponible:</span>
+                <span id="active-variant-badge" class="active-variant-badge">✓ Seleccionado: <strong>{variants[0].name}</strong></span>
+              </div>
+              <div class="variant-chips-scroll">
+                {variants.map((v, idx) => (
+                  <button 
+                    class={`variant-chip-btn ${idx === 0 ? 'active' : ''}`}
+                    data-variant={v.name}
+                    data-img-index={v.imageIndex}
+                  >
+                    {v.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <!-- Disponibilidad en Tienda Local de Churra, Murcia -->
+          <div class="pdp-stock-card">
+            <div class="stock-header">
+              <span class="stock-dot"></span>
+              <strong class="stock-title">En Stock • Listo para Recogida o Envío</strong>
+            </div>
+            <p class="stock-text">
+              Recogida sin esperas en tienda en <strong>Churra, Murcia (2h)</strong> o envío 100% discreto en 24h.
+            </p>
+          </div>
+
+          <!-- Selección de Cantidad y Botones de Compra -->
+          <div class="pdp-buying-controls">
+            
+            <div class="qty-control-row">
+              <span class="qty-label">Cantidad:</span>
+              <div class="quantity-selector">
+                <button id="qty-minus-btn" class="qty-btn" aria-label="Restar una unidad">-</button>
+                <input type="number" id="pdp-qty-input" value="1" min="1" max="99" readonly />
+                <button id="qty-plus-btn" class="qty-btn" aria-label="Sumar una unidad">+</button>
+              </div>
+            </div>
+
+            <!-- Botones de Acción Táctiles apilados a ancho completo en móviles -->
+            <div class="pdp-action-buttons-stack">
+              <button 
+                id="pdp-add-cart-btn" 
+                class="btn btn-primary pdp-btn-main"
+                data-id={product.id}
+                data-name={product.name}
+                data-price={product.price}
+                data-image={product.image}
+              >
+                {variants.length > 0 ? `Añadir (${variants[0].name}) a la cesta` : 'Añadir a la cesta'}
+              </button>
+
+              <button 
+                id="pdp-buy-now-btn" 
+                class="btn btn-secondary pdp-btn-secondary"
+                data-id={product.id}
+                data-name={product.name}
+                data-price={product.price}
+                data-image={product.image}
+              >
+                Comprar Ahora
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Asesoría Directa por WhatsApp -->
+          <div class="pdp-whatsapp-card">
+            <div>
+              <strong class="wa-title">¿Dudas sobre este producto?</strong>
+              <span class="wa-subtitle">Atención 100% confidencial por WhatsApp</span>
+            </div>
+            <a href="https://wa.me/34600000000" target="_blank" class="btn btn-secondary wa-btn">
+              Consultar
+            </a>
+          </div>
+
+          <!-- Bloque de Acordeones / Desplegables de Información -->
+          <div class="pdp-accordions-wrapper">
+            
+            <details class="pdp-accordion-item" open>
+              <summary class="pdp-accordion-title">
+                Descripción del producto
+                <span class="accordion-icon">›</span>
+              </summary>
+              <div class="pdp-accordion-content">
+                <p>{product.description}</p>
+              </div>
+            </details>
+
+            <details class="pdp-accordion-item">
+              <summary class="pdp-accordion-title">
+                Envíos Discretos y Recogida Local (2h)
+                <span class="accordion-icon">›</span>
+              </summary>
+              <div class="pdp-accordion-content">
+                <ul>
+                  <li><strong>Recogida Click & Collect:</strong> Disponible en 2 horas en nuestra tienda de <strong>Churra, Murcia</strong>. Totalmente gratuito y anónimo.</li>
+                  <li><strong>Envío a Domicilio 24h:</strong> Embalaje marrón neutro sin palabras ni marcas exteriores que revelen el contenido.</li>
+                </ul>
+              </div>
+            </details>
+
+            <details class="pdp-accordion-item">
+              <summary class="pdp-accordion-title">
+                Garantía de Calidad y Confidencialidad
+                <span class="accordion-icon">›</span>
+              </summary>
+              <div class="pdp-accordion-content">
+                <p>Todos nuestros artículos están fabricados con materiales quirúrgicos y siliconas médicas de grado superior. Tu privacidad e historial de compra se gestionan con la máxima encriptación.</p>
+              </div>
+            </details>
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra Flotante Inferior de Compra para Móviles (Sticky Mobile Bar) -->
+  <div class="mobile-sticky-buy-bar" id="mobile-sticky-bar">
+    <div class="mobile-sticky-info">
+      <span class="mobile-sticky-price">{product.price}€</span>
+      <span id="mobile-sticky-title" class="mobile-sticky-title">
+        {variants.length > 0 ? `${product.name} (${variants[0].name})` : product.name}
+      </span>
+    </div>
+    <button id="mobile-sticky-add-btn" class="btn btn-primary mobile-sticky-btn">
+      Añadir
+    </button>
+  </div>
+
+  <!-- Productos Relacionados ("También te puede interesar") -->
+  {relatedProducts.length > 0 && (
+    <section class="related-products-section">
+      <div class="container">
+        <div style="margin-bottom: 24px;">
+          <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 4px;">RECOMENDADOS</span>
+          <h2 style="font-size: 1.5rem; font-weight: 700;">Productos Relacionados</h2>
+        </div>
+
+        <div class="related-products-grid">
+          {relatedProducts.map(rel => (
+            <article class="related-card">
+              <a href={`/producto/${rel.slug}`} class="related-img-box">
+                <img src={rel.image} alt={rel.name} loading="lazy" />
+              </a>
+              <div class="related-card-body">
+                <span class="related-cat">{rel.category}</span>
+                <a href={`/producto/${rel.slug}`} class="related-title-link">
+                  <h3>{rel.name}</h3>
+                </a>
+                <div class="related-footer">
+                  <span class="related-price">{rel.price}€</span>
+                  <a href={`/producto/${rel.slug}`} class="btn btn-secondary related-btn">
+                    Ver
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Estilos Mobile-First de Alta Precisión -->
+  <style>
+    .pdp-breadcrumbs-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 0;
+    }
+
+    .pdp-breadcrumbs-nav {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pdp-back-link {
+      color: var(--text-secondary);
+      transition: color 0.2s;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .pdp-back-link:hover {
+      color: var(--primary);
+    }
+
+    .pdp-crumb-sep {
+      color: var(--border-color);
+    }
+
+    .pdp-crumb-category {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .pdp-main-section {
+      padding: 32px 0 60px 0;
+      overflow-x: hidden;
+    }
+
+    .pdp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+      width: 100%;
+    }
+
+    .pdp-info-box {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .pdp-gallery-container {
+      position: sticky;
+      top: 90px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .pdp-main-image-box {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      width: 100%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+
+    .pdp-main-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .pdp-thumbnails-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+      width: 100%;
+    }
+    .pdp-thumbnails-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .pdp-thumb-btn {
+      width: 68px;
+      height: 68px;
+      border-radius: 12px;
+      border: 2px solid var(--border-color);
+      background: #ffffff;
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+      transition: all 0.2s;
+    }
+    .pdp-thumb-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .pdp-thumb-btn.active, .pdp-thumb-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .pdp-category-badge {
+      color: var(--primary);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .pdp-title {
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+
+    .pdp-price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .pdp-price {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .pdp-old-price {
+      font-size: 1.15rem;
+      text-decoration: line-through;
+      color: var(--text-secondary);
+    }
+
+    .pdp-vat-tag {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    /* Estilos del Selector de Variantes */
+    .pdp-variant-selector-box {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .variant-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .variant-title-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .active-variant-badge {
+      font-size: 0.84rem;
+      color: var(--primary);
+      font-weight: 700;
+      background: rgba(216, 75, 140, 0.08);
+      border: 1px solid rgba(216, 75, 140, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .variant-chips-scroll {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 8px;
+      width: 100%;
+    }
+
+    .variant-chip-btn {
+      background: #f7f7fa;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .variant-chip-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #ffffff;
+    }
+
+    .variant-chip-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      font-weight: 700;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .pdp-stock-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .stock-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .stock-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 8px #10b981;
+      flex-shrink: 0;
+    }
+
+    .stock-title {
+      color: var(--text-primary);
+      font-size: 0.88rem;
+      word-break: break-word;
+    }
+
+    .stock-text {
+      color: var(--text-secondary);
+      font-size: 0.84rem;
+      margin: 0;
+      line-height: 1.4;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .pdp-buying-controls {
+      margin-bottom: 24px;
+      width: 100%;
+    }
+
+    .qty-control-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .qty-label {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f7f7fa;
+      height: 44px;
+    }
+
+    .qty-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      width: 44px;
+      height: 100%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .qty-btn:active {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    #pdp-qty-input {
+      width: 44px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-primary);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .pdp-action-buttons-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .pdp-btn-main, .pdp-btn-secondary {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 0.95rem;
+      min-height: 48px;
+      border-radius: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      white-space: normal;
+      box-sizing: border-box;
+    }
+
+    .pdp-whatsapp-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .wa-title {
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      display: block;
+    }
+    .wa-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+    .wa-btn {
+      font-size: 0.8rem;
+      padding: 8px 14px;
+      white-space: nowrap;
+      min-height: 38px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Acordeones Desplegables */
+    .pdp-accordions-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+
+    .pdp-accordion-item {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    .pdp-accordion-item[open] {
+      border-color: var(--primary);
+    }
+
+    .pdp-accordion-title {
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      list-style: none;
+      user-select: none;
+    }
+    .pdp-accordion-title::-webkit-details-marker {
+      display: none;
+    }
+
+    .accordion-icon {
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+      color: var(--primary);
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .pdp-accordion-item[open] .accordion-icon {
+      transform: rotate(90deg);
+    }
+
+    .pdp-accordion-content {
+      padding: 0 20px 18px 20px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+    .pdp-accordion-content p {
+      margin: 0;
+      white-space: pre-line;
+    }
+    .pdp-accordion-content ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+    .pdp-accordion-content li {
+      margin-bottom: 8px;
+    }
+
+    /* Barra Flotante Inferior de Compra en Móvil (Sticky Bar) */
+    .mobile-sticky-buy-bar {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 900;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .mobile-sticky-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      flex: 1;
+      padding-right: 12px;
+    }
+
+    .mobile-sticky-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+
+    .mobile-sticky-title {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    .mobile-sticky-btn {
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 50px;
+      min-height: 42px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* Sección Relacionados */
+    .related-products-section {
+      padding: 50px 0;
+      border-top: 1px solid var(--border-color);
+      background: #ffffff;
+    }
+
+    .related-products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .related-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.02);
+    }
+
+    .related-img-box {
+      aspect-ratio: 1;
+      background: #f7f7fa;
+      overflow: hidden;
+      display: block;
+    }
+    .related-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+    .related-card:hover .related-img-box img {
+      transform: scale(1.06);
+    }
+
+    .related-card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .related-cat {
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .related-title-link {
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .related-title-link h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .related-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .related-price {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .related-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 8px;
+    }
+
+    /* Adaptación Mobile-First */
+    @media (max-width: 768px) {
+      .pdp-grid {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 24px;
+      }
+      .pdp-gallery-container {
+        position: static;
+        width: 100%;
+      }
+      .pdp-action-buttons-stack {
+        flex-direction: column;
+        width: 100%;
+      }
+      .pdp-btn-main, .pdp-btn-secondary {
+        width: 100%;
+      }
+      .mobile-sticky-buy-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .related-products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .related-card-body {
+        padding: 12px;
+      }
+      .related-title-link h3 {
+        font-size: 0.85rem;
+      }
+      .pdp-whatsapp-card {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+      .wa-btn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+      }
+    }
+  </style>
+
+  <!-- Script interactivo de Variantes, Selector de Galería y Carrito -->
+  <script>
+    const mainImg = document.getElementById('pdp-main-img') as HTMLImageElement;
+    const activeVariantBadge = document.getElementById('active-variant-badge');
+    const mobileStickyTitle = document.getElementById('mobile-sticky-title');
+    const addCartBtn = document.getElementById('pdp-add-cart-btn');
+    const buyNowBtn = document.getElementById('pdp-buy-now-btn');
+    const mobileStickyAddBtn = document.getElementById('mobile-sticky-add-btn');
+    const qtyInput = document.getElementById('pdp-qty-input') as HTMLInputElement;
+
+    // Estado local de la variante seleccionada
+    let selectedVariant = '';
+    const initialChip = document.querySelector('.variant-chip-btn.active');
+    if (initialChip) {
+      selectedVariant = initialChip.getAttribute('data-variant') || '';
+    }
+
+    // Sincronizar UI al cambiar variante
+    function updateSelectedVariant(variantName: string, imgIndex: number) {
+      selectedVariant = variantName;
+
+      // 1. Actualizar Badge de confirmación
+      if (activeVariantBadge) {
+        activeVariantBadge.innerHTML = `✓ Seleccionado: <strong>${variantName}</strong>`;
+      }
+
+      // 2. Actualizar Chips activos
+      document.querySelectorAll('.variant-chip-btn').forEach(chip => {
+        if (chip.getAttribute('data-variant') === variantName) {
+          chip.classList.add('active');
+        } else {
+          chip.classList.remove('active');
+        }
+      });
+
+      // 3. Actualizar Miniatura e Imagen Principal
+      const thumbBtns = document.querySelectorAll('.pdp-thumb-btn');
+      if (thumbBtns[imgIndex]) {
+        thumbBtns.forEach(b => b.classList.remove('active'));
+        thumbBtns[imgIndex].classList.add('active');
+        const newSrc = thumbBtns[imgIndex].getAttribute('data-img');
+        if (mainImg && newSrc) {
+          mainImg.src = newSrc;
+        }
+      }
+
+      // 4. Actualizar Texto de Botones de Acción
+      if (addCartBtn) {
+        addCartBtn.textContent = `Añadir (${variantName}) a la cesta`;
+      }
+      if (mobileStickyTitle && addCartBtn) {
+        const prodName = addCartBtn.getAttribute('data-name') || '';
+        mobileStickyTitle.textContent = `${prodName} (${variantName})`;
+      }
+    }
+
+    // Escuchar eventos en los Chips de variantes
+    document.querySelectorAll('.variant-chip-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const vName = target.getAttribute('data-variant') || '';
+        const imgIdx = parseInt(target.getAttribute('data-img-index') || '0', 10);
+        updateSelectedVariant(vName, imgIdx);
+      });
+    });
+
+    // Escuchar eventos en las Miniaturas de imágenes (Permite explorar fotos sin cambiar el sabor/variante seleccionado)
+    document.querySelectorAll('.pdp-thumb-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const newSrc = target.getAttribute('data-img');
+        
+        if (mainImg && newSrc) {
+          mainImg.src = newSrc;
+          document.querySelectorAll('.pdp-thumb-btn').forEach(b => b.classList.remove('active'));
+          target.classList.add('active');
+        }
+      });
+    });
+
+    // Control de Cantidad
+    const minusBtn = document.getElementById('qty-minus-btn');
+    const plusBtn = document.getElementById('qty-plus-btn');
+
+    if (qtyInput && minusBtn && plusBtn) {
+      minusBtn.addEventListener('click', () => {
+        let val = parseInt(qtyInput.value || '1', 10);
+        if (val > 1) qtyInput.value = (val - 1).toString();
+      });
+
+      plusBtn.addEventListener('click', () => {
+        let val = parseInt(qtyInput.value || '1', 10);
+        if (val < 99) qtyInput.value = (val + 1).toString();
+      });
+    }
+
+    // Guardar en Carrito con la Variante Seleccionada
+    function addToCartHelper(qty: number) {
+      if (!addCartBtn) return;
+      const baseId = addCartBtn.getAttribute('data-id');
+      const baseName = addCartBtn.getAttribute('data-name');
+      const price = parseFloat(addCartBtn.getAttribute('data-price') || '0');
+      const currentImage = mainImg ? mainImg.src : (addCartBtn.getAttribute('data-image') || '');
+
+      if (!baseId || !baseName) return;
+
+      const itemCartId = selectedVariant ? `${baseId}-${selectedVariant.toLowerCase().replace(/\s+/g, '-')}` : baseId;
+
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItem = cart.find((item: any) => item.id === itemCartId);
+
+      if (existingItem) {
+        existingItem.quantity += qty;
+      } else {
+        cart.push({
+          id: itemCartId,
+          productId: baseId,
+          name: baseName,
+          variant: selectedVariant,
+          price: price,
+          image: currentImage,
+          quantity: qty
+        });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('cart-updated'));
+    }
+
+    if (addCartBtn) {
+      addCartBtn.addEventListener('click', () => {
+        const qty = parseInt(qtyInput?.value || '1', 10);
+        addToCartHelper(qty);
+
+        const origText = addCartBtn.textContent;
+        addCartBtn.textContent = selectedVariant ? `¡Añadido ${selectedVariant}! ✓` : '¡Añadido a la cesta! ✓';
+        addCartBtn.style.background = 'var(--success)';
+        addCartBtn.style.borderColor = 'var(--success)';
+
+        setTimeout(() => {
+          addCartBtn.textContent = origText;
+          addCartBtn.style.background = '';
+          addCartBtn.style.borderColor = '';
+        }, 1600);
+      });
+    }
+
+    if (mobileStickyAddBtn) {
+      mobileStickyAddBtn.addEventListener('click', () => {
+        const qty = parseInt(qtyInput?.value || '1', 10);
+        addToCartHelper(qty);
+
+        const origText = mobileStickyAddBtn.textContent;
+        mobileStickyAddBtn.textContent = '¡Añadido! ✓';
+        mobileStickyAddBtn.style.background = 'var(--success)';
+
+        setTimeout(() => {
+          mobileStickyAddBtn.textContent = origText;
+          mobileStickyAddBtn.style.background = '';
+        }, 1600);
+      });
+    }
+
+    if (buyNowBtn) {
+      buyNowBtn.addEventListener('click', () => {
+        const qty = parseInt(qtyInput?.value || '1', 10);
+        addToCartHelper(qty);
+        window.location.href = '/carrito';
+      });
+    }
+  </script>
+</Layout>

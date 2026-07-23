@@ -1,0 +1,1687 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <!-- SEO & Favicon Oficial AppleSex -->
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title ? `${title} | AppleSex` : "Tienda Online de Juguetes Eróticos - Applsex | AppleSex"}</title>
+    <meta name="description" content={description || "Descubre Applesex, tu tienda online de juguetes eróticos con más de 10 años de experiencia. Explora nuestro amplio catálogo y encuentra los productos perfectos para ti. ¡Compra hoy y disfruta de una experiencia única!"} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#d60068" />
+    <meta property="og:title" content={title ? `${title} | AppleSex` : "Tienda Online de Juguetes Eróticos - Applsex | AppleSex"} />
+    <meta property="og:description" content={description || "Descubre Applesex, tu tienda online de juguetes eróticos con más de 10 años de experiencia. Explora nuestro amplio catálogo y encuentra los productos perfectos para ti. ¡Compra hoy y disfruta de una experiencia única!"} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+  </head>
+  <body>
+    <!-- Barra de Anuncios Superior Elegante y Descartable -->
+    <div id="promo-announcement-bar" style="background: linear-gradient(90deg, #c43b7a, #ed6daa); color: white; padding: 8px 20px; font-size: 0.82rem; font-weight: 500; text-align: center; display: flex; align-items: center; justify-content: center; position: relative; z-index: 101; transition: var(--transition-smooth);">
+      <span id="promo-text-content" style="flex-grow: 1; padding-right: 18px;">
+        ¡Rebajas de Verano! <strong>15% DTO.</strong> con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">REBAJAS15</strong>
+      </span>
+      <button id="close-promo-bar" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.1rem; padding: 4px 8px; display: inline-flex; align-items: center; position: absolute; right: 10px;" aria-label="Cerrar aviso">
+        ✕
+      </button>
+    </div>
+
+    <!-- Encabezado con efecto cristal esmerilado -->
+    <header class="glass main-header" style="position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border-color);">
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; height: 72px; gap: 12px;">
+        
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <!-- Botón de Hamburguesa Móvil (Visible solo en móvil) -->
+          <button id="mobile-hamburger-btn" class="hamburger-btn" aria-label="Abrir menú de navegación" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+          
+          <a href="/" id="header-logo-link" style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+            <img src="/logo.png" alt="AppleSex - Tienda Online de Juguetes Eróticos" style="height: 44px; width: auto; object-fit: contain; mix-blend-mode: multiply;" />
+          </a>
+        </div>
+
+        <nav class="desktop-nav" style="display: flex; align-items: center; gap: 28px;">
+          <a href="/#catalogo" id="nav-catalogo-link" style="font-size: 0.95rem; font-weight: 500; color: var(--text-secondary);">Catálogo</a>
+          <a href="/#envios" id="nav-envios-link" style="font-size: 0.95rem; font-weight: 500; color: var(--text-secondary);">Envíos & Recogida</a>
+          <a href="/#contacto" id="nav-contacto-link" style="font-size: 0.95rem; font-weight: 500; color: var(--text-secondary);">Contacto</a>
+        </nav>
+
+        <!-- Buscador Móvil y Desktop Integrado -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button id="open-search-modal-btn" class="search-trigger-btn" aria-label="Abrir buscador de productos">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="search-trigger-text">Buscar productos...</span>
+            <span class="search-trigger-mobile-label">Buscar</span>
+          </button>
+
+          <!-- Widget del Carrito -->
+          <a href="/carrito" id="header-cart-button" class="btn btn-secondary header-cart-btn" aria-label="Ver carrito">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span id="cart-counter" class="cart-counter-badge">0</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Modal de Búsqueda Flotante de Pantalla Completa (Mobile-First 100% Optimizado) -->
+    <div id="search-modal-backdrop" class="search-backdrop" style="display: none;">
+      <div class="search-modal-container">
+        
+        <!-- Input Principal de Búsqueda -->
+        <div class="search-modal-header">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="modal-search-icon">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            type="text" 
+            id="modal-search-input" 
+            placeholder="¿Qué estás buscando hoy?" 
+            autocomplete="off"
+            inputmode="search"
+          />
+          <button id="modal-clear-input" class="search-clear-btn" style="display: none;" title="Limpiar texto">✕</button>
+          <button id="close-search-modal-btn" class="search-close-btn" aria-label="Cerrar buscador">Cerrar ✕</button>
+        </div>
+
+        <!-- Barra de Filtros Rápidos por Categoría (Scroll Táctil Suave) -->
+        <div class="search-modal-categories" id="modal-category-filters">
+          <button class="modal-cat-btn active" data-cat="all">Todas</button>
+          <button class="modal-cat-btn" data-cat="JUGUETES">Juguetes</button>
+          <button class="modal-cat-btn" data-cat="COSMÉTICA SENSORIAL">Cosmética Sensorial</button>
+          <button class="modal-cat-btn" data-cat="BDSM">BDSM</button>
+          <button class="modal-cat-btn" data-cat="SALUD ÍNTIMA">Salud Íntima</button>
+        </div>
+
+        <!-- Subcategorías Desplegables en el Buscador Modal con Transición Suave -->
+        <div class="modal-subcategory-filter-wrapper" id="modal-subcategory-filter-wrapper">
+          <div class="modal-subcategory-filter-chips" id="modal-subcategory-filter-chips"></div>
+        </div>
+
+        <!-- Búsquedas Populares -->
+        <div id="modal-popular-searches" class="modal-popular-box">
+          <span class="popular-title">Lo más buscado:</span>
+          <div class="popular-tags-container">
+            <button class="popular-tag-btn" data-query="vibrador">Vibradores</button>
+            <button class="popular-tag-btn" data-query="aceite">Aceites de Masaje</button>
+            <button class="popular-tag-btn" data-query="estimulador">Estimulador Clitoral</button>
+            <button class="popular-tag-btn" data-query="plug">Plug Anal</button>
+            <button class="popular-tag-btn" data-query="efecto calor">Efecto Calor</button>
+            <button class="popular-tag-btn" data-query="shunga">Shunga</button>
+          </div>
+        </div>
+
+        <!-- Resumen de Resultados -->
+        <div id="modal-results-summary" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.88rem; color: var(--text-secondary); background: #ffffff; flex-shrink: 0;">
+          <span id="modal-results-count">Resultados: 0</span>
+          <span style="font-weight: 500;">Relevancia</span>
+        </div>
+
+        <!-- Lista de Resultados de Productos -->
+        <div class="search-results-wrapper">
+          <div id="modal-results-grid" class="search-results-grid"></div>
+        </div>
+
+        <!-- Footer del Modal -->
+        <div class="search-modal-footer">
+          <span><strong id="modal-total-products">30</strong> productos disponibles</span>
+          <span class="desktop-only-hint">Presiona <kbd>ESC</kbd> para salir</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <main style="flex: 1;">
+      <slot />
+    </main>
+
+    <!-- Pie de página elegante -->
+    <footer style="background-color: #ffffff; border-top: 1px solid var(--border-color); padding: 50px 0 30px 0;">
+      <div class="container">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 32px; margin-bottom: 30px;">
+          <div>
+            <a href="/" style="display: inline-block; margin-bottom: 14px;">
+              <img src="/logo.png" alt="AppleSex" style="height: 38px; width: auto; object-fit: contain; mix-blend-mode: multiply;" />
+            </a>
+            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px; line-height: 1.5;">
+              Tu juguetería erótica y de bienestar íntimo de confianza en Churra, Murcia. Sexualidad sana, sana y divertida con envíos discretos.
+            </p>
+            <span style="color: var(--accent); font-weight: 600; font-size: 0.85rem;">📍 Av. de Alicante, Churra, Murcia</span>
+          </div>
+
+          <div>
+            <h4 style="margin-bottom: 16px; font-size: 0.95rem; color: var(--accent);">Navegación</h4>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem; color: var(--text-secondary);">
+              <li><a href="/#catalogo">Explorar Catálogo</a></li>
+              <li><a href="/#envios">Envíos Discretos</a></li>
+              <li><a href="/#recogida">Recogida Local (Click & Collect)</a></li>
+              <li><a href="/politica-privacidad">Política de Privacidad</a></li>
+            </ul>
+          </div>
+
+          <div id="contacto">
+            <h4 style="margin-bottom: 16px; font-size: 0.95rem; color: var(--accent);">Contacto & Ayuda</h4>
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem; color: var(--text-secondary);">
+              <li>WhatsApp: <a href="https://wa.me/34600000000" target="_blank" style="color: var(--primary); font-weight: 600;">+34 600 00 00 00</a></li>
+              <li>Email: info@applesex.es</li>
+              <li>Horario: Lun - Sáb: 10:00 - 20:30</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 0.78rem; color: var(--text-secondary);">
+          <p>© {new Date().getFullYear()} Applesex. Todos los derechos reservados.</p>
+          <div style="display: flex; gap: 12px;">
+            <span>Tarjeta • Bizum • PayPal</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Menú de Navegación Lateral Móvil (Drawer) -->
+    <div id="mobile-menu-drawer" class="mobile-drawer" style="display: none;">
+      <div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop"></div>
+      <div class="mobile-drawer-content">
+        <div class="mobile-drawer-header">
+          <a href="/" style="display: flex; align-items: center; gap: 8px;">
+            <img src="/logo.png" alt="AppleSex" style="height: 38px; width: auto; object-fit: contain; mix-blend-mode: multiply;" />
+          </a>
+          <button id="close-mobile-drawer-btn" class="drawer-close-btn" aria-label="Cerrar menú">✕</button>
+        </div>
+        
+        <div class="mobile-drawer-body">
+          <!-- Navegación Principal -->
+          <nav class="mobile-drawer-nav">
+            <a href="/" class="drawer-nav-item">Inicio</a>
+            <a href="/#catalogo" class="drawer-nav-item drawer-close-on-click">Catálogo Completo</a>
+            <a href="/#envios" class="drawer-nav-item drawer-close-on-click">Envíos & Recogida</a>
+            <a href="/#contacto" class="drawer-nav-item drawer-close-on-click">Contacto</a>
+          </nav>
+          
+          <!-- Separador -->
+          <div class="drawer-divider"></div>
+          
+          <!-- Categorías Populares -->
+          <div class="drawer-categories-section">
+            <span class="drawer-section-title">Categorías</span>
+            <div class="drawer-categories-list">
+              
+              <!-- 1. JUGUETES -->
+              <div class="drawer-cat-group">
+                <button class="drawer-cat-toggle" data-cat="JUGUETES">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span class="cat-dot"></span> Juguetes
+                  </span>
+                  <svg class="drawer-cat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="drawer-subcat-container">
+                  <div class="drawer-subcat-list">
+                    <a href="/?category=JUGUETES#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="all">Todos los artículos</a>
+                    <a href="/?category=JUGUETES&subcategory=Vibradores#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="Vibradores">Vibradores</a>
+                    <a href="/?category=JUGUETES&subcategory=Masculinos#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="Masculinos">Masculinos</a>
+                    <a href="/?category=JUGUETES&subcategory=Anal#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="Anal">Anal</a>
+                    <a href="/?category=JUGUETES&subcategory=Parejas#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="Parejas">Parejas</a>
+                    <a href="/?category=JUGUETES&subcategory=Plugs#catalogo" class="drawer-subcat-item" data-cat="JUGUETES" data-sub="Plugs">Plugs</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. COSMÉTICA SENSORIAL -->
+              <div class="drawer-cat-group">
+                <button class="drawer-cat-toggle" data-cat="COSMÉTICA SENSORIAL">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span class="cat-dot"></span> Cosmética Sensorial
+                  </span>
+                  <svg class="drawer-cat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="drawer-subcat-container">
+                  <div class="drawer-subcat-list">
+                    <a href="/?category=COSMÉTICA SENSORIAL#catalogo" class="drawer-subcat-item" data-cat="COSMÉTICA SENSORIAL" data-sub="all">Todos los artículos</a>
+                    <a href="/?category=COSMÉTICA SENSORIAL&subcategory=Efecto Calor#catalogo" class="drawer-subcat-item" data-cat="COSMÉTICA SENSORIAL" data-sub="Efecto Calor">Efecto Calor</a>
+                    <a href="/?category=COSMÉTICA SENSORIAL&subcategory=Aceites de Masaje#catalogo" class="drawer-subcat-item" data-cat="COSMÉTICA SENSORIAL" data-sub="Aceites de Masaje">Aceites de Masaje</a>
+                    <a href="/?category=COSMÉTICA SENSORIAL&subcategory=Velas de Masaje#catalogo" class="drawer-subcat-item" data-cat="COSMÉTICA SENSORIAL" data-sub="Velas de Masaje">Velas de Masaje</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. BDSM -->
+              <div class="drawer-cat-group">
+                <button class="drawer-cat-toggle" data-cat="BDSM">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span class="cat-dot"></span> BDSM
+                  </span>
+                  <svg class="drawer-cat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="drawer-subcat-container">
+                  <div class="drawer-subcat-list">
+                    <a href="/?category=BDSM#catalogo" class="drawer-subcat-item" data-cat="BDSM" data-sub="all">Todos los artículos</a>
+                    <a href="/?category=BDSM&subcategory=Bondage#catalogo" class="drawer-subcat-item" data-cat="BDSM" data-sub="Bondage">Bondage y Accesorios</a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. SALUD ÍNTIMA -->
+              <div class="drawer-cat-group">
+                <button class="drawer-cat-toggle" data-cat="SALUD ÍNTIMA">
+                  <span style="display: flex; align-items: center; gap: 8px;">
+                    <span class="cat-dot"></span> Salud Íntima
+                  </span>
+                  <svg class="drawer-cat-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                </button>
+                <div class="drawer-subcat-container">
+                  <div class="drawer-subcat-list">
+                    <a href="/?category=SALUD ÍNTIMA#catalogo" class="drawer-subcat-item" data-cat="SALUD ÍNTIMA" data-sub="all">Todos los artículos</a>
+                    <a href="/?category=SALUD ÍNTIMA&subcategory=Cuidado Natural#catalogo" class="drawer-subcat-item" data-cat="SALUD ÍNTIMA" data-sub="Cuidado Natural">Cuidado Natural</a>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Separador -->
+          <div class="drawer-divider"></div>
+          
+          <!-- Información y Redes -->
+          <div class="drawer-info-section">
+            <span class="drawer-section-title">¿Necesitas ayuda?</span>
+            <a href="https://wa.me/34600000000" target="_blank" class="drawer-whatsapp-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+              Preguntar por WhatsApp
+            </a>
+            <div class="drawer-store-hours">
+              <p>📍 Av. de Alicante, Churra, Murcia</p>
+              <p>🕒 Lun - Sáb: 10:00 - 20:30</p>
+              <p>📧 info@applesex.es</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estilos del Buscador Profesional Mobile-First -->
+    <style is:global>
+      /* Header principal */
+      .main-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+      }
+
+      .header-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 72px;
+        gap: 16px;
+      }
+
+      .header-cart-btn {
+        padding: 8px 14px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        min-height: 40px;
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+      }
+      .header-cart-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #fcf0f5;
+      }
+      .cart-counter-badge {
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+
+      /* Botón disparador del buscador en Header */
+      .search-trigger-btn {
+        background: #f2eff6;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 8px 16px;
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.25s ease;
+        width: 220px;
+        min-height: 40px;
+      }
+      .search-trigger-btn:hover, .search-trigger-btn:active {
+        background: #ffffff;
+        border-color: var(--primary);
+        color: var(--text-primary);
+        box-shadow: 0 0 15px rgba(216, 75, 140, 0.2);
+      }
+
+      .search-trigger-text {
+        flex-grow: 1;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .search-trigger-mobile-label {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .desktop-nav {
+          display: none !important;
+        }
+        .search-trigger-btn {
+          width: auto;
+          padding: 8px 14px;
+          background: rgba(216, 75, 140, 0.1);
+          border-color: rgba(216, 75, 140, 0.3);
+          color: var(--text-primary);
+        }
+        .search-trigger-text {
+          display: none;
+        }
+        .search-trigger-mobile-label {
+          display: inline;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+        .desktop-only-hint {
+          display: none !important;
+        }
+      }
+
+      /* Botón de Hamburguesa */
+      .hamburger-btn {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 22px;
+        height: 16px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1002; /* Por encima del header */
+        flex-shrink: 0;
+      }
+      .hamburger-line {
+        width: 100%;
+        height: 2px;
+        background-color: var(--text-primary);
+        border-radius: 4px;
+        transition: all 0.25s ease-in-out;
+      }
+      .hamburger-btn.open .hamburger-line:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+        background-color: var(--primary);
+      }
+      .hamburger-btn.open .hamburger-line:nth-child(2) {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      .hamburger-btn.open .hamburger-line:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+        background-color: var(--primary);
+      }
+
+      /* Drawer del menú móvil */
+      .mobile-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        z-index: 9999; /* Por encima del header y buscador modal */
+        display: flex;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+      .mobile-drawer.open {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .mobile-drawer-backdrop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(18, 18, 23, 0.5);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+      }
+
+      .mobile-drawer-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 80%;
+        max-width: 320px;
+        height: 100%;
+        background: #ffffff;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 10;
+      }
+      .mobile-drawer.open .mobile-drawer-content {
+        transform: translateX(0);
+      }
+
+      .mobile-drawer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        height: 72px;
+        flex-shrink: 0;
+      }
+
+      .drawer-close-btn {
+        background: #f2eff6;
+        border: none;
+        color: var(--text-secondary);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: var(--transition-smooth);
+      }
+      .drawer-close-btn:active {
+        background: var(--primary);
+        color: white;
+      }
+
+      .mobile-drawer-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .mobile-drawer-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .drawer-nav-item {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        padding: 6px 0;
+        border-bottom: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .drawer-nav-item.active {
+        color: var(--primary);
+      }
+
+      .drawer-divider {
+        height: 1px;
+        background-color: var(--border-color);
+        width: 100%;
+        margin: 4px 0;
+      }
+
+      .drawer-section-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+        letter-spacing: 0.08em;
+        display: block;
+        margin-bottom: 12px;
+      }
+
+      .drawer-categories-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .drawer-cat-group {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .drawer-cat-toggle {
+        width: 100%;
+        background: transparent;
+        border: none;
+        padding: 8px 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: color 0.25s ease;
+        outline: none;
+      }
+      .drawer-cat-toggle:hover, .drawer-cat-toggle.active {
+        color: var(--primary);
+      }
+
+      .drawer-cat-arrow {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--text-secondary);
+      }
+      .drawer-cat-toggle.active .drawer-cat-arrow {
+        transform: rotate(180deg);
+        color: var(--primary);
+      }
+
+      .drawer-subcat-container {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .drawer-subcat-list {
+        padding-left: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-bottom: 8px;
+        opacity: 0;
+        transform: translateY(-5px);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+
+      .drawer-subcat-item {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        padding: 4px 0;
+        transition: color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+      }
+      .drawer-subcat-item:hover, .drawer-subcat-item:active {
+        color: var(--primary);
+      }
+      .drawer-subcat-item::before {
+        content: "•";
+        color: var(--border-color);
+        font-size: 1rem;
+        line-height: 1;
+      }
+      .drawer-subcat-item:hover::before {
+        color: var(--primary);
+      }
+
+      .cat-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: var(--border-color);
+        transition: var(--transition-smooth);
+        display: inline-block;
+      }
+      .drawer-cat-toggle:hover .cat-dot, .drawer-cat-toggle.active .cat-dot {
+        background-color: var(--primary);
+        box-shadow: 0 0 8px var(--primary);
+      }
+
+      .drawer-whatsapp-btn {
+        background: #25d366;
+        color: white;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 16px;
+        transition: var(--transition-smooth);
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+      }
+      .drawer-whatsapp-btn:active {
+        transform: scale(0.98);
+        background: #128c7e;
+      }
+
+      .drawer-store-hours {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      @media (max-width: 768px) {
+        .hamburger-btn {
+          display: flex;
+        }
+      }
+
+      /* Modal de Búsqueda Overlay */
+      .search-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: rgba(18, 18, 23, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 50px 20px 20px 20px;
+        animation: fadeInModal 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      }
+
+      @keyframes fadeInModal {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      .search-modal-container {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        width: 100%;
+        max-width: 820px;
+        max-height: 85vh;
+        max-height: 85dvh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+
+      @media (max-width: 768px) {
+        .search-backdrop {
+          padding: 0;
+        }
+        .search-modal-container {
+          height: 100vh;
+          height: 100dvh;
+          max-height: 100vh;
+          max-height: 100dvh;
+          border-radius: 0;
+          border: none;
+        }
+        .modal-subcategory-filter-chips {
+          padding: 6px 16px 8px 16px;
+          gap: 6px;
+        }
+        .modal-sub-cat-btn {
+          padding: 4px 10px;
+          font-size: 0.74rem;
+          min-height: 26px;
+        }
+      }
+
+      /* Inner Input Header */
+      .search-modal-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color);
+        background: #fcfbfe;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      /* EVITAR AUTO-ZOOM EN SAFARI IOS MÓVIL Usando font-size: 16px */
+      #modal-search-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-primary);
+        font-size: 16px;
+        font-family: inherit;
+        padding: 6px 0;
+      }
+
+      .search-clear-btn {
+        background: rgba(0, 0, 0, 0.06);
+        border: none;
+        color: var(--text-secondary);
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+      }
+
+      .search-close-btn {
+        background: rgba(216, 75, 140, 0.1);
+        border: 1px solid var(--primary);
+        color: var(--primary);
+        padding: 8px 14px;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+        flex-shrink: 0;
+        min-height: 38px;
+        transition: all 0.2s;
+      }
+      .search-close-btn:active {
+        background: var(--primary);
+        color: white;
+      }
+
+      /* Categorías Chips con Scroll Táctil */
+      .search-modal-categories {
+        display: flex;
+        gap: 8px;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-color);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        background: #f8f6fb;
+        flex-shrink: 0;
+      }
+      .search-modal-categories::-webkit-scrollbar {
+        display: none;
+      }
+
+      .modal-cat-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.84rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s;
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .modal-cat-btn:hover, .modal-cat-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+        font-weight: 600;
+      }
+
+      /* Subcategorías Desplegables en el Buscador Modal */
+      .modal-subcategory-filter-wrapper {
+        height: 0;
+        overflow: hidden;
+        transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #f8f6fb;
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0;
+      }
+      .modal-subcategory-filter-chips {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 8px 20px 10px 20px;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .modal-subcategory-filter-chips::-webkit-scrollbar {
+        display: none;
+      }
+      .modal-sub-cat-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 0.78rem;
+        cursor: pointer;
+        white-space: nowrap;
+        min-height: 28px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+      }
+      .modal-sub-cat-btn:hover {
+        background: #fcfbfe;
+        color: var(--text-primary);
+      }
+      .modal-sub-cat-btn.active {
+        background: #fcf0f5;
+        border-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+      }
+
+      /* Sugerencias populares (Fila única deslizante táctil) */
+      .modal-popular-box {
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-color);
+        background: #ffffff;
+        flex-shrink: 0;
+      }
+      .popular-title {
+        font-size: 0.88rem;
+        color: var(--text-primary);
+        font-weight: 700;
+        display: block;
+        margin-bottom: 10px;
+      }
+      .popular-tags-container {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .popular-tags-container::-webkit-scrollbar {
+        display: none;
+      }
+      .popular-tag-btn {
+        background: #ffffff;
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: all 0.2s;
+        min-height: 34px;
+        display: inline-flex;
+        align-items: center;
+      }
+      .popular-tag-btn:hover, .popular-tag-btn:active {
+        border-color: var(--primary);
+        color: var(--primary);
+        background: #fcf0f5;
+      }
+
+      /* Lista de Resultados */
+      .search-results-wrapper {
+        padding: 20px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        flex: 1;
+        background: #ffffff;
+      }
+
+      .search-results-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 600px) {
+        .search-results-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+      }
+
+      .search-item-card {
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: all 0.2s;
+      }
+      .search-item-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .search-item-img-container {
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 12px;
+        background: #f8f8fb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        padding: 12px;
+      }
+
+      .search-item-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+      }
+      .search-item-card:hover .search-item-img {
+        transform: scale(1.05);
+      }
+
+      .search-item-info {
+        padding: 8px 4px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+
+      .search-item-title {
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 4px;
+        line-height: 1.25;
+        height: 2.5em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
+      .search-item-desc {
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .search-item-price-container {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        margin-top: auto;
+      }
+
+      .search-item-price-current {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--text-primary);
+      }
+
+      .search-item-price-old {
+        font-size: 0.8rem;
+        text-decoration: line-through;
+        color: var(--text-secondary);
+      }
+
+      .search-modal-footer {
+        padding: 12px 20px;
+        background: #f7f6fb;
+        border-top: 1px solid var(--border-color);
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+
+      mark.search-highlight {
+        background: transparent;
+        color: var(--primary);
+        font-style: italic;
+        font-weight: 700;
+        padding: 0;
+      }
+    </style>
+
+    <!-- Script de Interactividad del Carrito y Buscador Global Mobile-First -->
+    <script>
+      let allProducts: any[] = [];
+      let activeCategory = 'all';
+      let activeSubcategory = 'all';
+
+      const subcategoriesData = {
+        "JUGUETES": ["Vibradores", "Masculinos", "Anal", "Parejas", "Plugs"],
+        "COSMÉTICA SENSORIAL": ["Efecto Calor", "Aceites de Masaje", "Velas de Masaje"],
+        "BDSM": ["Bondage"],
+        "SALUD ÍNTIMA": ["Cuidado Natural"]
+      };
+
+      function getProductSubcategory(product) {
+        const idMap = {
+          "prod-1": "Efecto Calor",
+          "prod-2": "Efecto Calor",
+          "prod-3": "Cuidado Natural",
+          "prod-4": "Aceites de Masaje",
+          "prod-5": "Aceites de Masaje",
+          "prod-6": "Velas de Masaje",
+          "prod-7": "Masculinos",
+          "prod-8": "Masculinos",
+          "prod-9": "Vibradores",
+          "prod-10": "Vibradores",
+          "prod-11": "Vibradores",
+          "prod-12": "Vibradores",
+          "prod-13": "Vibradores",
+          "prod-14": "Vibradores",
+          "prod-15": "Vibradores",
+          "prod-16": "Vibradores",
+          "prod-17": "Parejas",
+          "prod-18": "Vibradores",
+          "prod-19": "Plugs",
+          "prod-20": "Plugs",
+          "prod-21": "Plugs",
+          "prod-22": "Plugs",
+          "prod-23": "Anal",
+          "prod-24": "Plugs",
+          "prod-25": "Plugs",
+          "prod-26": "Plugs",
+          "prod-27": "Plugs",
+          "prod-28": "Plugs",
+          "prod-29": "Plugs",
+          "prod-30": "Plugs"
+        };
+        
+        if (idMap[product.id]) return idMap[product.id];
+        
+        const name = (product.name || '').toLowerCase();
+        const desc = (product.description || '').toLowerCase();
+        const cat = (product.category || '').toUpperCase();
+        
+        if (cat.includes('JUGUETES')) {
+          if (name.includes('plug')) return 'Plugs';
+          if (name.includes('beads') || name.includes('anal') || name.includes('bolas anales')) return 'Anal';
+          if (name.includes('pareja') || name.includes('doble')) return 'Parejas';
+          if (name.includes('masculino') || name.includes('hombre') || name.includes('pene') || name.includes('perineal') || name.includes('próstata')) return 'Masculinos';
+          return 'Vibradores';
+        }
+        if (cat.includes('COSMÉTICA') || cat.includes('COSMETICA') || cat.includes('SENSORIAL')) {
+          if (name.includes('calor') || desc.includes('calor')) return 'Efecto Calor';
+          if (name.includes('vela')) return 'Velas de Masaje';
+          return 'Aceites de Masaje';
+        }
+        if (cat.includes('BDSM')) {
+          return 'Bondage';
+        }
+        if (cat.includes('SALUD') || cat.includes('BIENESTAR') || cat.includes('ÍNTIMA') || cat.includes('INTIMA')) {
+          return 'Cuidado Natural';
+        }
+        return 'Otros';
+      }
+
+      // Algoritmo de distancia de Levenshtein para tolerancia a erratas
+      function levenshtein(a, b) {
+        const matrix = [];
+        for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+        for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= b.length; i++) {
+          for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) === a.charAt(j - 1)) {
+              matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+              matrix[i][j] = Math.min(
+                matrix[i - 1][j - 1] + 1,
+                matrix[i][j - 1] + 1,
+                matrix[i - 1][j] + 1
+              );
+            }
+          }
+        }
+        return matrix[b.length][a.length];
+      }
+
+      // Comprobar coincidencia fuzzy
+      function matchProductFuzzy(product, query) {
+        if (!query) return true;
+        const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+        if (queryWords.length === 0) return true;
+        
+        const searchFields = [
+          product.name,
+          product.description || '',
+          product.category
+        ].join(' ').toLowerCase();
+
+        const productWords = searchFields.split(/[\s,.:;?!()""']+/).filter(w => w.length >= 2);
+
+        return queryWords.every(qw => {
+          return productWords.some(pw => {
+            if (pw.includes(qw) || qw.includes(pw)) return true;
+            if (qw.length < 4) return pw === qw;
+            const maxEdits = qw.length <= 6 ? 1 : 2;
+            return levenshtein(qw, pw) <= maxEdits;
+          });
+        });
+      }
+
+      // Resaltar coincidencias de forma inteligente
+      function highlightText(text, query) {
+        if (!query) return text;
+        const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+        if (queryWords.length === 0) return text;
+
+        const textWords = text.split(/(\s+)/);
+        
+        const highlightedWords = textWords.map(part => {
+          if (/^\s+$/.test(part)) return part;
+          const cleanWord = part.toLowerCase().replace(/[,.:;?!()""']/g, '');
+          
+          const matches = queryWords.some(qw => {
+            if (cleanWord.includes(qw) || qw.includes(cleanWord)) return true;
+            if (qw.length < 4) return cleanWord === qw;
+            const maxEdits = qw.length <= 6 ? 1 : 2;
+            return levenshtein(qw, cleanWord) <= maxEdits;
+          });
+
+          if (matches) {
+            return `<mark class="search-highlight">${part}</mark>`;
+          }
+          return part;
+        });
+
+        return highlightedWords.join('');
+      }
+
+      // Cargar productos para el buscador
+      async function loadProductsForSearch() {
+        try {
+          const res = await fetch('/api/products');
+          if (res.ok) {
+            allProducts = await res.json();
+            const totalEl = document.getElementById('modal-total-products');
+            if (totalEl) totalEl.textContent = allProducts.length.toString();
+          }
+        } catch (e) {
+          console.error('Error al cargar productos para el buscador:', e);
+        }
+      }
+      loadProductsForSearch();
+
+      // Control del Modal
+      const modalBackdrop = document.getElementById('search-modal-backdrop');
+      const openModalBtn = document.getElementById('open-search-modal-btn');
+      const closeModalBtn = document.getElementById('close-search-modal-btn');
+      const searchInput = document.getElementById('modal-search-input') as HTMLInputElement;
+      const clearInputBtn = document.getElementById('modal-clear-input');
+      const resultsGrid = document.getElementById('modal-results-grid');
+      const resultsCount = document.getElementById('modal-results-count');
+      const popularSearchesBox = document.getElementById('modal-popular-searches');
+
+      function openModal() {
+        if (!modalBackdrop) return;
+        modalBackdrop.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => {
+          if (searchInput) searchInput.focus();
+        }, 100);
+        renderSearchResults();
+      }
+
+      function closeModal() {
+        if (!modalBackdrop) return;
+        modalBackdrop.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+
+      if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+      if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+
+      if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', (e) => {
+          if (e.target === modalBackdrop) closeModal();
+        });
+      }
+
+      // Atajos de teclado: Ctrl+K, CMD+K, ESC
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          if (modalBackdrop?.style.display === 'none' || !modalBackdrop?.style.display) {
+            openModal();
+          } else {
+            closeModal();
+          }
+        } else if (e.key === 'Escape' && modalBackdrop?.style.display === 'flex') {
+          closeModal();
+        }
+      });
+
+      const modalSubcategoryWrapper = document.getElementById('modal-subcategory-filter-wrapper');
+      const modalSubcategoryChips = document.getElementById('modal-subcategory-filter-chips');
+
+      // Actualizar la interfaz de subcategorías desplegables en el buscador modal
+      function updateModalSubcategoriesUI() {
+        if (!modalSubcategoryWrapper || !modalSubcategoryChips) return;
+
+        const subCats = subcategoriesData[activeCategory];
+
+        if (!subCats || subCats.length === 0) {
+          modalSubcategoryChips.style.opacity = '0';
+          modalSubcategoryChips.style.transform = 'translateY(-8px)';
+          modalSubcategoryWrapper.style.height = '0px';
+          return;
+        }
+
+        let html = `
+          <button class="modal-sub-cat-btn ${activeSubcategory === 'all' ? 'active' : ''}" data-subcat="all">
+            Todos los artículos
+          </button>
+        `;
+
+        subCats.forEach(sub => {
+          const count = allProducts.filter(p => p.category.toUpperCase() === activeCategory.toUpperCase() && getProductSubcategory(p) === sub).length;
+          html += `
+            <button class="modal-sub-cat-btn ${activeSubcategory === sub ? 'active' : ''}" data-subcat="${sub}">
+              ${sub} (${count})
+            </button>
+          `;
+        });
+
+        modalSubcategoryChips.innerHTML = html;
+
+        modalSubcategoryChips.querySelectorAll('.modal-sub-cat-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            modalSubcategoryChips.querySelectorAll('.modal-sub-cat-btn').forEach(b => b.classList.remove('active'));
+            const target = e.currentTarget as HTMLButtonElement;
+            target.classList.add('active');
+            activeSubcategory = target.getAttribute('data-subcat') || 'all';
+            renderSearchResults();
+          });
+        });
+
+        modalSubcategoryWrapper.style.height = 'auto';
+        const height = modalSubcategoryChips.scrollHeight + 'px';
+        modalSubcategoryWrapper.style.height = '0px';
+        modalSubcategoryWrapper.offsetHeight; // Forzar repaint
+        modalSubcategoryWrapper.style.height = height;
+        modalSubcategoryChips.style.opacity = '1';
+        modalSubcategoryChips.style.transform = 'translateY(0)';
+      }
+
+      // Filtros por categoría en el modal
+      document.querySelectorAll('.modal-cat-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.modal-cat-btn').forEach(b => b.classList.remove('active'));
+          const target = e.currentTarget as HTMLButtonElement;
+          target.classList.add('active');
+          activeCategory = target.getAttribute('data-cat') || 'all';
+          activeSubcategory = 'all'; // Restablecer subcategoría al cambiar de categoría
+          
+          updateModalSubcategoriesUI();
+          renderSearchResults();
+        });
+      });
+
+      // Sugerencias populares
+      document.querySelectorAll('.popular-tag-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const query = (e.currentTarget as HTMLButtonElement).getAttribute('data-query') || '';
+          if (searchInput) {
+            searchInput.value = query;
+            if (clearInputBtn) clearInputBtn.style.display = 'inline-flex';
+            renderSearchResults();
+          }
+        });
+      });
+
+      if (clearInputBtn && searchInput) {
+        clearInputBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          clearInputBtn.style.display = 'none';
+          renderSearchResults();
+          searchInput.focus();
+        });
+
+        searchInput.addEventListener('input', () => {
+          clearInputBtn.style.display = searchInput.value.trim() ? 'inline-flex' : 'none';
+          renderSearchResults();
+        });
+      }
+
+      // Renderizar resultados con resaltado de coincidencias
+      function renderSearchResults() {
+        if (!resultsGrid || !resultsCount) return;
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+        // Filtrar productos con soporte fuzzy y subcategoría
+        let filtered = allProducts.filter(p => {
+          const matchCat = activeCategory === 'all' || p.category.toUpperCase() === activeCategory.toUpperCase();
+          if (!matchCat) return false;
+          
+          const matchSubcat = activeSubcategory === 'all' || getProductSubcategory(p) === activeSubcategory;
+          if (!matchSubcat) return false;
+          
+          return matchProductFuzzy(p, query);
+        });
+
+        // Mostrar u ocultar caja de populares
+        if (popularSearchesBox) {
+          popularSearchesBox.style.display = query ? 'none' : 'block';
+        }
+
+        if (filtered.length === 0) {
+          resultsCount.style.display = 'block';
+          resultsCount.textContent = `Sin resultados para "${query}"`;
+          resultsGrid.innerHTML = `
+            <div style="text-align: center; padding: 40px 16px;">
+              <div style="margin-bottom: 16px; color: var(--text-secondary);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+              </div>
+              <h4 style="font-size: 1.1rem; margin-bottom: 8px;">No encontramos ningún producto</h4>
+              <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px;">Prueba con otra palabra como "vibrador", "aceite" o borra la categoría.</p>
+              <button id="reset-search-modal-filters" class="btn btn-secondary" style="font-size: 0.85rem; padding: 10px 18px; border-radius: 50px;">Ver todo el catálogo</button>
+            </div>
+          `;
+
+          const resetBtn = document.getElementById('reset-search-modal-filters');
+          if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+              if (searchInput) searchInput.value = '';
+              activeCategory = 'all';
+              activeSubcategory = 'all';
+              document.querySelectorAll('.modal-cat-btn').forEach(b => b.classList.remove('active'));
+              document.querySelector('.modal-cat-btn[data-cat="all"]')?.classList.add('active');
+              updateModalSubcategoriesUI();
+              renderSearchResults();
+            });
+          }
+          return;
+        }
+
+        resultsCount.style.display = 'block';
+        resultsCount.textContent = query 
+          ? `Resultados: ${filtered.length}`
+          : `Resultados: ${filtered.length}`;
+
+        resultsGrid.innerHTML = filtered.map(p => {
+          let highlightedTitle = highlightText(p.name, query);
+          let highlightedDesc = highlightText(p.description || '', query);
+
+          const currentPrice = p.price;
+          const oldPrice = p.oldPrice;
+
+          return `
+            <article class="search-item-card">
+              <a href="/producto/${p.slug}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
+                <div class="search-item-img-container">
+                  <img src="${p.image}" alt="${p.name}" class="search-item-img" loading="lazy" />
+                </div>
+                <div class="search-item-info">
+                  <h4 class="search-item-title">${highlightedTitle}</h4>
+                  <p class="search-item-desc">${highlightedDesc}</p>
+                  <div class="search-item-price-container">
+                    ${oldPrice ? `
+                      <span class="search-item-price-old">${oldPrice}€</span>
+                    ` : ''}
+                    <span class="search-item-price-current">${currentPrice}€</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          `;
+        }).join('');
+      }
+
+      // Script para actualizar el contador de carrito
+      function updateHeaderCart() {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const count = cart.reduce((total: number, item: any) => total + item.quantity, 0);
+        const counterEl = document.getElementById('cart-counter');
+        if (counterEl) {
+          counterEl.textContent = count.toString();
+        }
+      }
+      window.addEventListener('cart-updated', updateHeaderCart);
+      updateHeaderCart();
+
+      // Lógica de la barra de anuncios descartable
+      const promoBar = document.getElementById('promo-announcement-bar');
+      const closePromoBtn = document.getElementById('close-promo-bar');
+      const copyPromoBtn = document.getElementById('copy-promo-code');
+      const promoTextEl = document.getElementById('promo-text-content');
+      
+      if (promoBar && closePromoBtn) {
+        if (sessionStorage.getItem('promo-bar-dismissed') === 'true') {
+          promoBar.style.display = 'none';
+        }
+        
+        closePromoBtn.addEventListener('click', () => {
+          promoBar.style.display = 'none';
+          sessionStorage.setItem('promo-bar-dismissed', 'true');
+        });
+      }
+
+      if (copyPromoBtn && promoTextEl) {
+        copyPromoBtn.addEventListener('click', () => {
+          const code = 'REBAJAS15';
+          navigator.clipboard.writeText(code).then(() => {
+            const originalHTML = promoTextEl.innerHTML;
+            promoTextEl.innerHTML = `🎉 ¡Código <strong>${code}</strong> copiado al portapapeles! 📋`;
+            setTimeout(() => {
+              promoTextEl.innerHTML = originalHTML;
+            }, 2500);
+          });
+        });
+      }
+
+      // Lógica del menú lateral móvil (Hamburger drawer)
+      const mobileDrawer = document.getElementById('mobile-menu-drawer');
+      const hamburgerBtn = document.getElementById('mobile-hamburger-btn');
+      const closeDrawerBtn = document.getElementById('close-mobile-drawer-btn');
+      const drawerBackdrop = document.getElementById('mobile-drawer-backdrop');
+
+      function openMobileDrawer() {
+        if (!mobileDrawer || !hamburgerBtn) return;
+        mobileDrawer.style.display = 'flex';
+        mobileDrawer.offsetHeight; // Forzar reflujo para que se aplique la transición
+        mobileDrawer.classList.add('open');
+        hamburgerBtn.classList.add('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileDrawer() {
+        if (!mobileDrawer || !hamburgerBtn) return;
+        mobileDrawer.classList.remove('open');
+        hamburgerBtn.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          if (!mobileDrawer.classList.contains('open')) {
+            mobileDrawer.style.display = 'none';
+          }
+        }, 300);
+      }
+
+      if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', () => {
+          if (mobileDrawer?.classList.contains('open')) {
+            closeMobileDrawer();
+          } else {
+            openMobileDrawer();
+          }
+        });
+      }
+
+      if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeMobileDrawer);
+      if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeMobileDrawer);
+
+      // Cerrar drawer al clickear enlaces directos de la misma página
+      document.querySelectorAll('.drawer-close-on-click').forEach(link => {
+        link.addEventListener('click', closeMobileDrawer);
+      });
+
+      // Lógica de Acordeón de Categorías en el Drawer Hamburguesa
+      document.querySelectorAll('.drawer-cat-toggle').forEach(toggle => {
+        toggle.addEventListener('click', (e) => {
+          const cat = toggle.getAttribute('data-cat');
+          const group = toggle.closest('.drawer-cat-group');
+          const container = group.querySelector('.drawer-subcat-container');
+          const list = group.querySelector('.drawer-subcat-list');
+
+          if (!container || !list) return;
+
+          const isOpen = toggle.classList.contains('active');
+
+          // Cerrar los otros acordeones para mantener el menú ordenado
+          document.querySelectorAll('.drawer-cat-toggle').forEach(t => {
+            if (t !== toggle && t.classList.contains('active')) {
+              t.classList.remove('active');
+              const g = t.closest('.drawer-cat-group');
+              const c = g.querySelector('.drawer-subcat-container');
+              const l = g.querySelector('.drawer-subcat-list');
+              if (c && l) {
+                c.style.height = '0px';
+                l.style.opacity = '0';
+                l.style.transform = 'translateY(-5px)';
+              }
+            }
+          });
+
+          if (isOpen) {
+            toggle.classList.remove('active');
+            container.style.height = '0px';
+            list.style.opacity = '0';
+            list.style.transform = 'translateY(-5px)';
+          } else {
+            toggle.classList.add('active');
+            container.style.height = list.scrollHeight + 'px';
+            list.style.opacity = '1';
+            list.style.transform = 'translateY(0)';
+          }
+        });
+      });
+
+      // Escuchar clicks de subcategorías en el drawer para abrir el buscador modal filtrado
+      document.querySelectorAll('.drawer-subcat-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const cat = item.getAttribute('data-cat') || 'all';
+          const sub = item.getAttribute('data-sub') || 'all';
+          
+          closeMobileDrawer();
+
+          // Configurar filtros globales del buscador
+          activeCategory = cat;
+          activeSubcategory = sub;
+
+          // Sincronizar botones de categoría del buscador modal
+          document.querySelectorAll('.modal-cat-btn').forEach(btn => {
+            if (btn.getAttribute('data-cat') === activeCategory) {
+              btn.classList.add('active');
+            } else {
+              btn.classList.remove('active');
+            }
+          });
+
+          // Limpiar texto de búsqueda anterior
+          if (searchInput) searchInput.value = '';
+
+          // Lanzar modal
+          openModal();
+          updateModalSubcategoriesUI();
+          renderSearchResults();
+        });
+      });
+
+      // Escuchar clicks en todos los enlaces de "Catálogo Completo" para abrir el buscador modal completo
+      document.querySelectorAll('a[href="/#catalogo"], a[href="#catalogo"], #nav-catalogo-link').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          closeMobileDrawer();
+
+          activeCategory = 'all';
+          activeSubcategory = 'all';
+
+          document.querySelectorAll('.modal-cat-btn').forEach(b => {
+            if (b.getAttribute('data-cat') === 'all') {
+              b.classList.add('active');
+            } else {
+              b.classList.remove('active');
+            }
+          });
+
+          if (searchInput) searchInput.value = '';
+
+          openModal();
+          updateModalSubcategoriesUI();
+          renderSearchResults();
+        });
+      });
+    </script>
+  </body>
+</html>

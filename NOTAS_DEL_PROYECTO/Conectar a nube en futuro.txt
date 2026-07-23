@@ -1,0 +1,28 @@
+1. Cliente de Sanity: He creado el archivo sanity.ts. Éste inicializa el SDK de Sanity e incluye 
+  un generador de URLs de imagen para que las fotos de tus productos se auto-redimensionen y optimicen  
+  en el servidor de Sanity antes de descargarse (clave para ahorrar datos móviles y acelerar la carga en
+  teléfonos).                                                                                           
+  2. Carga Inteligente con Fallback (Híbrida): He modificado la página index.astro.                  
+      • Cómo funciona: La web verifica si has rellenado las credenciales reales de Sanity. Si las tienes,
+      se conecta a la nube de Sanity y trae tus productos. Si Sanity no está configurado (como ahora    
+      mismo) o la conexión falla temporalmente, la web carga automáticamente los productos locales de   
+      demostración.                                                                                     
+      • Ventaja: Tu web nunca fallará ni se romperá por no tener configurada la nube al principio.      
+      Podrás verla y navegar en local con normalidad.                                                   
+  3. Instalación de paquetes: La terminal está instalando en segundo plano los paquetes oficiales de    
+  Sanity ( @sanity/client  y  @sanity/image-url ).                                                      
+                                                                                                        
+  ### ¿Cómo conectarlo a tu nube en el futuro?                                                          
+                                                                                                        
+  Cuando te registres en Sanity.io y crees tu proyecto:                                                 
+                                                                                                        
+  1. Abre sanity.ts.                                                                               
+  2. Cambia la constante  TU_PROJECT_ID_DE_SANITY  por el ID numérico de tu proyecto que te proporciona 
+  el panel de Sanity.                                                                                   
+  3. ¡Y listo! Tu web pasará automáticamente de mostrar los datos de demostración a cargar tu catálogo  
+  real de la nube de forma transparente.                                                                
+                                                                                                        
+  La instalación de los paquetes de Sanity en segundo plano terminará en unos instantes. Puedes probar a
+  arrancar la web en local con  npm run dev  cuando lo desees.                                          
+
+  La instalación de los SDK de Sanity ha finalizado con éxito en tu ordenador.

@@ -1,0 +1,153 @@
+/* Importar tipografías premium */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* Reset de estilos básicos */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Diseño del sistema de diseño (Tokens CSS) - Rosa Orquídea Elegante inspirada en #ed6daa */
+:root {
+  /* Paleta cromática - Rosa Orquídea Sofisticada (Soft Velvet Rose) */
+  --bg-color: #fbf7f9;             /* Fondo neutro suave con matiz rosa muy tenue */
+  --card-bg: #ffffff;             /* Blanco puro para tarjetas */
+  --primary: #d84b8c;             /* Rosa Orquídea Elegante (#d84b8c) - Basado en #ed6daa con contraste accesible */
+  --primary-hover: #c43b7a;       /* Rosa Orquídea Profundo */
+  --accent: #d84b8c;              /* Rosa Orquídea Acento */
+  --accent-hover: #ed6daa;        /* Tono Rose Pastel Radiante (#ed6daa) */
+  --text-primary: #121217;       /* Negro grafito elegante de alta legibilidad */
+  --text-secondary: #5e5a6c;     /* Gris lavanda neutro */
+  --border-color: #f2e3ec;       /* Borde suave sedoso */
+  --success: #10b981;
+  --error: #ef4444;
+
+  /* Fuentes */
+  --font-title: 'Outfit', 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Transiciones y Sombras */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-premium: 0 8px 30px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 4px 20px rgba(216, 75, 140, 0.28);
+  --border-radius: 14px;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-color: var(--bg-color);
+}
+
+/* Tipografía */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Contenedores y Estilos Layout */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Botones con efectos táctiles y micro-animaciones */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e45b9a, #c43b7a);
+  color: white;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transition: 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ed6daa, #d84b8c);
+  box-shadow: 0 6px 25px rgba(216, 75, 140, 0.4);
+}
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: #fcf0f5;
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* Efecto de cristal esmerilado (Glassmorphism Claro) */
+.glass {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+}

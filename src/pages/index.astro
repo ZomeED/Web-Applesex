@@ -1,0 +1,1336 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getAllProducts } from '../lib/products';
+import { sanityClient, isSanityConfigured } from '../db/sanity';
+
+const allProducts = await getAllProducts();
+
+// Configuración local del Banner Principal
+const localHeroSettings = {
+  isPromoActive: true,
+  tag: 'Promoción Exclusiva Catálogo 2026',
+  title: 'Redefine tu Bienestar Íntimo',
+  subtitle: 'Explora nuestro catálogo exclusivo de alta gama. Productos de las mejores marcas internacionales con la máxima calidad y discreción.',
+  promoCode: 'REBAJAS15',
+  promoDetails: '15% de Descuento en toda la web',
+  promoExclusions: '*Descuento automático aplicando el cupón en la cesta',
+  image: allProducts[0]?.image || '/images/vibrador_minimalista.jpg',
+  buttonText: 'Explorar 30 Productos',
+  productName: allProducts[0]?.name || 'ACEITE DE MASAJE EFECTO CALOR',
+  productDescription: allProducts[0]?.description || 'Formulado con ingredientes naturales para estimular los sentidos de forma sensual.',
+  productPrice: `${allProducts[0]?.price || 29.95}€`
+};
+
+let heroSettings = localHeroSettings;
+
+if (isSanityConfigured()) {
+  try {
+    const heroQuery = `*[_type == "homepageSettings"][0] {
+      isPromoActive,
+      tag,
+      title,
+      subtitle,
+      promoCode,
+      promoDetails,
+      promoExclusions,
+      "image": image.asset->url,
+      buttonText,
+      productName,
+      productDescription,
+      productPrice
+    }`;
+    const sanityHeroSettings = await sanityClient.fetch(heroQuery);
+    if (sanityHeroSettings) {
+      heroSettings = { ...localHeroSettings, ...sanityHeroSettings };
+    }
+  } catch (error) {
+    console.warn('Error al cargar la configuración de Sanity:', error);
+  }
+}
+
+// Extraer categorías únicas para los filtros
+const categoriesOrder = ["JUGUETES", "COSMÉTICA SENSORIAL", "BDSM", "SALUD ÍNTIMA"];
+const categories = Array.from(new Set(allProducts.map(p => p.category)))
+  .filter(Boolean)
+  .sort((a, b) => categoriesOrder.indexOf(a) - categoriesOrder.indexOf(b));
+
+// Helper para formatear categorías a Camel Case (Title Case) respetando nexos
+function formatCategoryName(str) {
+  if (!str) return '';
+  const words = str.toLowerCase().split(' ');
+  const formattedWords = words.map((word, index) => {
+    const lowerWords = ['y', 'e', 'o', 'u', 'de', 'del', 'con', 'para', 'en'];
+    if (lowerWords.includes(word) && index > 0) {
+      return word;
+    }
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  });
+  return formattedWords.join(' ');
+}
+---
+
+<Layout 
+  title="Inicio - Catálogo Oficial" 
+  description="Explora los 30 productos de nuestra boutique erótica y bienestar íntimo en Churra, Murcia. Envíos discretos 24h o recogida local en 2 horas."
+>
+  <!-- Hero Section con gradiente animado y diseño premium -->
+  <section style="position: relative; padding: 100px 0 70px 0; overflow: hidden; background: radial-gradient(circle at 80% 20%, rgba(216, 75, 140, 0.1) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(216, 75, 140, 0.05) 0%, transparent 40%);">
+    <div class="container hero-grid" style="z-index: 2; position: relative;">
+      
+      <!-- Textos Hero -->
+      <div>
+        <span style="color: var(--primary); text-transform: uppercase; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; display: inline-block; margin-bottom: 16px;">
+          {heroSettings.tag}
+        </span>
+        
+        {heroSettings.isPromoActive ? (
+          <div>
+            <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px;">
+              {heroSettings.title}
+            </h1>
+            <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-family: var(--font-title); font-weight: 800; color: var(--primary); margin-bottom: 20px; line-height: 1.2;">
+              {heroSettings.promoDetails}
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 24px; max-width: 500px;">
+              {heroSettings.subtitle}
+            </p>
+            
+            <!-- Caja de Cupón Interactiva y Profesional -->
+            <div class="promo-box-container" style="background: #ffffff; border: 1px dashed var(--primary); border-radius: 12px; padding: 16px 20px; max-width: 420px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+              <div>
+                <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 2px;">CÓDIGO DE DESCUENTO</span>
+                <strong style="font-family: var(--font-title); font-size: 1.4rem; color: var(--primary); letter-spacing: 0.05em;">{heroSettings.promoCode}</strong>
+              </div>
+              <button 
+                id="copy-hero-promo-btn" 
+                class="btn btn-primary" 
+                data-code={heroSettings.promoCode}
+                style="padding: 8px 16px; font-size: 0.85rem; border-radius: 8px;"
+              >
+                Copiar
+              </button>
+            </div>
+            
+            {heroSettings.promoExclusions && (
+              <span class="promo-exclusions-text" style="display: block; font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-bottom: 30px;">
+                {heroSettings.promoExclusions}
+              </span>
+            )}
+            
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+              <a href="#catalogo" class="btn btn-primary">Ver {allProducts.length} Productos</a>
+              <button id="trigger-hero-search-btn" class="btn btn-secondary">Buscar Producto</button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 24px;">
+              {heroSettings.title}
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 32px; max-width: 500px;">
+              {heroSettings.subtitle}
+            </p>
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+              <a href="#catalogo" class="btn btn-primary" id="hero-explore-btn">{heroSettings.buttonText}</a>
+              <a href="#recogida" class="btn btn-secondary" id="hero-pickup-btn">Recogida en Churra (2h)</a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <!-- Imagen Destacada del Producto Estrella -->
+      <div style="position: relative; display: flex; justify-content: center;">
+        <div style="position: absolute; width: 300px; height: 300px; background: var(--primary); filter: blur(100px); opacity: 0.12; top: 10%; left: 10%; border-radius: 50%; z-index: -1;"></div>
+        <div style="border-radius: 24px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); background: #ffffff; padding: 24px; max-width: 420px; text-align: center; width: 100%;">
+          <img src={heroSettings.image} alt={heroSettings.productName} style="width: 100%; border-radius: 16px; object-fit: cover; aspect-ratio: 1; margin-bottom: 20px; border: 1px solid var(--border-color); background: #f7f7fa;" />
+          <span style="background: rgba(216, 75, 140, 0.08); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; display: inline-block; margin-bottom: 8px;">DESTACADO DE HOY</span>
+          <h3 style="font-size: 1.2rem; margin-bottom: 8px; font-weight: 700;">{heroSettings.productName}</h3>
+          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{heroSettings.productDescription}</p>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border-color);">
+            <span style="color: var(--primary); font-weight: 800; font-size: 1.3rem;">{heroSettings.productPrice}</span>
+            <button class="btn btn-primary hero-add-cart-btn" data-id={allProducts[0]?.id} data-name={allProducts[0]?.name} data-price={allProducts[0]?.price} data-image={allProducts[0]?.image} style="padding: 8px 16px; font-size: 0.85rem;">
+              Añadir a la cesta
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Sección Catálogo de Productos con Buscador Inteligente Integrado -->
+  <section id="catalogo" style="padding: 80px 0;">
+    <div class="container">
+      
+      <div style="text-align: center; margin-bottom: 40px;">
+        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">NUESTRA SELECCIÓN</span>
+        <h2 style="font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 12px;">Recomendaciones</h2>
+        <p style="color: var(--text-secondary); max-width: 650px; margin: 0 auto; font-size: 1.05rem;">
+          Una selección exclusiva de nuestros mejores artículos eróticos y de bienestar íntimo, recomendados para tu disfrute.
+        </p>
+      </div>
+
+      <!-- Barra de Control del Catálogo -->
+      <div class="catalog-toolbar">
+        
+        <!-- Fila de Búsqueda y Ordenación -->
+        <div class="catalog-toolbar-filters">
+          
+          <div style="position: relative; width: 100%;">
+            <input 
+              type="text" 
+              id="grid-search-input" 
+              placeholder="Buscar productos..."
+              style="width: 100%; padding: 12px 16px 12px 44px; background: #f7f7fa; border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 16px; outline: none; transition: border-color 0.2s;"
+            />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <button id="clear-grid-search-btn" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem;">✕</button>
+          </div>
+
+          <div class="sort-select-wrapper">
+            <label for="grid-sort-select" class="sort-label">Ordenar por:</label>
+            <select id="grid-sort-select" class="sort-select-input">
+              <option value="default">Recomendados</option>
+              <option value="price-asc">Precio: de menor a mayor</option>
+              <option value="price-desc">Precio: de mayor a menor</option>
+              <option value="name-asc">Nombre: A - Z</option>
+            </select>
+          </div>
+
+        </div>
+
+
+        <!-- Chips de Categorías con Scroll Horizontal Táctil -->
+        <div class="category-filter-chips">
+          <button class="grid-cat-btn active" data-category="all">
+            Todas ({allProducts.length})
+          </button>
+          {categories.map(cat => {
+            const count = allProducts.filter(p => p.category === cat).length;
+            return (
+              <button class="grid-cat-btn" data-category={cat}>
+                {formatCategoryName(cat)} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        <!-- Subcategorías Desplegables con Transición Suave -->
+        <div class="subcategory-filter-wrapper" id="subcategory-filter-wrapper">
+          <div class="subcategory-filter-chips" id="subcategory-filter-chips"></div>
+        </div>
+
+      </div>
+
+      <!-- Contador de Productos Filtrados -->
+      <div id="grid-counter-text" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; font-weight: 500;">
+        Mostrando <strong style="color: var(--primary);">{allProducts.length}</strong> de <strong>{allProducts.length}</strong> productos
+      </div>
+
+      <!-- Parrilla de Productos Renderizada -->
+      <div id="main-products-grid" class="products-grid">
+        <!-- Inyectado por JS client-side -->
+      </div>
+
+      <!-- Controles de Paginación del Catálogo -->
+      <div id="catalog-pagination-container" class="pagination-container">
+        <!-- Inyectado por JS client-side -->
+      </div>
+
+      <!-- Estado Vacío cuando no hay resultados -->
+      <div id="no-products-found" style="display: none; text-align: center; padding: 60px 20px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; margin-top: 20px;">
+        <div style="width: 64px; height: 64px; background: rgba(216, 75, 140, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--primary);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 10px;">No se encontraron productos</h3>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px auto;">
+          No coincide ningún producto con tu criterio de búsqueda o categoría seleccionada.
+        </p>
+        <button id="reset-grid-filters-btn" class="btn btn-primary">
+          Restablecer Filtros y Ver Todos ({allProducts.length})
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Ventajas Locales -->
+  <section id="envios" style="padding: 50px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); background-color: #ffffff;">
+    <div class="container">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px;">
+        
+        <div class="glass" style="padding: 32px; border-radius: var(--border-radius); transition: var(--transition-smooth); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+          <div style="background: rgba(216, 75, 140, 0.08); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--primary);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 12px;">Recogida Express en 2 Horas</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Compra online en 1 clic y recoge tu pedido listo en nuestra tienda de <strong>Churra, Murcia</strong> sin coste de envío.
+          </p>
+        </div>
+
+        <div class="glass" style="padding: 32px; border-radius: var(--border-radius); transition: var(--transition-smooth); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+          <div style="background: rgba(216, 75, 140, 0.08); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--primary);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 12px;">Envíos 100% Discretos</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            Caja marrón neutra sin logotipos ni marcas externas. Tu privacidad e intimidad están totalmente garantizadas.
+          </p>
+        </div>
+
+        <div class="glass" style="padding: 32px; border-radius: var(--border-radius); transition: var(--transition-smooth); text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.02);">
+          <div style="background: rgba(216, 75, 140, 0.08); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; color: var(--primary);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.2rem; margin-bottom: 12px;">Atención Confidencial por WhatsApp</h3>
+          <p style="color: var(--text-secondary); font-size: 0.9rem;">
+            ¿Necesitas asesoría sobre algún producto? Te atendemos con la máxima discreción y amabilidad.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Recogida e Inmediatez Local -->
+  <section id="recogida" style="padding: 80px 0; background: #ffffff;">
+    <div class="container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 48px; align-items: center;">
+      <div>
+        <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">SERVICIO LOCAL EN MURCIA</span>
+        <h2 style="font-size: 2.2rem; margin-bottom: 24px;">Click & Collect en Churra</h2>
+        <p style="color: var(--text-secondary); font-size: 1.05rem; margin-bottom: 20px;">
+          En <strong>Applesex</strong> la discreción y la rapidez son nuestras señas de identidad. Recoge tu compra empaquetada en nuestra tienda física en Churra.
+        </p>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 16px; margin-bottom: 32px;">
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div>
+              <strong style="color: var(--text-primary);">Anonimato Total:</strong> Paquete sin logos ni distintivos exteriores.
+            </div>
+          </li>
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div>
+              <strong style="color: var(--text-primary);">Listo en 2 Horas:</strong> Te notificamos por WhatsApp en cuanto tu caja esté guardada.
+            </div>
+          </li>
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <div>
+              <strong style="color: var(--text-primary);">Gastos de Envío 0€:</strong> Retira gratis tu producto cuando mejor te venga.
+            </div>
+          </li>
+        </ul>
+        <a href="#catalogo" class="btn btn-secondary">Explorar Catálogo</a>
+      </div>
+
+      <div class="glass" style="padding: 40px; border-radius: var(--border-radius); border: 1px solid var(--border-color); box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+        <h3 style="margin-bottom: 24px; font-size: 1.4rem; color: var(--primary);">📍 Dirección de nuestra tienda</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 0.95rem;">
+          Estamos en <strong>Churra, Murcia</strong>. Puedes visitarnos directamente para ver el catálogo físico o resolver tus dudas en persona.
+        </p>
+        <div style="background-color: #f7f7fa; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 12px; font-size: 0.95rem; margin-bottom: 24px;">
+          <div>
+            <strong style="color: var(--text-primary);">Dirección:</strong> Av. de Alicante, Churra, 30110 Murcia.
+          </div>
+          <div>
+            <strong style="color: var(--text-primary);">WhatsApp:</strong> +34 600 00 00 00
+          </div>
+          <div>
+            <strong style="color: var(--text-primary);">Horario:</strong> Lunes a Sábado de 10:00 a 20:30 (Ininterrumpido).
+          </div>
+        </div>
+        <a href="https://maps.google.com/?q=Churra+Murcia" target="_blank" class="btn btn-primary" style="width: 100%;">
+          Ver Ubicación en Google Maps
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Estilos del Catálogo & Buscador Integrado -->
+  <style is:global>
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: center;
+    }
+
+    /* Barra de herramientas del catálogo */
+    .catalog-toolbar {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+
+    .catalog-toolbar-filters {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .sort-select-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .sort-label {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    .sort-select-input {
+      flex: 1;
+      background: #f7f7fa;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    @media (min-width: 768px) {
+      .catalog-toolbar-filters {
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+      }
+      .sort-select-wrapper {
+        width: auto;
+      }
+      .sort-select-input {
+        flex: none;
+        width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .catalog-toolbar {
+        padding: 12px;
+      }
+      .sort-label {
+        display: none;
+      }
+      .sort-select-input {
+        padding: 9px 12px;
+        min-height: 40px;
+      }
+    }
+
+    .category-filter-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .category-filter-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .grid-cat-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 40px;
+      transition: all 0.2s;
+    }
+    .grid-cat-btn:hover, .grid-cat-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      font-weight: 600;
+    }
+
+    /* Subcategorías Desplegables */
+    .subcategory-filter-wrapper {
+      height: 0;
+      overflow: hidden;
+      transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .subcategory-filter-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 10px 4px 6px 4px;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .subcategory-filter-chips::-webkit-scrollbar {
+      display: none;
+    }
+
+    .grid-sub-cat-btn {
+      background: #f8f8fb;
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 32px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .grid-sub-cat-btn:hover {
+      background: #f1f0f5;
+      color: var(--text-primary);
+    }
+    .grid-sub-cat-btn.active {
+      background: #fcf0f5;
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(216, 75, 140, 0.08);
+    }
+
+    /* Grid de Productos */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: var(--transition-smooth);
+      position: relative;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+    }
+    .product-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(216, 75, 140, 0.12);
+    }
+
+    .product-image-container {
+      overflow: hidden;
+      aspect-ratio: 1;
+      border-bottom: 1px solid var(--border-color);
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 100%;
+      padding: 16px;
+    }
+
+    .product-image-zoom {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      display: block;
+    }
+    .product-card:hover .product-image-zoom {
+      transform: scale(1.06);
+    }
+
+    /* Ajustes responsivos móviles para el catálogo */
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 16px;
+      }
+      .product-image-container {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      
+      .product-card {
+        border-radius: 12px;
+      }
+      
+      .product-image-container {
+        padding: 8px;
+      }
+      
+      .product-card-body {
+        padding: 10px !important;
+      }
+      
+      .product-title-link {
+        font-size: 0.88rem !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+        height: 2.4em; /* Limitar para alinear cuadrícula */
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      
+      .product-card-body p {
+        display: none !important;
+      }
+      
+      .product-card-footer {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 6px;
+        padding-top: 6px !important;
+        border-top: 1px solid var(--border-color);
+      }
+      
+      .product-card-footer > div {
+        justify-content: center;
+        width: 100%;
+      }
+      
+      .product-card-footer .add-to-cart-btn {
+        width: 100%;
+        padding: 6px 8px !important;
+        font-size: 0.78rem !important;
+        min-height: 32px;
+        border-radius: 8px;
+      }
+
+      .category-filter-chips {
+        gap: 6px !important;
+      }
+      
+      .grid-cat-btn {
+        padding: 6px 12px !important;
+        font-size: 0.78rem !important;
+        min-height: 32px !important;
+      }
+
+      .subcategory-filter-chips {
+        gap: 6px !important;
+        padding: 8px 4px 4px 4px !important;
+      }
+
+      .grid-sub-cat-btn {
+        padding: 5px 10px !important;
+        font-size: 0.74rem !important;
+        min-height: 28px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+      }
+      .hero-grid > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .catalogue-toolbar {
+        padding: 16px;
+      }
+    }
+
+    /* Paginación del catálogo */
+    .pagination-container {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .pagination-btn {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-family: var(--font-title);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      user-select: none;
+    }
+    
+    .pagination-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+      background-color: #fcf0f5;
+      transform: translateY(-1px);
+    }
+    
+    .pagination-btn.active {
+      background: linear-gradient(135deg, #e45b9a, #c43b7a);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: var(--shadow-glow);
+    }
+    
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #f7f7fa;
+    }
+    
+    .pagination-arrow {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+  </style>
+
+  <!-- Script del cliente para filtrado en tiempo real de los 30 productos -->
+  <script define:vars={{ initialProducts: allProducts }}>
+    // Helper para formatear categorías a Camel Case
+    function formatCategoryName(str) {
+      if (!str) return '';
+      const words = str.toLowerCase().split(' ');
+      const formattedWords = words.map((word, index) => {
+        const lowerWords = ['y', 'e', 'o', 'u', 'de', 'del', 'con', 'para', 'en'];
+        if (lowerWords.includes(word) && index > 0) {
+          return word;
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      return formattedWords.join(' ');
+    }
+
+    // Algoritmo de distancia de Levenshtein para tolerancia a erratas
+    function levenshtein(a, b) {
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    // Comprobar coincidencia fuzzy
+    function matchProductFuzzy(product, query) {
+      if (!query) return true;
+      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+      if (queryWords.length === 0) return true;
+      
+      const searchFields = [
+        product.name,
+        product.description || '',
+        product.category
+      ].join(' ').toLowerCase();
+
+      const productWords = searchFields.split(/[\s,.:;?!()""']+/).filter(w => w.length >= 2);
+
+      return queryWords.every(qw => {
+        return productWords.some(pw => {
+          if (pw.includes(qw) || qw.includes(pw)) return true;
+          if (qw.length < 4) return pw === qw;
+          const maxEdits = qw.length <= 6 ? 1 : 2;
+          return levenshtein(qw, pw) <= maxEdits;
+        });
+      });
+    }
+
+    // Resaltar coincidencias de forma inteligente
+    function highlightText(text, query) {
+      if (!query) return text;
+      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+      if (queryWords.length === 0) return text;
+
+      const textWords = text.split(/(\s+)/);
+      
+      const highlightedWords = textWords.map(part => {
+        if (/^\s+$/.test(part)) return part;
+        const cleanWord = part.toLowerCase().replace(/[,.:;?!()""']/g, '');
+        
+        const matches = queryWords.some(qw => {
+          if (cleanWord.includes(qw) || qw.includes(cleanWord)) return true;
+          if (qw.length < 4) return cleanWord === qw;
+          const maxEdits = qw.length <= 6 ? 1 : 2;
+          return levenshtein(qw, cleanWord) <= maxEdits;
+        });
+
+        if (matches) {
+          return `<mark class="search-highlight">${part}</mark>`;
+        }
+        return part;
+      });
+
+      return highlightedWords.join('');
+    }
+
+    // Clasificar productos en subcategorías de forma determinista y extensible
+    function getProductSubcategory(product) {
+      const idMap = {
+        "prod-1": "Efecto Calor",
+        "prod-2": "Efecto Calor",
+        "prod-3": "Cuidado Natural",
+        "prod-4": "Aceites de Masaje",
+        "prod-5": "Aceites de Masaje",
+        "prod-6": "Velas de Masaje",
+        "prod-7": "Masculinos",
+        "prod-8": "Masculinos",
+        "prod-9": "Vibradores",
+        "prod-10": "Vibradores",
+        "prod-11": "Vibradores",
+        "prod-12": "Vibradores",
+        "prod-13": "Vibradores",
+        "prod-14": "Vibradores",
+        "prod-15": "Vibradores",
+        "prod-16": "Vibradores",
+        "prod-17": "Parejas",
+        "prod-18": "Vibradores",
+        "prod-19": "Plugs",
+        "prod-20": "Plugs",
+        "prod-21": "Plugs",
+        "prod-22": "Plugs",
+        "prod-23": "Anal",
+        "prod-24": "Plugs",
+        "prod-25": "Plugs",
+        "prod-26": "Plugs",
+        "prod-27": "Plugs",
+        "prod-28": "Plugs",
+        "prod-29": "Plugs",
+        "prod-30": "Plugs"
+      };
+      
+      if (idMap[product.id]) return idMap[product.id];
+      
+      const name = (product.name || '').toLowerCase();
+      const desc = (product.description || '').toLowerCase();
+      const cat = (product.category || '').toUpperCase();
+      
+      if (cat.includes('JUGUETES')) {
+        if (name.includes('plug')) return 'Plugs';
+        if (name.includes('beads') || name.includes('anal') || name.includes('bolas anales')) return 'Anal';
+        if (name.includes('pareja') || name.includes('doble')) return 'Parejas';
+        if (name.includes('masculino') || name.includes('hombre') || name.includes('pene') || name.includes('perineal') || name.includes('próstata')) return 'Masculinos';
+        return 'Vibradores';
+      }
+      if (cat.includes('COSMÉTICA') || cat.includes('COSMETICA') || cat.includes('SENSORIAL')) {
+        if (name.includes('calor') || desc.includes('calor')) return 'Efecto Calor';
+        if (name.includes('vela')) return 'Velas de Masaje';
+        return 'Aceites de Masaje';
+      }
+      if (cat.includes('BDSM')) {
+        return 'Bondage';
+      }
+      if (cat.includes('SALUD') || cat.includes('BIENESTAR') || cat.includes('ÍNTIMA') || cat.includes('INTIMA')) {
+        return 'Cuidado Natural';
+      }
+      return 'Otros';
+    }
+
+    const subcategoriesData = {
+      "JUGUETES": ["Vibradores", "Masculinos", "Anal", "Parejas", "Plugs"],
+      "COSMÉTICA SENSORIAL": ["Efecto Calor", "Aceites de Masaje", "Velas de Masaje"],
+      "BDSM": ["Bondage"],
+      "SALUD ÍNTIMA": ["Cuidado Natural"]
+    };
+
+    // Cargar categoría inicial desde URL si existe
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCategory = urlParams.get('category');
+    const urlSubcategory = urlParams.get('subcategory');
+    
+    let currentCategory = 'all';
+    if (urlCategory) {
+      currentCategory = urlCategory;
+    }
+    let currentSubcategory = 'all';
+    if (urlSubcategory) {
+      currentSubcategory = urlSubcategory;
+    }
+    let currentQuery = '';
+    let currentSort = 'default';
+
+    // Paginación
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 16;
+    const paginationContainer = document.getElementById('catalog-pagination-container');
+
+    const gridSearchInput = document.getElementById('grid-search-input');
+    const clearGridSearchBtn = document.getElementById('clear-grid-search-btn');
+    const sortSelect = document.getElementById('grid-sort-select');
+    const productsGrid = document.getElementById('main-products-grid');
+    const noProductsBox = document.getElementById('no-products-found');
+    const counterText = document.getElementById('grid-counter-text');
+    const resetFiltersBtn = document.getElementById('reset-grid-filters-btn');
+    const triggerHeroSearchBtn = document.getElementById('trigger-hero-search-btn');
+    const subcategoryWrapper = document.getElementById('subcategory-filter-wrapper');
+    const subcategoryChips = document.getElementById('subcategory-filter-chips');
+
+    // Botón del Hero para abrir el buscador global
+    if (triggerHeroSearchBtn) {
+      triggerHeroSearchBtn.addEventListener('click', () => {
+        document.getElementById('open-search-modal-btn')?.click();
+      });
+    }
+
+    // Actualizar la interfaz de subcategorías desplegables con transiciones
+    function updateSubcategoriesUI() {
+      if (!subcategoryWrapper || !subcategoryChips) return;
+
+      const subCats = subcategoriesData[currentCategory];
+
+      if (!subCats || subCats.length === 0) {
+        // Ocultar y contraer
+        subcategoryChips.style.opacity = '0';
+        subcategoryChips.style.transform = 'translateY(-8px)';
+        subcategoryWrapper.style.height = '0px';
+        return;
+      }
+
+      // Generar los chips HTML
+      let html = `
+        <button class="grid-sub-cat-btn ${currentSubcategory === 'all' ? 'active' : ''}" data-subcat="all">
+          Todos los artículos
+        </button>
+      `;
+
+      subCats.forEach(sub => {
+        const count = initialProducts.filter(p => p.category === currentCategory && getProductSubcategory(p) === sub).length;
+        html += `
+          <button class="grid-sub-cat-btn ${currentSubcategory === sub ? 'active' : ''}" data-subcat="${sub}">
+            ${sub} (${count})
+          </button>
+        `;
+      });
+
+      subcategoryChips.innerHTML = html;
+
+      // Click listeners para subcategorías
+      subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(subBtn => {
+        subBtn.addEventListener('click', (e) => {
+          subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(b => b.classList.remove('active'));
+          const target = e.currentTarget;
+          target.classList.add('active');
+          currentSubcategory = target.getAttribute('data-subcat') || 'all';
+          currentPage = 1;
+          renderProducts();
+        });
+      });
+
+      // Transición suave: calcular scrollHeight
+      subcategoryWrapper.style.height = 'auto';
+      const height = subcategoryChips.scrollHeight + 'px';
+      subcategoryWrapper.style.height = '0px';
+      
+      // Forzar repaint para que se aplique la transición
+      subcategoryWrapper.offsetHeight;
+
+      subcategoryWrapper.style.height = height;
+      subcategoryChips.style.opacity = '1';
+      subcategoryChips.style.transform = 'translateY(0)';
+    }
+
+    // Filtrar por categoría principal
+    document.querySelectorAll('.grid-cat-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.grid-cat-btn').forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget;
+        target.classList.add('active');
+        currentCategory = target.getAttribute('data-category') || 'all';
+        currentSubcategory = 'all'; // Restablecer subcategoría
+        currentPage = 1;
+        
+        updateSubcategoriesUI();
+        renderProducts();
+      });
+    });
+
+    // Búsqueda en vivo
+    if (gridSearchInput && clearGridSearchBtn) {
+      gridSearchInput.addEventListener('input', () => {
+        currentQuery = gridSearchInput.value.trim().toLowerCase();
+        clearGridSearchBtn.style.display = currentQuery ? 'inline-flex' : 'none';
+        currentPage = 1;
+        renderProducts();
+      });
+
+      clearGridSearchBtn.addEventListener('click', () => {
+        gridSearchInput.value = '';
+        currentQuery = '';
+        clearGridSearchBtn.style.display = 'none';
+        currentPage = 1;
+        renderProducts();
+        gridSearchInput.focus();
+      });
+    }
+
+    // Ordenación
+    if (sortSelect) {
+      sortSelect.addEventListener('change', () => {
+        currentSort = sortSelect.value;
+        currentPage = 1;
+        renderProducts();
+      });
+    }
+
+    // Resetear filtros
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', () => {
+        currentCategory = 'all';
+        currentSubcategory = 'all';
+        currentQuery = '';
+        currentSort = 'default';
+        currentPage = 1;
+        if (gridSearchInput) gridSearchInput.value = '';
+        if (clearGridSearchBtn) clearGridSearchBtn.style.display = 'none';
+        if (sortSelect) sortSelect.value = 'default';
+
+        document.querySelectorAll('.grid-cat-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.grid-cat-btn[data-category="all"]')?.classList.add('active');
+
+        updateSubcategoriesUI();
+        renderProducts();
+      });
+    }
+
+    function renderProducts() {
+      if (!productsGrid || !counterText || !noProductsBox) return;
+
+      // Actualizar texto de los chips de categoría según si hay búsqueda activa o no
+      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
+        const catName = btn.getAttribute('data-category');
+        if (currentQuery) {
+          // Ocultar contador entre paréntesis si se busca por texto
+          if (catName === 'all') {
+            btn.textContent = 'Todas';
+          } else {
+            btn.textContent = formatCategoryName(catName);
+          }
+        } else {
+          // Restaurar contador de productos
+          if (catName === 'all') {
+            btn.textContent = `Todas (${initialProducts.length})`;
+          } else {
+            const count = initialProducts.filter(p => p.category === catName).length;
+            btn.textContent = `${formatCategoryName(catName)} (${count})`;
+          }
+        }
+      });
+
+      // 1. Filtrar con soporte fuzzy y subcategorías
+      let filtered = initialProducts.filter(p => {
+        const matchCat = currentCategory === 'all' || p.category === currentCategory;
+        if (!matchCat) return false;
+        
+        const matchSubcat = currentSubcategory === 'all' || getProductSubcategory(p) === currentSubcategory;
+        if (!matchSubcat) return false;
+        
+        return matchProductFuzzy(p, currentQuery);
+      });
+
+      // 2. Ordenar con soporte robusto para valores numéricos
+      if (currentSort === 'price-asc') {
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.price) || 0;
+          const priceB = parseFloat(b.price) || 0;
+          return priceA - priceB;
+        });
+      } else if (currentSort === 'price-desc') {
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.price) || 0;
+          const priceB = parseFloat(b.price) || 0;
+          return priceB - priceA;
+        });
+      } else if (currentSort === 'name-asc') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      }
+
+      // 3. Paginación
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+      if (totalItems === 0) {
+        productsGrid.style.display = 'none';
+        noProductsBox.style.display = 'block';
+        counterText.innerHTML = `Mostrando <strong style="color: var(--primary);">0</strong> de <strong>${initialProducts.length}</strong> productos`;
+        if (paginationContainer) paginationContainer.innerHTML = '';
+        return;
+      }
+
+      // Ajustar página activa si está fuera de límites
+      if (currentPage > totalPages) {
+        currentPage = Math.max(1, totalPages);
+      }
+
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+      const paginatedProducts = filtered.slice(startIndex, endIndex);
+
+      productsGrid.style.display = 'grid';
+      noProductsBox.style.display = 'none';
+      counterText.innerHTML = `Mostrando <strong style="color: var(--accent);">${startIndex + 1}-${endIndex}</strong> de <strong style="color: var(--accent);">${totalItems}</strong> productos`;
+
+      productsGrid.innerHTML = paginatedProducts.map(product => {
+        const highlightedTitle = highlightText(product.name, currentQuery);
+        const highlightedDesc = highlightText(product.description || '', currentQuery);
+
+        return `
+          <article class="product-card">
+            ${product.oldPrice ? `
+              <span style="position: absolute; top: 16px; left: 16px; background-color: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 10;">
+                Oferta
+              </span>
+            ` : ''}
+
+            <a href="/producto/${product.slug}" class="product-image-container" aria-label="Ver detalles de ${product.name}">
+              <img 
+                src="${product.image}" 
+                alt="${product.name}"
+                class="product-image-zoom"
+                loading="lazy"
+              />
+            </a>
+
+            <div class="product-card-body" style="padding: 22px; display: flex; flex-direction: column; flex-grow: 1;">
+              <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">${product.category}</span>
+              <a href="/producto/${product.slug}" style="color: inherit; text-decoration: none;">
+                <h3 style="font-size: 1.15rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; transition: color 0.2s;" class="product-title-link">${highlightedTitle}</h3>
+              </a>
+              <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 20px; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                ${highlightedDesc}
+              </p>
+              
+              <div class="product-card-footer" style="display: flex; align-items: center; justify-content: center; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: baseline; gap: 8px; justify-content: center; width: 100%;">
+                  <span style="font-size: 1.35rem; font-weight: 800; color: var(--text-primary);">${product.price}€</span>
+                  ${product.oldPrice ? `
+                    <span style="font-size: 0.9rem; text-decoration: line-through; color: var(--text-secondary);">${product.oldPrice}€</span>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+
+      // Renderizar controles de paginación
+      renderPaginationControls(totalPages);
+    }
+
+    function renderPaginationControls(totalPages) {
+      if (!paginationContainer) return;
+
+      if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+
+      // Botón Anterior
+      html += `
+        <button 
+          class="pagination-btn pagination-arrow" 
+          ${currentPage === 1 ? 'disabled' : ''} 
+          data-page="${currentPage - 1}"
+          aria-label="Página anterior"
+        >
+          &larr;
+        </button>
+      `;
+
+      // Números de Página
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button 
+            class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+            data-page="${i}"
+            aria-label="Ir a la página ${i}"
+          >
+            ${i}
+          </button>
+        `;
+      }
+
+      // Botón Siguiente
+      html += `
+        <button 
+          class="pagination-btn pagination-arrow" 
+          ${currentPage === totalPages ? 'disabled' : ''} 
+          data-page="${currentPage + 1}"
+          aria-label="Página siguiente"
+        >
+          &rarr;
+        </button>
+      `;
+
+      paginationContainer.innerHTML = html;
+
+      // Escuchar eventos en los botones de paginación
+      paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget;
+          const page = parseInt(target.getAttribute('data-page') || '1');
+          
+          if (page !== currentPage && page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderProducts();
+            
+            // Scroll suave al inicio del catálogo
+            document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Inicializar la primera renderización al cargar la página
+    if (urlCategory) {
+      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
+        if (btn.getAttribute('data-category')?.toUpperCase() === urlCategory.toUpperCase()) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+      // Scroll automático al catálogo si viene con categoría desde URL
+      setTimeout(() => {
+        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+    updateSubcategoriesUI();
+    renderProducts();
+
+    // Escuchar eventos personalizados del menú hamburguesa / navegación global
+    window.addEventListener('filter-category-subcategory', (e) => {
+      const { category, subcategory } = e.detail;
+      currentCategory = category || 'all';
+      currentSubcategory = subcategory || 'all';
+      currentPage = 1;
+
+      // Actualizar clases activas en los botones de categoría principal
+      document.querySelectorAll('.grid-cat-btn').forEach(btn => {
+        const catVal = btn.getAttribute('data-category');
+        if (catVal === currentCategory) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      updateSubcategoriesUI();
+      renderProducts();
+
+      // Scroll suave al catálogo
+      document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Evento del botón de añadir al carrito del Hero
+    document.querySelector('.hero-add-cart-btn')?.addEventListener('click', (e) => {
+      const target = e.currentTarget;
+      const id = target.getAttribute('data-id');
+      const name = target.getAttribute('data-name');
+      const price = parseFloat(target.getAttribute('data-price') || '0');
+      const image = target.getAttribute('data-image');
+
+      if (!id || !name) return;
+
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItem = cart.find(item => item.id === id);
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ id, name, price, image, quantity: 1 });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('cart-updated'));
+
+      const orig = target.textContent || 'Añadir';
+      target.textContent = '¡Añadido! ✓';
+      target.style.backgroundColor = 'var(--success)';
+      target.style.borderColor = 'var(--success)';
+      
+      setTimeout(() => {
+        target.textContent = orig;
+        target.style.backgroundColor = '';
+        target.style.borderColor = '';
+      }, 1500);
+    });
+
+    // Copiar cupón en Hero
+    document.getElementById('copy-hero-promo-btn')?.addEventListener('click', (e) => {
+      const targetBtn = e.currentTarget;
+      const code = targetBtn.getAttribute('data-code') || 'REBAJAS15';
+      
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = targetBtn.textContent || 'Copiar';
+        targetBtn.textContent = '¡Copiado! ✓';
+        targetBtn.style.backgroundColor = 'var(--success)';
+        targetBtn.style.borderColor = 'var(--success)';
+        setTimeout(() => {
+          targetBtn.textContent = orig;
+          targetBtn.style.backgroundColor = '';
+          targetBtn.style.borderColor = '';
+        }, 2000);
+      });
+    });
+  </script>
+</Layout>
