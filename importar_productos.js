@@ -163,9 +163,12 @@ async function migrar() {
       }
     }
 
-    // Crear el documento del producto para Sanity
+    const cleanSlug = (slug || nombre.toLowerCase().replace(/[^a-z0-9]+/g, '-')).replace(/[^a-zA-Z0-9\-_]/g, '');
+
+    // Crear el documento del producto para Sanity (idempotente usando createOrReplace)
     const doc = {
       _type: 'product',
+      _id: `product-${cleanSlug}`,
       name: nombre,
       slug: {
         _type: 'slug',
@@ -179,11 +182,11 @@ async function migrar() {
     };
 
     try {
-      const result = await sanityClient.create(doc);
-      console.log(`✓ Producto creado en Sanity con ID: ${result._id}`);
+      const result = await sanityClient.createOrReplace(doc);
+      console.log(`✓ Producto procesado en Sanity con ID: ${result._id}`);
       creados++;
     } catch (err) {
-      console.error(`✕ Error al crear el producto en Sanity:`, err.message);
+      console.error(`✕ Error al procesar el producto en Sanity:`, err.message);
     }
   }
 
