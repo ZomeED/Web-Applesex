@@ -1261,6 +1261,32 @@ const { title, description } = Astro.props;
             allProducts = await res.json();
             const totalEl = document.getElementById('modal-total-products');
             if (totalEl) totalEl.textContent = allProducts.length.toString();
+
+            // Comprobar si se ha solicitado abrir el catálogo desde otra página
+            if (sessionStorage.getItem('open_catalog') === 'true') {
+              const cat = sessionStorage.getItem('active_category') || 'all';
+              const sub = sessionStorage.getItem('active_subcategory') || 'all';
+
+              sessionStorage.removeItem('open_catalog');
+              sessionStorage.removeItem('active_category');
+              sessionStorage.removeItem('active_subcategory');
+
+              activeCategory = cat;
+              activeSubcategory = sub;
+
+              // Sincronizar botones de categoría
+              document.querySelectorAll('.modal-cat-btn').forEach(btn => {
+                if (btn.getAttribute('data-cat') === activeCategory) {
+                  btn.classList.add('active');
+                } else {
+                  btn.classList.remove('active');
+                }
+              });
+
+              openModal();
+              updateModalSubcategoriesUI();
+              renderSearchResults();
+            }
           }
         } catch (e) {
           console.error('Error al cargar productos para el buscador:', e);
@@ -1629,10 +1655,20 @@ const { title, description } = Astro.props;
       // Escuchar clicks de subcategorías en el drawer para abrir el buscador modal filtrado
       document.querySelectorAll('.drawer-subcat-item').forEach(item => {
         item.addEventListener('click', (e) => {
-          e.preventDefault();
+          const isHomepage = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('/');
           const cat = item.getAttribute('data-cat') || 'all';
           const sub = item.getAttribute('data-sub') || 'all';
-          
+
+          if (!isHomepage) {
+            // Guardar en sessionStorage para abrir el catálogo automáticamente al cargar la home
+            sessionStorage.setItem('open_catalog', 'true');
+            sessionStorage.setItem('active_category', cat);
+            sessionStorage.setItem('active_subcategory', sub);
+            // Dejar que navegue de forma natural al href de destino
+            return;
+          }
+
+          e.preventDefault();
           closeMobileDrawer();
 
           // Configurar filtros globales del buscador
@@ -1661,6 +1697,16 @@ const { title, description } = Astro.props;
       // Escuchar clicks en todos los enlaces de "Catálogo Completo" para abrir el buscador modal completo
       document.querySelectorAll('a[href="/#catalogo"], a[href="#catalogo"], #nav-catalogo-link').forEach(btn => {
         btn.addEventListener('click', (e) => {
+          const isHomepage = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('/');
+          if (!isHomepage) {
+            // Guardar en sessionStorage para abrir el catálogo automáticamente al cargar la home
+            sessionStorage.setItem('open_catalog', 'true');
+            sessionStorage.setItem('active_category', 'all');
+            sessionStorage.setItem('active_subcategory', 'all');
+            // Dejar que navegue de forma natural al href de destino
+            return;
+          }
+
           e.preventDefault();
           closeMobileDrawer();
 
