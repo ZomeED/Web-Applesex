@@ -1224,15 +1224,19 @@ function formatCategoryName(str) {
         </button>
       `;
 
-      // Números de Página (paginación inteligente con elipsis)
+      // Números de Página (paginación inteligente con elipsis y ventana deslizante)
       const pagesToShow = [];
-      const range = 1; // número de páginas vecinas a la actual
-
-      for (let i = 1; i <= totalPages; i++) {
-        if (i === 1 || i === totalPages || (i >= currentPage - range && i <= currentPage + range)) {
+      if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
           pagesToShow.push(i);
-        } else if (pagesToShow[pagesToShow.length - 1] !== '...') {
-          pagesToShow.push('...');
+        }
+      } else {
+        if (currentPage <= 4) {
+          pagesToShow.push(1, 2, 3, 4, 5, '...', totalPages);
+        } else if (currentPage >= totalPages - 3) {
+          pagesToShow.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+        } else {
+          pagesToShow.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
         }
       }
 
