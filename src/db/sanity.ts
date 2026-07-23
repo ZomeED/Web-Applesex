@@ -3,7 +3,7 @@ import imageUrlBuilder from '@sanity/image-url';
 
 // Configuración del cliente de Sanity.io
 // Reemplaza 'applesex-demo-project-id' con el ID real desde el dashboard de Sanity.
-export const SANITY_PROJECT_ID = 'applesex-demo-project-id';
+export const SANITY_PROJECT_ID = 'hs1mheh1';
 export const SANITY_DATASET = 'production';
 
 export const sanityClient = createClient({
