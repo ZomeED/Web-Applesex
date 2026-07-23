@@ -193,8 +193,8 @@ const { title, description } = Astro.props;
           </div>
         </div>
 
-        <div style="border-top: 1px solid var(--border-color); padding-top: 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 0.78rem; color: var(--text-secondary);">
-          <p>© {new Date().getFullYear()} Applesex. Todos los derechos reservados.</p>
+        <div style="border-top: 1px solid var(--border-color); padding-top: 24px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 12px;">
+          <h5 style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-primary); margin: 0 0 4px 0; text-align: left;">Métodos de pago</h5>
           <div class="footer-payment-logos">
             <!-- Visa -->
             <div class="payment-logo-card" title="Visa">
@@ -204,35 +204,31 @@ const { title, description } = Astro.props;
             <div class="payment-logo-card" title="Mastercard">
               <img src="/images/payments/mastercard.svg" alt="Mastercard" width="36" height="24" loading="lazy" />
             </div>
-            <!-- Maestro -->
-            <div class="payment-logo-card" title="Maestro">
-              <img src="/images/payments/maestro.svg" alt="Maestro" width="36" height="24" loading="lazy" />
-            </div>
             <!-- Bizum -->
             <div class="payment-logo-card" title="Bizum">
-              <img src="/images/payments/bizum.svg" alt="Bizum" width="36" height="24" loading="lazy" style="height: 14px;" />
+              <img src="/images/payments/bizum.svg" alt="Bizum" width="36" height="24" loading="lazy" style="max-height: 14px;" />
             </div>
             <!-- Apple Pay -->
             <div class="payment-logo-card" title="Apple Pay">
-              <img src="/images/payments/apple-pay.svg" alt="Apple Pay" width="36" height="24" loading="lazy" style="height: 18px;" />
+              <img src="/images/payments/apple-pay.svg" alt="Apple Pay" width="36" height="24" loading="lazy" style="max-height: 18px;" />
             </div>
             <!-- Google Pay -->
             <div class="payment-logo-card" title="Google Pay">
-              <img src="/images/payments/google-pay.svg" alt="Google Pay" width="36" height="24" loading="lazy" style="height: 18px;" />
+              <img src="/images/payments/google-pay.svg" alt="Google Pay" width="36" height="24" loading="lazy" style="max-height: 18px;" />
             </div>
             <!-- Klarna -->
             <div class="payment-logo-card" title="Klarna">
-              <img src="/images/payments/klarna.svg" alt="Klarna" width="36" height="24" loading="lazy" style="height: 15px;" />
+              <img src="/images/payments/klarna.svg" alt="Klarna" width="36" height="24" loading="lazy" style="max-height: 15px;" />
             </div>
             <!-- PayPal -->
             <div class="payment-logo-card" title="PayPal">
-              <img src="/images/payments/paypal.svg" alt="PayPal" width="36" height="24" loading="lazy" style="height: 18px;" />
-            </div>
-            <!-- Stripe -->
-            <div class="payment-logo-card" title="Procesado por Stripe">
-              <img src="/images/payments/stripe.svg" alt="Stripe" width="36" height="24" loading="lazy" style="height: 18px;" />
+              <img src="/images/payments/paypal.svg" alt="PayPal" width="36" height="24" loading="lazy" style="max-height: 18px;" />
             </div>
           </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-color); padding-top: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 0.78rem; color: var(--text-secondary);">
+          <p>© {new Date().getFullYear()} Applesex. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>
@@ -1206,30 +1202,31 @@ const { title, description } = Astro.props;
       .footer-payment-logos {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         flex-wrap: wrap;
       }
       .payment-logo-card {
         background: #ffffff;
         border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 4px 6px;
+        border-radius: 8px;
+        padding: 6px 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 28px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        transition: transform 0.2s, border-color 0.2s;
+        height: 36px;
+        width: 60px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
       }
       .payment-logo-card:hover {
         transform: translateY(-2px);
         border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(228, 91, 154, 0.15);
       }
-      .payment-logo-card svg {
+      .payment-logo-card img {
         max-height: 100%;
         max-width: 100%;
-        width: auto;
-        height: auto;
+        object-fit: contain;
         display: block;
       }
     </style>
