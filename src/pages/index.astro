@@ -730,6 +730,18 @@ function formatCategoryName(str) {
       font-size: 1.1rem;
       font-weight: 700;
     }
+
+    .pagination-ellipsis {
+      color: #727586;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1rem;
+      user-select: none;
+    }
   </style>
 
   <!-- Script del cliente para filtrado en tiempo real de los 30 productos -->
@@ -1196,18 +1208,33 @@ function formatCategoryName(str) {
         </button>
       `;
 
-      // Números de Página
+      // Números de Página (paginación inteligente con elipsis)
+      const pagesToShow = [];
+      const range = 1; // número de páginas vecinas a la actual
+
       for (let i = 1; i <= totalPages; i++) {
-        html += `
-          <button 
-            class="pagination-btn ${i === currentPage ? 'active' : ''}" 
-            data-page="${i}"
-            aria-label="Ir a la página ${i}"
-          >
-            ${i}
-          </button>
-        `;
+        if (i === 1 || i === totalPages || (i >= currentPage - range && i <= currentPage + range)) {
+          pagesToShow.push(i);
+        } else if (pagesToShow[pagesToShow.length - 1] !== '...') {
+          pagesToShow.push('...');
+        }
       }
+
+      pagesToShow.forEach(page => {
+        if (page === '...') {
+          html += `<span class="pagination-ellipsis">&hellip;</span>`;
+        } else {
+          html += `
+            <button 
+              class="pagination-btn ${page === currentPage ? 'active' : ''}" 
+              data-page="${page}"
+              aria-label="Ir a la página ${page}"
+            >
+              ${page}
+            </button>
+          `;
+        }
+      });
 
       // Botón Siguiente
       html += `
