@@ -249,16 +249,12 @@ function formatCategoryName(str) {
                   ) : null}
                   <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary);">{product.price}€</span>
                 </div>
-                <button 
-                  class="btn btn-primary add-to-cart-btn" 
-                  data-id={product.id}
-                  data-name={product.name}
-                  data-price={product.price}
-                  data-image={product.image}
-                  style="padding: 8px 14px; font-size: 0.85rem; border-radius: 8px;"
+                <a 
+                  href={`/producto/${product.slug}`}
+                  class="btn-detail-link"
                 >
-                  Comprar
-                </button>
+                  Ver Producto
+                </a>
               </div>
             </div>
           </article>
@@ -955,6 +951,27 @@ function formatCategoryName(str) {
       .pagination-arrow {
         font-size: 1rem;
       }
+    }
+
+    .btn-detail-link {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .btn-detail-link:hover {
+      background-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(228, 91, 154, 0.2);
+      transform: translateY(-1px);
     }
   </style>
 
