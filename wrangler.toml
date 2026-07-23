@@ -1,0 +1,9 @@
+name = "applesex-ecommerce"
+compatibility_date = "2024-04-03"
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "applesex_db"
+database_id = "local-applesex-db" # Reemplazar con el ID real al crear la base de datos en Cloudflare Dash
+database_internal_env = "production"

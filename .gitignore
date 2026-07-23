@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Astro files
+.astro/
+
+# Cloudflare Wrangler files
+.wrangler/
+
+# Environment files
+.env
+.env.*
+.dev.vars
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
