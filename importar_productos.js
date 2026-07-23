@@ -15,42 +15,44 @@ const sanityClient = createClient({
   apiVersion: '2024-03-01',
 });
 
-// Función auxiliar para parsear una línea CSV de forma robusta con soporte para comillas dobles de Excel/Sheets
-function parseCSVLine(line) {
-  let cleaned = line.trim().replace(/;+$/, '');
-  
-  // Si la línea entera empieza y termina con comilla por exportación doble
-  if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
-    cleaned = cleaned.slice(1, -1);
-  }
-  
-  // Reducir comillas dobles escapadas ("" -> ")
-  cleaned = cleaned.replace(/""/g, '"');
-
-  const result = [];
-  let current = '';
+// Función auxiliar para parsear el archivo CSV de forma robusta soportando saltos de línea y comillas internas
+function parseCSV(text) {
+  const lines = [];
+  let row = [];
+  let cell = '';
   let inQuotes = false;
 
-  for (let i = 0; i < cleaned.length; i++) {
-    const char = cleaned[i];
-    const nextChar = cleaned[i + 1];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const nextChar = text[i + 1];
 
     if (char === '"') {
       if (inQuotes && nextChar === '"') {
-        current += '"';
+        cell += '"';
         i++;
       } else {
         inQuotes = !inQuotes;
       }
     } else if (char === ',' && !inQuotes) {
-      result.push(current.trim().replace(/^"|"$/g, ''));
-      current = '';
+      row.push(cell.trim());
+      cell = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') {
+        i++;
+      }
+      row.push(cell.trim());
+      lines.push(row);
+      row = [];
+      cell = '';
     } else {
-      current += char;
+      cell += char;
     }
   }
-  result.push(current.trim().replace(/^"|"$/g, ''));
-  return result;
+  if (row.length > 0 || cell !== '') {
+    row.push(cell.trim());
+    lines.push(row);
+  }
+  return lines;
 }
 
 // Descargar una imagen desde una URL y subirla como asset a Sanity
@@ -89,6 +91,14 @@ async function migrar() {
     return;
   }
 
+  console.log('Limpiando base de datos de productos actuales en Sanity para evitar duplicaciones...');
+  try {
+    await sanityClient.delete({ query: '*[_type == "product"]' });
+    console.log('✓ Base de datos de productos limpia en Sanity.');
+  } catch (err) {
+    console.warn('⚠️ No se pudieron limpiar los productos anteriores:', err.message);
+  }
+
   const csvPath = path.resolve('productos.csv');
   if (!fs.existsSync(csvPath)) {
     console.error(`ERROR: No se encuentra el archivo productos.csv en la ruta: ${csvPath}`);
@@ -96,25 +106,27 @@ async function migrar() {
   }
 
   const content = fs.readFileSync(csvPath, 'utf-8');
-  // Dividir por líneas pero gestionando saltos de línea dentro de comillas (básico)
-  const lines = content.split(/\r?\n/);
+  const rows = parseCSV(content);
+
+  if (rows.length === 0) {
+    console.error('El archivo CSV está vacío.');
+    return;
+  }
   
   // La primera línea son las cabeceras
-  const headers = parseCSVLine(lines[0]);
+  const headers = rows[0];
   console.log('Columnas detectadas en el CSV:', headers);
 
   let creados = 0;
   let omitidos = 0;
 
-  for (let idx = 1; idx < lines.length; idx++) {
-    const line = lines[idx];
-    if (!line.trim()) continue;
+  for (let idx = 1; idx < rows.length; idx++) {
+    const row = rows[idx];
+    if (row.length === 1 && row[0] === '') continue; // línea vacía
 
-    const row = parseCSVLine(line);
-
-    // Validación de robustez: Si el CSV tiene menos columnas de las necesarias (como la línea 4 truncada)
+    // Validación de robustez: Si el CSV tiene menos columnas de las necesarias
     if (row.length < 8) {
-      console.warn(`⚠️ [Línea ${idx + 1}] OMITIDA: Faltan columnas básicas (la línea parece incompleta o rota).`);
+      console.warn(`⚠️ [Fila ${idx + 1}] OMITIDA: Faltan columnas básicas (tiene ${row.length} columnas).`);
       omitidos++;
       continue;
     }
