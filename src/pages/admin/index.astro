@@ -1,0 +1,615 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getDb } from '../../db/client';
+import { orders, orderItems } from '../../db/schema';
+import { desc } from 'drizzle-orm';
+import { verifySessionToken } from '../../lib/auth';
+
+const sessionToken = Astro.cookies.get('admin_session')?.value;
+const env = Astro.locals.runtime?.env;
+const secret = env?.SESSION_SECRET || 'applesex-fallback-super-secret-key-2026';
+
+// 1. Verificar autenticación
+if (!sessionToken) {
+  return Astro.redirect('/admin/login');
+}
+
+const authResult = await verifySessionToken(sessionToken, secret);
+if ('error' in authResult) {
+  // Token caducado o inválido, limpiar cookie y redirigir
+  Astro.cookies.delete('admin_session', { path: '/' });
+  return Astro.redirect('/admin/login?error=' + encodeURIComponent('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.'));
+}
+
+const adminEmail = authResult.email;
+
+// 2. Obtener datos de la base de datos D1
+let dbOrders: any[] = [];
+let dbItems: any[] = [];
+let dbError = '';
+
+try {
+  const db = getDb(env);
+  dbOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
+  dbItems = await db.select().from(orderItems);
+} catch (err: any) {
+  console.error('Error cargando la intranet:', err);
+  dbError = err.message || 'No se pudo conectar a la base de datos Cloudflare D1.';
+}
+
+// 3. Agrupar productos por ID de pedido
+const itemsByOrderId: Record<string, any[]> = {};
+for (const item of dbItems) {
+  if (item.orderId) {
+    if (!itemsByOrderId[item.orderId]) {
+      itemsByOrderId[item.orderId] = [];
+    }
+    itemsByOrderId[item.orderId].push(item);
+  }
+}
+
+// 4. Calcular estadísticas básicas
+const totalOrders = dbOrders.length;
+const totalRevenue = dbOrders
+  .filter(o => o.status === 'paid' || o.status === 'shipped')
+  .reduce((acc, o) => acc + o.total, 0);
+
+const pendingDeliveries = dbOrders.filter(o => o.status === 'paid').length;
+---
+
+<Layout title="Intranet de Administración - Applesex" description="Panel de control privado de Applesex." hideWhatsApp={true} hideHeaderFooter={true}>
+  <main style="max-width: 1200px; margin: 0 auto; padding: 40px 20px; min-height: 85vh; font-family: var(--font-body);">
+    
+    <!-- Encabezado del Panel Personalizado (Light y Premium) -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; border-bottom: 1px solid var(--border-color); padding-bottom: 24px;">
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="/" style="display: flex; align-items: center;">
+          <img src="/logo.png" alt="AppleSex" style="height: 48px; width: auto; object-fit: contain; mix-blend-mode: multiply;" />
+        </a>
+        <span style="background: rgba(216, 75, 140, 0.1); color: var(--primary); font-size: 0.8rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.05em; text-transform: uppercase; font-family: var(--font-title);">
+          Intranet
+        </span>
+      </div>
+      
+      <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+          Identificado: <strong style="color: var(--primary);">{adminEmail}</strong>
+        </p>
+        <div style="display: flex; gap: 12px;">
+          <a href="/" target="_blank" class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.85rem; border-radius: 8px; font-family: var(--font-title); display: inline-flex; align-items: center; gap: 6px;">
+            Ver Tienda ↗
+          </a>
+          <button id="logout-btn" class="btn" style="padding: 10px 18px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); color: #ef4444; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: var(--transition-smooth); font-family: var(--font-title);">
+            Cerrar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+
+    {dbError ? (
+      <div class="glass" style="padding: 30px; border-radius: var(--border-radius); background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); color: #ef4444; text-align: center; margin-bottom: 40px;">
+        <h3 style="margin-top: 0; font-family: var(--font-title);">⚠️ Error de Conexión</h3>
+        <p>{dbError}</p>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 8px;">Asegúrate de que estás ejecutando wrangler localmente o de tener creada la base de datos D1 en Cloudflare.</p>
+      </div>
+    ) : null}
+
+    <!-- Tarjetas de Estadísticas -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 40px;">
+      
+      <div class="glass" style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: var(--shadow-premium); display: flex; flex-direction: column; justify-content: center; transition: var(--transition-smooth);">
+        <span style="color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 10px; font-family: var(--font-title);">Facturación (Ventas Confirmadas)</span>
+        <span style="font-size: 2.4rem; font-weight: 800; color: var(--primary); font-family: var(--font-title);">
+          {totalRevenue.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+        </span>
+      </div>
+
+      <div class="glass" style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: var(--shadow-premium); display: flex; flex-direction: column; justify-content: center; transition: var(--transition-smooth);">
+        <span style="color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 10px; font-family: var(--font-title);">Pedidos Totales</span>
+        <span style="font-size: 2.4rem; font-weight: 800; color: var(--text-primary); font-family: var(--font-title);">
+          {totalOrders}
+        </span>
+      </div>
+
+      <div class="glass" style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-color); background: var(--card-bg); box-shadow: var(--shadow-premium); display: flex; flex-direction: column; justify-content: center; transition: var(--transition-smooth);">
+        <span style="color: var(--text-secondary); font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 10px; font-family: var(--font-title);">Envíos Pendientes</span>
+        <span style="font-size: 2.4rem; font-weight: 800; color: #2563eb; font-family: var(--font-title);">
+          {pendingDeliveries}
+        </span>
+      </div>
+
+    </div>
+
+    <!-- Enlaces Directos de Gestión Externa -->
+    <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 45px;">
+      
+      <a href="https://www.sanity.io/manage/project/hs1mheh1" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 250px; text-decoration: none; display: block;">
+        <div class="glass card-hover" style="padding: 24px; border-radius: var(--border-radius); border: 1px solid var(--border-color); background: linear-gradient(135deg, rgba(216, 75, 140, 0.03) 0%, transparent 100%); transition: var(--transition-smooth); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; color: var(--primary); font-weight: 700; font-family: var(--font-title);">Editar Catálogo (Sanity.io)</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">Añadir productos, cambiar fotos, ajustar precios y descripciones de forma visual.</p>
+          </div>
+          <span style="font-size: 1.5rem; color: var(--primary); margin-left: 15px;">🔗</span>
+        </div>
+      </a>
+
+      <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer" style="flex: 1; min-width: 250px; text-decoration: none; display: block;">
+        <div class="glass card-hover" style="padding: 24px; border-radius: var(--border-radius); border: 1px solid rgba(99, 91, 255, 0.15); background: linear-gradient(135deg, rgba(99, 91, 255, 0.03) 0%, transparent 100%); transition: var(--transition-smooth); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <h3 style="margin: 0 0 6px 0; font-size: 1.15rem; color: #635bff; font-weight: 700; font-family: var(--font-title);">Códigos Promocionales (Stripe)</h3>
+            <p style="margin: 0; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.4;">Crear cupones de descuento, ver facturas de Stripe y configurar reembolsos.</p>
+          </div>
+          <span style="font-size: 1.5rem; color: #635bff; margin-left: 15px;">💳</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Buscador y Filtros -->
+    <div style="margin-bottom: 30px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 280px; position: relative;">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Buscar por cliente, email o número de pedido..." 
+          style="width: 100%; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-primary); font-size: 0.95rem; outline: none; font-family: var(--font-body); transition: var(--transition-smooth);"
+        />
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <select id="status-filter" style="padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-primary); font-size: 0.95rem; cursor: pointer; outline: none; font-family: var(--font-body); transition: var(--transition-smooth);">
+          <option value="all" style="background: #ffffff; color: var(--text-primary);">Todos los estados</option>
+          <option value="pending" style="background: #ffffff; color: var(--text-primary);">Pendientes de pago</option>
+          <option value="paid" style="background: #ffffff; color: var(--text-primary);">Pagados (A preparar)</option>
+          <option value="shipped" style="background: #ffffff; color: var(--text-primary);">Enviados</option>
+          <option value="cancelled" style="background: #ffffff; color: var(--text-primary);">Cancelados</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Listado de Pedidos -->
+    <div class="glass" style="border-radius: var(--border-radius); overflow: hidden; border: 1px solid var(--border-color); background: #ffffff; box-shadow: var(--shadow-premium); margin-bottom: 40px;">
+      
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+          <thead>
+            <tr style="background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(255, 255, 255, 0.08); color: var(--accent, #dfc79b); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; font-weight: 700;">
+              <th style="padding: 16px 20px;">ID Pedido</th>
+              <th style="padding: 16px 20px;">Fecha</th>
+              <th style="padding: 16px 20px;">Cliente</th>
+              <th style="padding: 16px 20px;">Entrega</th>
+              <th style="padding: 16px 20px;">Total</th>
+              <th style="padding: 16px 20px;">Estado</th>
+              <th style="padding: 16px 20px; text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody">
+            {dbOrders.length === 0 ? (
+              <tr>
+                <td colspan="7" style="padding: 40px 20px; text-align: center; color: var(--text-secondary, #a0a0a0);">
+                  No hay pedidos registrados en el sistema.
+                </td>
+              </tr>
+            ) : (
+              dbOrders.map((order) => {
+                let orderDate = 'N/A';
+                if (order.createdAt) {
+                  if (order.createdAt === 'CURRENT_TIMESTAMP') {
+                    orderDate = 'Reciente';
+                  } else {
+                    const d = new Date(order.createdAt);
+                    if (isNaN(d.getTime())) {
+                      // Intentar parsear formato SQLite "YYYY-MM-DD HH:MM:SS"
+                      const isoStr = order.createdAt.replace(' ', 'T');
+                      const d2 = new Date(isoStr);
+                      orderDate = !isNaN(d2.getTime()) ? d2.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }) : order.createdAt;
+                    } else {
+                      orderDate = d.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      });
+                    }
+                  }
+                }
+
+                const items = itemsByOrderId[order.id] || [];
+
+                return (
+                  <Fragment>
+                    <!-- Fila Principal del Pedido -->
+                    <tr 
+                      class="order-row" 
+                      data-id={order.id} 
+                      data-client={`${order.customerName} ${order.customerEmail}`.toLowerCase()}
+                      data-status={order.status}
+                      style="border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;"
+                    >
+                      <td style="padding: 18px 20px; font-family: monospace; font-weight: 700; color: var(--text-primary);">
+                        {order.id}
+                      </td>
+                      <td style="padding: 18px 20px; color: var(--text-secondary); font-size: 0.88rem;">
+                        {orderDate}
+                      </td>
+                      <td style="padding: 18px 20px;">
+                        <div style="font-weight: 600; color: var(--text-primary);">{order.customerName}</div>
+                        <div style="font-size: 0.82rem; color: var(--text-secondary);">{order.customerEmail}</div>
+                      </td>
+                      <td style="padding: 18px 20px;">
+                        <span style={`font-size: 0.88rem; font-weight: 600; color: ${order.deliveryMethod === 'recogida' ? '#d97706' : '#2563eb'};`}>
+                          {order.deliveryMethod === 'recogida' ? '🏠 Recogida' : '📦 Envío'}
+                        </span>
+                        {order.deliveryMethod === 'envio' && order.city ? (
+                          <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
+                            {order.city} ({order.postalCode})
+                          </div>
+                        ) : null}
+                      </td>
+                      <td style="padding: 18px 20px; font-weight: 800; color: var(--primary); font-family: var(--font-title); font-size: 1.05rem;">
+                        {order.total.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                      </td>
+                      <td style="padding: 18px 20px;">
+                        {order.status === 'pending' && (
+                          <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25); color: #d97706; font-family: var(--font-title);">
+                            Pendiente Pago
+                          </span>
+                        )}
+                        {order.status === 'paid' && (
+                          <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); color: #059669; font-family: var(--font-title);">
+                            Pagado / Preparar
+                          </span>
+                        )}
+                        {order.status === 'shipped' && (
+                          <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.25); color: #2563eb; font-family: var(--font-title);">
+                            Enviado
+                          </span>
+                        )}
+                        {order.status === 'cancelled' && (
+                          <span style="display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); color: #dc2626; font-family: var(--font-title);">
+                            Cancelado
+                          </span>
+                        )}
+                      </td>
+                      <td style="padding: 18px 20px; text-align: right;">
+                        <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                          <button 
+                            class="toggle-details-btn" 
+                            data-target={`details-${order.id}`}
+                            style="padding: 8px 14px; border-radius: 6px; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-primary); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); font-family: var(--font-title);"
+                          >
+                            Detalles ({items.length})
+                          </button>
+                          
+                          {order.status === 'paid' && (
+                            <button 
+                              class="status-action-btn" 
+                              data-id={order.id} 
+                              data-status="shipped"
+                              style="padding: 8px 14px; border-radius: 6px; border: none; background: #2563eb; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); font-family: var(--font-title);"
+                            >
+                              Enviado
+                            </button>
+                          )}
+                          
+                          {order.status === 'pending' && (
+                            <button 
+                              class="status-action-btn" 
+                              data-id={order.id} 
+                              data-status="paid"
+                              style="padding: 8px 14px; border-radius: 6px; border: none; background: #059669; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); font-family: var(--font-title);"
+                            >
+                              Confirmar Pago
+                            </button>
+                          )}
+
+                          {(order.status === 'pending' || order.status === 'paid') && (
+                            <button 
+                              class="status-action-btn cancel-btn" 
+                              data-id={order.id} 
+                              data-status="cancelled"
+                              style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(239, 68, 68, 0.2); background: transparent; color: #dc2626; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: var(--transition-smooth); font-family: var(--font-title);"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+
+                    <!-- Fila Oculta / Detalles de Productos -->
+                    <tr id={`details-${order.id}`} style="display: none; background: #faf6f8; border-bottom: 1px solid var(--border-color);">
+                      <td colspan="7" style="padding: 24px 30px;">
+                        
+                        <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: space-between;">
+                          <!-- Desglose de Productos -->
+                          <div style="flex: 2; min-width: 300px;">
+                            <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em; font-family: var(--font-title); font-weight: 700;">Productos del Pedido:</h4>
+                            <table style="width: 100%; text-align: left; font-size: 0.88rem; border-collapse: collapse;">
+                              <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-weight: 700; background: transparent;">
+                                  <th style="padding: 8px 0; background: transparent !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-secondary) !important;">Producto</th>
+                                  <th style="padding: 8px 12px; text-align: center; background: transparent !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-secondary) !important;">Cantidad</th>
+                                  <th style="padding: 8px 12px; text-align: right; background: transparent !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-secondary) !important;">Precio Unitario</th>
+                                  <th style="padding: 8px 0; text-align: right; background: transparent !important; border-bottom: 1px solid var(--border-color) !important; color: var(--text-secondary) !important;">Subtotal</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {items.map((item) => (
+                                  <tr style="border-bottom: 1px dashed var(--border-color); color: var(--text-primary); background: transparent;">
+                                    <td style="padding: 12px 0; color: var(--text-primary) !important; border-bottom: 1px dashed var(--border-color) !important;">
+                                      <span style="font-weight: 600; color: var(--text-primary);">{item.productName}</span>
+                                      <span style="display: block; font-size: 0.78rem; color: var(--text-secondary); font-family: monospace;">ID: {item.productId}</span>
+                                    </td>
+                                    <td style="padding: 12px 12px; text-align: center; font-weight: 700; color: var(--text-primary) !important; border-bottom: 1px dashed var(--border-color) !important;">
+                                      {item.quantity}
+                                    </td>
+                                    <td style="padding: 12px 12px; text-align: right; color: var(--text-secondary) !important; border-bottom: 1px dashed var(--border-color) !important;">
+                                      {item.price.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                    </td>
+                                    <td style="padding: 12px 0; text-align: right; font-weight: 800; color: var(--primary) !important; border-bottom: 1px dashed var(--border-color) !important; font-family: var(--font-title);">
+                                      {(item.price * item.quantity).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <!-- Información de Envío Completa -->
+                          <div style="flex: 1; min-width: 250px; border-left: 1px solid var(--border-color); padding-left: 30px;">
+                            <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em; font-family: var(--font-title); font-weight: 700;">Detalles de Entrega:</h4>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; color: var(--text-primary);">
+                              <div>
+                                <span style="color: var(--text-secondary); display: block; font-size: 0.78rem; font-weight: 600;">Método:</span>
+                                <strong style="color: var(--text-primary);">{order.deliveryMethod === 'recogida' ? '🏠 Recogida Express en Churra, Murcia' : '🚚 Envío a Domicilio'}</strong>
+                              </div>
+
+                              {order.deliveryMethod === 'envio' ? (
+                                <div>
+                                  <span style="color: var(--text-secondary); display: block; font-size: 0.78rem; font-weight: 600;">Dirección:</span>
+                                  <span style="color: var(--text-primary);">{order.addressLine1}</span>
+                                  {order.addressLine2 ? <span style="display: block; color: var(--text-primary);">{order.addressLine2}</span> : null}
+                                  <span style="display: block; font-weight: 700; color: var(--text-primary);">{order.postalCode} - {order.city} ({order.province})</span>
+                                </div>
+                              ) : null}
+
+                              {order.customerPhone ? (
+                                <div>
+                                  <span style="color: var(--text-secondary); display: block; font-size: 0.78rem; font-weight: 600;">Teléfono:</span>
+                                  <a href={`tel:${order.customerPhone}`} style="color: var(--primary); text-decoration: none; font-weight: 600; border-bottom: 1px dotted var(--primary);">{order.customerPhone}</a>
+                                </div>
+                              ) : null}
+
+                              <div>
+                                <span style="color: var(--text-secondary); display: block; font-size: 0.78rem; font-weight: 600;">ID de Pago Stripe:</span>
+                                <span style="font-family: monospace; font-size: 0.8rem; color: var(--text-secondary); word-break: break-all;">
+                                  {order.stripeSessionId || 'Sin registrar / Pago offline'}
+                                </span>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+
+                      </td>
+                    </tr>
+                  </Fragment>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+  <style>
+    table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      text-align: left !important;
+      font-size: 0.95rem !important;
+      color: var(--text-primary) !important;
+    }
+    
+    th {
+      color: var(--primary) !important;
+      font-weight: 700 !important;
+      padding: 16px 20px !important;
+      background: #faf6f8 !important;
+      border-bottom: 1px solid var(--border-color) !important;
+    }
+    
+    td {
+      color: var(--text-primary) !important;
+      padding: 18px 20px !important;
+      border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .order-row td span[style*="#a0a0a0"],
+    .order-row td div[style*="#a0a0a0"],
+    .order-row td[style*="#a0a0a0"] {
+      color: var(--text-secondary) !important;
+    }
+    
+    .order-row td[style*="--accent"] {
+      color: var(--primary) !important;
+    }
+
+    .order-row:hover {
+      background-color: rgba(216, 75, 140, 0.02) !important;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 25px rgba(216, 75, 140, 0.08);
+    }
+    
+    .status-action-btn:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+    
+    .toggle-details-btn:hover {
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+      background: rgba(216, 75, 140, 0.02) !important;
+    }
+
+    .cancel-btn:hover {
+      background: rgba(239, 68, 68, 0.08) !important;
+      border-color: rgba(239, 68, 68, 0.5) !important;
+    }
+
+    #logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+      border-color: #ef4444 !important;
+    }
+  </style>
+
+  <script>
+    // 1. Lógica para expandir/ocultar los detalles de los productos
+    document.querySelectorAll('.toggle-details-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-target');
+        if (targetId) {
+          const detailRow = document.getElementById(targetId);
+          if (detailRow) {
+            if (detailRow.style.display === 'none') {
+              detailRow.style.display = 'table-row';
+              button.textContent = 'Ocultar';
+              button.classList.add('active');
+            } else {
+              detailRow.style.display = 'none';
+              button.textContent = 'Detalles';
+              button.classList.remove('active');
+            }
+          }
+        }
+      });
+    });
+
+    // 2. Lógica para cambiar el estado de un pedido (ej: Marcar como enviado, o cancelar)
+    document.querySelectorAll('.status-action-btn').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        const btn = e.currentTarget as HTMLButtonElement;
+        const orderId = btn.getAttribute('data-id');
+        const nextStatus = btn.getAttribute('data-status');
+
+        if (!orderId || !nextStatus) return;
+
+        let confirmMsg = `¿Seguro que deseas marcar el pedido ${orderId} como enviado?`;
+        if (nextStatus === 'cancelled') {
+          confirmMsg = `¿Seguro que deseas cancelar el pedido ${orderId}? Esta acción no se puede deshacer.`;
+        } else if (nextStatus === 'paid') {
+          confirmMsg = `¿Confirmar que has recibido el pago para el pedido ${orderId}?`;
+        }
+
+        if (!confirm(confirmMsg)) return;
+
+        btn.disabled = true;
+        const oldText = btn.textContent;
+        btn.textContent = '...';
+
+        try {
+          const response = await fetch('/api/admin/orders/update-status', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              orderId,
+              status: nextStatus
+            })
+          });
+
+          const data = await response.json();
+          if (response.ok && data.success) {
+            // Recargar para refrescar el estado del panel
+            window.location.reload();
+          } else {
+            alert('Error al actualizar el estado: ' + (data.error || 'Inténtalo de nuevo.'));
+            btn.disabled = false;
+            btn.textContent = oldText;
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Hubo un error de conexión al actualizar el pedido.');
+          btn.disabled = false;
+          btn.textContent = oldText;
+        }
+      });
+    });
+
+    // 3. Lógica para buscar pedidos
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
+    const statusFilter = document.getElementById('status-filter') as HTMLSelectElement;
+    const orderRows = document.querySelectorAll('.order-row');
+
+    function filterRows() {
+      const query = searchInput.value.toLowerCase().trim();
+      const statusValue = statusFilter.value;
+
+      orderRows.forEach(row => {
+        const r = row as HTMLTableRowElement;
+        const orderId = r.getAttribute('data-id')?.toLowerCase() || '';
+        const clientInfo = r.getAttribute('data-client') || '';
+        const status = r.getAttribute('data-status') || '';
+
+        const matchesQuery = orderId.includes(query) || clientInfo.includes(query);
+        const matchesStatus = statusValue === 'all' || status === statusValue;
+
+        // Ocultar fila principal y su correspondiente fila de detalles
+        const detailsRow = document.getElementById(`details-${r.getAttribute('data-id')}`);
+        
+        if (matchesQuery && matchesStatus) {
+          r.style.display = 'table-row';
+        } else {
+          r.style.display = 'none';
+          if (detailsRow) {
+            detailsRow.style.display = 'none';
+            // Volver el botón de detalles a su estado inicial
+            const btn = r.querySelector('.toggle-details-btn');
+            if (btn) btn.textContent = 'Detalles';
+          }
+        }
+      });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterRows);
+    if (statusFilter) statusFilter.addEventListener('change', filterRows);
+
+    // 4. Lógica de cerrar sesión
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        if (!confirm('¿Seguro que deseas cerrar la sesión del panel?')) return;
+        
+        try {
+          const response = await fetch('/api/admin/logout', {
+            method: 'POST'
+          });
+          if (response.ok) {
+            window.location.href = '/admin/login';
+          } else {
+            alert('Error al cerrar sesión. Inténtalo de nuevo.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Error de conexión.');
+        }
+      });
+    }
+  </script>
+</Layout>

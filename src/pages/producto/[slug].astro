@@ -79,21 +79,32 @@ function getProductVariants(prod: any) {
     ];
   }
 
-  // 5. Genérico si hay múltiples imágenes
-  if (imagesList.length > 1) {
-    return imagesList.map((_, i) => ({
-      name: `Opción ${i + 1}`,
-      imageIndex: i
-    }));
-  }
-
   return [];
 }
 
 const variants = getProductVariants(product);
+
+// Construir marcado JSON-LD para SEO de producto
+const productSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": product.name,
+  "image": product.image,
+  "description": product.description,
+  "offers": {
+    "@type": "Offer",
+    "url": Astro.url.href,
+    "priceCurrency": "EUR",
+    "price": product.price.toFixed(2),
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+});
 ---
 
 <Layout title={product.name} description={product.description}>
+  <!-- Marcado de Datos Estructurados de Producto (Product JSON-LD) -->
+  <script type="application/ld+json" set:html={productSchema}></script>
   <!-- Migas de Pan / Breadcrumbs Compactos Mobile-First -->
   <div class="pdp-breadcrumbs-bar">
     <div class="container">
@@ -232,7 +243,8 @@ const variants = getProductVariants(product);
               <strong class="wa-title">¿Dudas sobre este producto?</strong>
               <span class="wa-subtitle">Atención 100% confidencial por WhatsApp</span>
             </div>
-            <a href="https://wa.me/34690127039" target="_blank" class="btn btn-secondary wa-btn">
+            <a href="https://wa.me/34690127039" target="_blank" class="btn btn-secondary wa-btn" style="display: flex; gap: 6px; align-items: center;">
+              <img src="/images/WhatsApp.svg" alt="WhatsApp" style="width: 14px; height: 14px; display: block;" />
               Consultar
             </a>
           </div>
@@ -412,14 +424,9 @@ const variants = getProductVariants(product);
     .pdp-thumbnails-list {
       display: flex;
       gap: 10px;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding-bottom: 4px;
+      flex-wrap: wrap; /* En ordenador, las imágenes saltan a una nueva fila si hay más de 7 */
       width: 100%;
-    }
-    .pdp-thumbnails-list::-webkit-scrollbar {
-      display: none;
+      padding-bottom: 4px;
     }
 
     .pdp-thumb-btn {
@@ -973,6 +980,15 @@ const variants = getProductVariants(product);
         text-align: center;
         justify-content: center;
       }
+      .pdp-thumbnails-list {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .pdp-thumbnails-list::-webkit-scrollbar {
+        display: none;
+      }
     }
   </style>
 
@@ -1146,5 +1162,15 @@ const variants = getProductVariants(product);
         window.location.href = '/carrito';
       });
     }
+
+    // Volver al catálogo conservando el estado previo del historial si es del mismo origen
+    document.querySelectorAll('.pdp-back-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (document.referrer && document.referrer.includes(window.location.host)) {
+          e.preventDefault();
+          history.back();
+        }
+      });
+    });
   </script>
 </Layout>

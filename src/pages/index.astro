@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { getAllProducts } from '../lib/products';
 import { sanityClient, isSanityConfigured } from '../db/sanity';
+import GoogleReviews from '../components/GoogleReviews.astro';
 
 const allProducts = await getAllProducts();
 
@@ -10,8 +11,8 @@ const localHeroSettings = {
   isPromoActive: true,
   tag: 'Descuento de lanzamiento',
   title: 'Juguetes eróticos y cosmética para disfrutar',
-  subtitle: 'Encuentra las mejores marcas internacionales de bienestar íntimo. Envíos 100% discretos en 24h o recogida local en nuestro almacén en Churra, Murcia.',
-  promoCode: 'APPLE20',
+  subtitle: 'Encuentra las mejores marcas internacionales de bienestar íntimo. Envíos 100% discretos en 24h o recogida local en nuestra tienda en Churra, Murcia.',
+  promoCode: 'APPLESEX20',
   promoDetails: '20% de descuento en toda la web',
   promoExclusions: '*Excepto afrodisíacos',
   image: allProducts[0]?.image || '/images/vibrador_minimalista.jpg',
@@ -49,7 +50,7 @@ if (isSanityConfigured()) {
 }
 
 // Extraer categorías únicas para los filtros
-const categoriesOrder = ["JUGUETES", "COSMÉTICA SENSORIAL", "BDSM", "SALUD ÍNTIMA"];
+const categoriesOrder = ["JUGUETES", "LENCERÍA", "ANAL", "COSMÉTICA", "BDSM", "BIENESTAR"];
 const categories = Array.from(new Set(allProducts.map(p => p.category)))
   .filter(Boolean)
   .sort((a, b) => categoriesOrder.indexOf(a) - categoriesOrder.indexOf(b));
@@ -73,33 +74,74 @@ function formatCategoryName(str) {
   title="Inicio - Catálogo Oficial" 
   description="Explora los 30 productos de nuestra boutique erótica y bienestar íntimo en Churra, Murcia. Envíos discretos 24h o recogida local en 2 horas."
 >
+  <!-- Marcado de Datos Estructurados de Negocio Local (LocalBusiness JSON-LD) -->
+  <script type="application/ld+json" is:inline>
+    {
+      "@context": "https://schema.org",
+      "@type": "AdultStore",
+      "name": "Applesex",
+      "image": "https://applesex-ecommerce.pages.dev/logo.png",
+      "@id": "https://applesex-ecommerce.pages.dev/#store",
+      "url": "https://applesex-ecommerce.pages.dev",
+      "telephone": "+34690127039",
+      "priceRange": "$$",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Calle Brazal 1",
+        "addressLocality": "Churra",
+        "addressRegion": "Murcia",
+        "postalCode": "30110",
+        "addressCountry": "ES"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 38.0094, 
+        "longitude": -1.1278
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "10:00",
+          "closes": "13:30"
+        },
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "17:30",
+          "closes": "21:00"
+        }
+      ]
+    }
+  </script>
+
   <!-- Hero Section con gradiente animado y diseño premium -->
-  <section style="position: relative; padding: 100px 0 70px 0; overflow: hidden; background: radial-gradient(circle at 80% 20%, rgba(216, 75, 140, 0.1) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(216, 75, 140, 0.05) 0%, transparent 40%);">
+  <section class="hero-section">
     <div class="container hero-grid" style="z-index: 2; position: relative;">
       
       <!-- Textos Hero -->
       <div>
-        <span style="color: var(--primary); text-transform: uppercase; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; display: inline-block; margin-bottom: 16px;">
+        <span style="color: var(--primary); text-transform: uppercase; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.15em; display: inline-block; margin-bottom: 12px;">
           {heroSettings.tag}
         </span>
         
         {heroSettings.isPromoActive ? (
           <div>
-            <h1 style="font-size: clamp(2.2rem, 4.5vw, 3.5rem); line-height: 1.1; margin-bottom: 8px;">
+            <h1 class="hero-title">
               {heroSettings.title}
             </h1>
-            <h2 style="font-size: clamp(1.6rem, 3.5vw, 2.6rem); font-family: var(--font-title); font-weight: 800; color: var(--primary); margin-bottom: 20px; line-height: 1.2;">
+            <h2 class="hero-promo-sub">
               {heroSettings.promoDetails}
             </h2>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; margin-bottom: 24px; max-width: 500px;">
+            <p class="hero-description">
               {heroSettings.subtitle}
             </p>
             
             <!-- Caja de Cupón Interactiva y Profesional -->
-            <div class="promo-box-container" style="background: #ffffff; border: 1px dashed var(--primary); border-radius: 12px; padding: 16px 20px; max-width: 420px; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+            <div class="hero-promo-box">
               <div>
-                <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 2px;">CÓDIGO DE DESCUENTO</span>
-                <strong style="font-family: var(--font-title); font-size: 1.4rem; color: var(--primary); letter-spacing: 0.05em;">{heroSettings.promoCode}</strong>
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-secondary); display: block; margin-bottom: 2px;">CÓDIGO DE DESCUENTO</span>
+                <strong style="font-family: var(--font-title); font-size: 1.3rem; color: var(--primary); letter-spacing: 0.05em;">{heroSettings.promoCode}</strong>
               </div>
               <button 
                 id="copy-hero-promo-btn" 
@@ -112,155 +154,265 @@ function formatCategoryName(str) {
             </div>
             
             {heroSettings.promoExclusions && (
-              <span class="promo-exclusions-text" style="display: block; font-size: 0.8rem; color: var(--text-secondary); font-style: italic; margin-bottom: 30px;">
+              <span class="hero-exclusions" style="margin-bottom: 0;">
                 {heroSettings.promoExclusions}
               </span>
             )}
-            
-            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-              <a href="#catalogo" class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem; border-radius: 12px;">Explorar Catálogo</a>
-            </div>
           </div>
         ) : (
           <div>
-            <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; margin-bottom: 24px;">
+            <h1 class="hero-title">
               {heroSettings.title}
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.15rem; margin-bottom: 32px; max-width: 500px;">
+            <p class="hero-description" style="margin-bottom: 0;">
               {heroSettings.subtitle}
             </p>
-            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-              <a href="#catalogo" class="btn btn-primary" style="padding: 14px 28px; font-size: 1rem; border-radius: 12px;" id="hero-explore-btn">Explorar Catálogo</a>
-            </div>
           </div>
         )}
       </div>
 
-      <!-- Imagen Destacada del Producto Estrella -->
-      <div style="position: relative; display: flex; justify-content: center;">
-        <div style="position: absolute; width: 300px; height: 300px; background: var(--primary); filter: blur(100px); opacity: 0.12; top: 10%; left: 10%; border-radius: 50%; z-index: -1;"></div>
-        <div style="border-radius: 24px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow-premium); background: #ffffff; padding: 24px; max-width: 420px; text-align: center; width: 100%;">
-          <img src={heroSettings.image} alt={heroSettings.productName} style="width: 100%; border-radius: 16px; object-fit: cover; aspect-ratio: 1; margin-bottom: 20px; border: 1px solid var(--border-color); background: #f7f7fa;" />
-          <span style="background: rgba(216, 75, 140, 0.08); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; display: inline-block; margin-bottom: 8px;">DESTACADO DE HOY</span>
-          <h3 style="font-size: 1.2rem; margin-bottom: 8px; font-weight: 700;">{heroSettings.productName}</h3>
-          <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">{heroSettings.productDescription}</p>
-          <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border-color);">
-            <span style="color: var(--primary); font-weight: 800; font-size: 1.3rem;">{heroSettings.productPrice}</span>
-            <button class="btn btn-primary hero-add-cart-btn" data-id={allProducts[0]?.id} data-name={allProducts[0]?.name} data-price={allProducts[0]?.price} data-image={allProducts[0]?.image} style="padding: 8px 16px; font-size: 0.85rem;">
-              Añadir a la cesta
-            </button>
-          </div>
-        </div>
-      </div>
+
 
     </div>
   </section>
 
 
-  <!-- Burbujas de Categorías estilo Instagram Stories -->
-  <section style="padding: 24px 0 10px 0; background: #ffffff;">
-    <div class="categories-bubbles-container">
+  <!-- Banner de Categorías y Descuento Premium (Diseño Mobile-First) -->
+  <section class="promo-categories-banner" style="background: linear-gradient(180deg, #fbfafd 0%, #f6f2f7 100%); padding: 50px 0; color: var(--text-primary); position: relative; overflow: hidden; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+    <!-- Elementos decorativos de fondo -->
+    <div style="position: absolute; width: 250px; height: 250px; background: var(--primary); filter: blur(100px); opacity: 0.04; top: -10%; right: -5%; border-radius: 50%; z-index: 1; pointer-events: none;"></div>
+    <div style="position: absolute; width: 200px; height: 200px; background: #885df1; filter: blur(90px); opacity: 0.03; bottom: -10%; left: -5%; border-radius: 50%; z-index: 1; pointer-events: none;"></div>
+    
+    <div class="container" style="position: relative; z-index: 2;">
       
-      <button class="category-bubble-item" data-category="JUGUETES" style="background: transparent; border: none; padding: 0; font-family: inherit;">
-        <div class="category-bubble-img" style="color: #e45b9a; background: #fdfafb;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        </div>
-        <span class="category-bubble-label">Juguetes</span>
-      </button>
+      <!-- Título de Categorías -->
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-title);">¿Qué buscas hoy?</h3>
+      </div>
 
-      <button class="category-bubble-item" data-category="COSMÉTICA SENSORIAL" style="background: transparent; border: none; padding: 0; font-family: inherit;">
-        <div class="category-bubble-img" style="color: #885df1; background: #fbf9ff;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
-          </svg>
-        </div>
-        <span class="category-bubble-label">Cosmética</span>
-      </button>
+      <!-- Cuadrícula 2x2 de Categorías Estilo Platanomelón (Diseño Premium 3D) -->
+      <div class="categories-2x2-grid">
+        
+        <!-- Categoría 1: Juguetes -->
+        <button class="pl-cat-card" data-category="JUGUETES">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-juguetes.jpg');"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">explora</span>
+            <span class="pl-cat-title">Juguetes</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-juguetes-icon.png" alt="Juguetes" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-toy" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e45b9a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M12 2a4 4 0 0 0-4 4v6a4 4 0 0 0 8 0V6a4 4 0 0 0-4-4z"></path>
+              <path d="M12 16v5"></path>
+              <circle cx="12" cy="6" r="1" fill="#e45b9a"></circle>
+            </svg>
+          </div>
+        </button>
 
-      <button class="category-bubble-item" data-category="BDSM" style="background: transparent; border: none; padding: 0; font-family: inherit;">
-        <div class="category-bubble-img" style="color: #3b3759; background: #f7f6f9;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-          </svg>
-        </div>
-        <span class="category-bubble-label">BDSM</span>
-      </button>
+        <!-- Categoría 2: Lencería -->
+        <button class="pl-cat-card" data-category="LENCERÍA">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-lenceria.jpg');"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">viste</span>
+            <span class="pl-cat-title">Lencería</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-lenceria-icon.png" alt="Lencería" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-lingerie" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M6 3h12l1 5-4 2v11H9V10L5 8z"></path>
+              <path d="M9 10h6"></path>
+              <path d="M12 3v7"></path>
+            </svg>
+          </div>
+        </button>
 
-      <button class="category-bubble-item" data-category="SALUD ÍNTIMA" style="background: transparent; border: none; padding: 0; font-family: inherit;">
-        <div class="category-bubble-img" style="color: #10b981; background: #f2faf7;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-        </div>
-        <span class="category-bubble-label">Salud Íntima</span>
-      </button>
+        <!-- Categoría 3: Anal -->
+        <button class="pl-cat-card" data-category="ANAL">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-anal.jpg');"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">experimenta</span>
+            <span class="pl-cat-title">Anal</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-anal-icon.png" alt="Anal" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-anal" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M12 2a3 3 0 0 1 3 3c0 2-3 6-3 6s-3-4-3-6a3 3 0 0 1 3-3z"></path>
+              <path d="M12 11v3"></path>
+              <path d="M9 14h6"></path>
+              <path d="M8 18h8a2 2 0 0 1 2 2v2H6v-2a2 2 0 0 1 2-2z"></path>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Categoría 4: Cosmética -->
+        <button class="pl-cat-card" data-category="COSMÉTICA">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-cosmetica.jpg');"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">siente</span>
+            <span class="pl-cat-title">Cosmética</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-cosmetica-icon.png" alt="Cosmética" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-lotion" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#885df1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <rect x="6" y="8" width="12" height="13" rx="2"></rect>
+              <path d="M9 8V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"></path>
+              <path d="M12 11v4"></path>
+              <path d="M10 13h4"></path>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Categoría 5: BDSM -->
+        <button class="pl-cat-card" data-category="BDSM">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-bdsm.png'); background-color: #211522;"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">atrévete</span>
+            <span class="pl-cat-title">BDSM</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-bdsm-icon.png" alt="BDSM" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-bdsm" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ed6daa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <circle cx="6" cy="12" r="4"></circle>
+              <circle cx="18" cy="12" r="4"></circle>
+              <path d="M10 12h4"></path>
+            </svg>
+          </div>
+        </button>
+
+        <!-- Categoría 6: Bienestar -->
+        <button class="pl-cat-card" data-category="BIENESTAR">
+          <div class="pl-cat-bg" style="background-image: url('/images/cat-salud.jpg');"></div>
+          <div class="pl-cat-content">
+            <span class="pl-cat-subtext">cuida</span>
+            <span class="pl-cat-title">bienestar</span>
+          </div>
+          <div class="pl-cat-badge">
+            <div class="pl-cat-shadow-base"></div>
+            <img src="/images/cat-salud-icon.png" alt="Salud Íntima" class="pl-cat-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <svg class="placeholder-svg-health" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="M12 8v6"></path>
+              <path d="M12 11h.01"></path>
+            </svg>
+          </div>
+        </button>
+
+      </div>
+
+      <!-- Botón Explorar Todo el Catálogo -->
+      <div style="text-align: center;">
+        <button 
+          id="banner-explore-all-btn" 
+          class="btn btn-secondary" 
+          style="background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: #ffffff; font-size: 0.95rem; border-radius: 12px; padding: 12px 30px; transition: var(--transition-smooth); width: 100%; max-width: 320px; box-shadow: none;"
+        >
+          Explorar catálogo completo
+        </button>
+      </div>
 
     </div>
   </section>
 
   <!-- Sección Catálogo de Productos con Buscador Inteligente Integrado -->
-  <!-- Sección Catálogo de Productos (Recomendados) -->
   <section id="catalogo" style="padding: 90px 0; background: #ffffff;">
     <div class="container">
       
       <div style="text-align: center; margin-bottom: 48px;">
         <span style="color: var(--primary); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px;">NUESTRA SELECCIÓN</span>
-        <h2 style="font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 12px; font-family: var(--font-title); font-weight: 800;">Recomendaciones</h2>
-        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem; line-height: 1.5;">
+        <h2 id="catalog-title" style="font-size: clamp(2rem, 3.5vw, 2.8rem); margin-bottom: 12px; font-family: var(--font-title); font-weight: 800;">Recomendaciones</h2>
+        <p id="catalog-desc" style="color: var(--text-secondary); max-width: 600px; margin: 0 auto; font-size: 1.05rem; line-height: 1.5;">
           Una cuidada selección de nuestros mejores artículos eróticos y bienestar íntimo para disfrutar a solas o en pareja.
         </p>
       </div>
 
-      <!-- Parrilla de Productos Recomendados (Estática y veloz) -->
-      <div class="products-grid">
-        {allProducts.slice(0, 8).map(product => (
-          <article class="product-card">
-            {product.oldPrice ? (
-              <span style="position: absolute; top: 16px; left: 16px; background-color: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 10;">
-                Oferta
-              </span>
-            ) : null}
+      <!-- Barra de Control del Catálogo -->
+      <div class="catalog-toolbar">
+        
+        <!-- Fila de Búsqueda y Ordenación -->
+        <div class="catalog-toolbar-filters">
+          
+          <div style="position: relative; width: 100%;">
+            <input 
+              type="text" 
+              id="grid-search-input" 
+              placeholder="Buscar productos..."
+              style="width: 100%; padding: 12px 16px 12px 44px; background: #f7f7fa; border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 16px; outline: none; transition: border-color 0.2s;"
+            />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <button id="clear-grid-search-btn" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1rem;">✕</button>
+          </div>
 
-            <a href={`/producto/${product.slug}`} class="product-image-container" aria-label={`Ver detalles de ${product.name}`}>
-              <img 
-                src={product.image} 
-                alt={product.name}
-                class="product-image-zoom"
-                loading="lazy"
-              />
-            </a>
+          <div class="sort-select-wrapper">
+            <label for="grid-sort-select" class="sort-label">Ordenar por:</label>
+            <select id="grid-sort-select" class="sort-select-input">
+              <option value="default">Destacados</option>
+              <option value="price-asc">Precio: más bajo</option>
+              <option value="price-desc">Precio: más alto</option>
+              <option value="name-asc">Nombre: A - Z</option>
+            </select>
+          </div>
 
-            <div class="product-card-body" style="padding: 22px; display: flex; flex-direction: column; flex-grow: 1;">
-              <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">{product.category}</span>
-              <a href={`/producto/${product.slug}`} style="color: inherit; text-decoration: none;">
-                <h3 style="font-size: 1.15rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; transition: color 0.2s;" class="product-title-link">{product.name}</h3>
-              </a>
-              <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
-                {product.description || ''}
-              </p>
-              
-              <div style="display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                {product.oldPrice ? (
-                  <span style="font-size: 0.95rem; text-decoration: line-through; color: var(--text-secondary); font-weight: 500;">{product.oldPrice}€</span>
-                ) : null}
-                <span style="font-size: 1.35rem; font-weight: 800; color: var(--primary); font-family: var(--font-title);">{product.price}€</span>
-              </div>
-            </div>
-          </article>
-        ))}
+        </div>
+
+        <!-- Chips de Categorías con Scroll Horizontal Táctil -->
+        <div class="category-filter-chips" style="align-items: center;">
+          <button class="cat-filter-btn grid-cat-all-btn active" data-category="all">
+            Ver todo
+          </button>
+          {categories.map(cat => {
+            return (
+              <button class="cat-filter-btn grid-cat-btn" data-category={cat}>
+                {formatCategoryName(cat)}
+              </button>
+            );
+          })}
+        </div>
+
+        <!-- Subcategorías Desplegables con Transición Suave -->
+        <div class="subcategory-filter-wrapper" id="subcategory-filter-wrapper">
+          <div class="subcategory-filter-chips" id="subcategory-filter-chips"></div>
+        </div>
+
       </div>
 
-      <!-- Gran CTA central para abrir el Catálogo Completo en el Buscador Modal -->
-      <div style="text-align: center; margin-top: 48px;">
-        <button 
-          id="open-catalog-full-btn"
-          class="btn btn-primary" 
-          style="padding: 16px 36px; font-size: 1rem; font-weight: 700; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em; background: linear-gradient(135deg, #e45b9a, #c43b7a); border: none; box-shadow: var(--shadow-glow);"
-        >
-          Ver Catálogo Completo ({allProducts.length} artículos)
+      <!-- Contador de Productos Filtrados -->
+      <div id="grid-counter-text" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; font-weight: 500;">
+        Mostrando <strong style="color: var(--primary);">{allProducts.length}</strong> de <strong>{allProducts.length}</strong> productos
+      </div>
+
+      <!-- Parrilla de Productos Renderizada -->
+      <div id="main-products-grid" class="products-grid">
+        <!-- Inyectado por JS client-side -->
+      </div>
+
+      <!-- Controles de Paginación del Catálogo -->
+      <div id="catalog-pagination-container" class="pagination-container">
+        <!-- Inyectado por JS client-side -->
+      </div>
+
+      <!-- Estado Vacío cuando no hay resultados -->
+      <div id="no-products-found" style="display: none; text-align: center; padding: 60px 20px; background: #ffffff; border: 1px solid var(--border-color); border-radius: 20px; margin-top: 20px;">
+        <div style="width: 64px; height: 64px; background: rgba(216, 75, 140, 0.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; color: var(--primary);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 10px;">No se encontraron productos</h3>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; max-width: 480px; margin: 0 auto 24px auto;">
+          No coincide ningún producto con tu criterio de búsqueda o categoría seleccionada.
+        </p>
+        <button id="reset-grid-filters-btn" class="btn btn-primary">
+          Restablecer Filtros y Ver Todos ({allProducts.length})
         </button>
       </div>
 
@@ -320,13 +472,16 @@ function formatCategoryName(str) {
           </div>
           <h3 style="font-size: 1.15rem; margin-bottom: 10px; font-weight: 700; color: var(--text-primary);">Compra 100% Segura</h3>
           <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin: 0;">
-            Tus pagos están totalmente protegidos con encriptación SSL de grado militar a través de <strong>Stripe</strong>. Tarjeta, Bizum o Apple Pay.
+            Tus pagos están totalmente protegidos con encriptación SSL de alto nivel a través de <strong>Stripe</strong>. Tarjeta, Bizum o Apple Pay.
           </p>
         </div>
 
       </div>
     </div>
   </section>
+
+  <!-- Sección de Reseñas de Google (Social Proof) -->
+  <GoogleReviews />
 
   <!-- Sección Recogida e Inmediatez Local (Tienda Física Murcia) -->
   <section id="recogida" style="padding: 90px 0; background: #ffffff; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
@@ -423,94 +578,299 @@ function formatCategoryName(str) {
 
   <!-- Estilos del Catálogo & Buscador Integrado -->
   <style is:global>
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 48px;
-      align-items: center;
+    /* Hero Section Responsive Layout */
+    .hero-section {
+      position: relative;
+      padding: 60px 0 45px 0; /* Compact padding on mobile */
+      overflow: hidden;
+      background: radial-gradient(circle at 80% 20%, rgba(216, 75, 140, 0.1) 0%, transparent 50%), radial-gradient(circle at 10% 80%, rgba(216, 75, 140, 0.05) 0%, transparent 40%);
+    }
+    @media (min-width: 768px) {
+      .hero-section {
+        padding: 100px 0 70px 0; /* Desktop padding */
+      }
     }
 
-    /* Burbujas de categorías estilo Instagram */
-    .categories-bubbles-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 28px;
-      padding: 24px 16px;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      width: 100%;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
       max-width: 800px;
-      margin: 0 auto;
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
+      gap: 32px;
+      align-items: center;
     }
-    .categories-bubbles-container::-webkit-scrollbar {
-      display: none;
+    @media (min-width: 768px) {
+      .hero-grid {
+        gap: 48px;
+      }
     }
-    
-    .category-bubble-item {
+
+    .hero-title {
+      font-size: clamp(1.9rem, 4.5vw, 3.5rem);
+      line-height: 1.15;
+      margin-bottom: 6px;
+      margin-top: 0;
+      color: var(--text-primary);
+    }
+
+    .hero-promo-sub {
+      font-size: clamp(1.35rem, 3.5vw, 2.5rem);
+      font-family: var(--font-title);
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 12px;
+      line-height: 1.2;
+      margin-top: 0;
+    }
+
+    .hero-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.45;
+      margin-bottom: 16px;
+      max-width: 500px;
+    }
+    @media (min-width: 768px) {
+      .hero-description {
+        font-size: 1.1rem;
+        margin-bottom: 24px;
+      }
+    }
+
+    .hero-promo-box {
+      background: #ffffff;
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      padding: 10px 14px;
+      max-width: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+      width: 100%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+    @media (min-width: 768px) {
+      .hero-promo-box {
+        padding: 16px 20px;
+        margin-bottom: 8px;
+      }
+    }
+
+    .hero-exclusions {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      margin-bottom: 16px;
+    }
+    @media (min-width: 768px) {
+      .hero-exclusions {
+        margin-bottom: 30px;
+      }
+    }
+
+    .hero-cta-btn {
+      padding: 10px 22px;
+      font-size: 0.92rem;
+      border-radius: 10px;
+    }
+    @media (min-width: 768px) {
+      .hero-cta-btn {
+        padding: 14px 28px;
+        font-size: 1rem;
+        border-radius: 12px;
+      }
+    }
+
+    /* Cuadrícula de Categorías estilo Platanomelón */
+    .categories-2x2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 540px;
+      margin: 0 auto 30px auto;
+    }
+
+    @media (min-width: 768px) {
+      .categories-2x2-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 900px;
+        gap: 20px;
+      }
+    }
+
+    .pl-cat-card {
+      position: relative;
+      aspect-ratio: 1 / 1.06;
+      background: #ffffff;
+      border: none;
+      border-radius: 18px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 0;
+      width: 100%;
+      outline: none;
+    }
+
+    .pl-cat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+    }
+
+    .pl-cat-card:active {
+      transform: scale(0.97);
+    }
+
+    /* Mitad superior: Foto Lifestyle */
+    .pl-cat-bg {
+      height: 50%;
+      width: 100%;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.5s ease;
+    }
+
+    .pl-cat-card:hover .pl-cat-bg {
+      transform: scale(1.06);
+    }
+
+    /* Mitad inferior: Fondo sólido pastel desaturado */
+    .pl-cat-content {
+      height: 50%;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-decoration: none;
-      color: var(--text-primary);
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 0.23s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      scroll-snap-align: start;
+      justify-content: flex-end;
+      padding-bottom: 12px; /* Bajar un poco más el texto */
+      transition: background-color 0.3s ease;
     }
-    .category-bubble-item:hover {
-      transform: translateY(-4px);
+
+    /* Colores pastel desaturados para el fondo inferior */
+    .pl-cat-card[data-category="JUGUETES"] .pl-cat-content {
+      background-color: #d1c8c5; /* Arcilla suave */
     }
-    
-    .category-bubble-img {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
+    .pl-cat-card[data-category="LENCERÍA"] .pl-cat-content {
+      background-color: #d2c8cb; /* Rosa viejo desaturado */
+    }
+    .pl-cat-card[data-category="ANAL"] .pl-cat-content {
+      background-color: #e2dcd5; /* Arena suave desaturado */
+    }
+    .pl-cat-card[data-category="COSMÉTICA"] .pl-cat-content {
+      background-color: #cbd3c6; /* Verde salvia desaturado */
+    }
+    .pl-cat-card[data-category="BDSM"] .pl-cat-content {
+      background-color: #c8bfcb; /* Lila apagado desaturado */
+    }
+    .pl-cat-card[data-category="BIENESTAR"] .pl-cat-content {
+      background-color: #c9d2ce; /* Menta grisácea desaturado */
+    }
+
+    .pl-cat-subtext {
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-size: 0.8rem; /* Tamaño reducido para mejor proporción */
+      color: #554846;
+      margin: 0 0 -2px 0; /* Juntar los textos reduciendo el espacio intermedio */
+      line-height: 1.2;
+    }
+
+    .pl-cat-title {
+      font-family: var(--font-title);
+      font-weight: 800;
+      font-size: 1.3rem; /* Ajustado ligeramente */
+      color: #21121d;
+      text-transform: lowercase;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    /* Insignia central flotante */
+    .pl-cat-badge {
+      position: absolute;
+      top: 45%; /* Subido del 50% al 45% para dar más espacio al texto abajo */
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 46%; /* Reducido ligeramente de 50% para evitar superposición */
+      height: 46%;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-      margin-bottom: 8px;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .category-bubble-item:hover .category-bubble-img {
-      border-color: var(--primary);
-      box-shadow: var(--shadow-glow);
-    }
-    
-    /* Anillo exterior premium estilo Stories */
-    .category-bubble-img::before {
-      content: '';
-      position: absolute;
-      top: -3px;
-      left: -3px;
-      right: -3px;
-      bottom: -3px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      background: linear-gradient(135deg, #ff7eb3, #ff758c) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: destination-out;
-      mask-composite: exclude;
-      opacity: 0.7;
-      transition: opacity 0.2s;
-    }
-    .category-bubble-item:hover .category-bubble-img::before {
-      opacity: 1;
+      z-index: 10;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .category-bubble-label {
-      font-size: 0.78rem;
+    .pl-cat-card:hover .pl-cat-badge {
+      transform: translate(-50%, -45%) scale(1.08); /* Mantener la alineación en hover */
+    }
+
+    /* Suave sombra de contacto elíptica y direccional (luz desde arriba-derecha hacia abajo-izquierda) */
+    .pl-cat-shadow-base {
+      position: absolute;
+      bottom: 1%; /* Ligeramente más abajo de la base */
+      left: 42%; /* Desplazada hacia la izquierda */
+      transform: translateX(-50%) skewX(-24deg); /* Inclinada hacia la izquierda */
+      width: 52%; /* Más ancha para representar la proyección */
+      height: 10px; /* Un poco más de altura para la inclinación */
+      background: rgba(16, 8, 14, 0.42); /* Sombra de contacto oscurecida a 0.42 para darle más peso y realismo */
+      border-radius: 50%;
+      filter: blur(5px); /* Reducido a 5px para mantener más definición en el punto de contacto */
+      z-index: 5;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* Al hacer hover la sombra se proyecta más lejos (se desplaza más a la izquierda, se encoge, difumina y atenúa) */
+    .pl-cat-card:hover .pl-cat-shadow-base {
+      transform: translateX(-65%) scale(0.6) skewX(-24deg);
+      opacity: 0.38;
+      filter: blur(8px);
+    }
+
+    .pl-cat-icon {
+      position: relative;
+      z-index: 10; /* Renderizarse por encima de la sombra */
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      /* Sombra proyectada del producto desplazada a la izquierda (-8px) para alinearse con la sombra del suelo,
+         y un sutil procesado fotográfico (saturación y brillo) para fundirse orgánicamente con el ambiente cálido de la foto */
+      filter: drop-shadow(-8px 12px 14px rgba(0, 0, 0, 0.38)) brightness(0.96) contrast(1.03) saturate(0.98);
+    }
+
+    /* Efecto 3D pop-out: el producto flota hacia arriba y adelante al hacer hover */
+    .pl-cat-card:hover .pl-cat-icon {
+      transform: translateY(-10px) scale(1.2);
+      filter: drop-shadow(-14px 20px 24px rgba(0, 0, 0, 0.45)) brightness(0.96) contrast(1.03) saturate(0.98);
+    }
+
+    #banner-explore-all-btn {
+      background: transparent !important;
+      border: 1px solid var(--primary) !important;
+      color: var(--primary) !important;
+      font-size: 0.92rem !important;
+      border-radius: 12px !important;
+      padding: 12px 30px !important;
+      width: 100%;
+      max-width: 320px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-primary);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: none;
+    }
+
+    #banner-explore-all-btn:hover {
+      background: var(--primary) !important;
+      color: #ffffff !important;
+      border-color: var(--primary) !important;
+      box-shadow: 0 8px 24px rgba(216, 75, 140, 0.2) !important;
+      transform: translateY(-2px);
     }
 
     @media (max-width: 480px) {
@@ -637,11 +997,50 @@ function formatCategoryName(str) {
       min-height: 40px;
       transition: all 0.2s;
     }
-    .grid-cat-btn:hover, .grid-cat-btn.active {
+    .grid-cat-btn.active {
       background: var(--primary);
       border-color: var(--primary);
       color: white;
       font-weight: 600;
+    }
+    .grid-cat-all-btn {
+      background: none;
+      border: none;
+      box-shadow: none;
+      outline: none;
+      color: var(--text-secondary);
+      padding: 8px 4px;
+      margin-left: 4px;
+      margin-right: 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      white-space: nowrap;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      border-bottom: 2px solid transparent;
+      font-family: var(--font-title), sans-serif;
+    }
+    .grid-cat-all-btn.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+    @media (hover: hover) {
+      .grid-cat-btn:hover {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+        font-weight: 600;
+      }
+      .grid-cat-all-btn:hover {
+        color: var(--primary);
+        border-bottom: 2px solid var(--primary);
+      }
     }
 
     /* Subcategorías Desplegables */
@@ -697,7 +1096,7 @@ function formatCategoryName(str) {
     /* Grid de Productos */
     .products-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      grid-template-columns: repeat(4, 1fr); /* 4 columnas en ordenador */
       gap: 20px;
     }
 
@@ -910,9 +1309,6 @@ function formatCategoryName(str) {
       max-width: 320px; /* Ancho máximo en tabletas/escritorio */
       -webkit-overflow-scrolling: touch;
       padding: 4px 10px;
-      /* Máscara de desvanecimiento premium en los bordes izquierdo y derecho */
-      mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
-      -webkit-mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
     }
 
     .pagination-numbers-scroll::-webkit-scrollbar {
@@ -968,7 +1364,845 @@ function formatCategoryName(str) {
   </style>
 
   <!-- Script del cliente para interactividad y adición al carrito -->
-  <script>
+  <script define:vars={{ initialProducts: allProducts }}>
+    const subcategorySubtitles = {
+      "Vibradores": "Vibrador estimulador",
+      "Succionadores y Estimuladores": "Succionador de clítoris",
+      "Dildos": "Dildo / Consolador",
+      "Para Parejas": "Juguete erótico para parejas",
+      "Para Pene": "Estimulador / Masturbador",
+      "Control remoto": "Juguete a control remoto",
+      "Juegos y regalos": "Juego erótico sensual",
+      "Plugs": "Plug anal",
+      "Vibradores Anales": "Vibrador anal",
+      "Prostáticos": "Masajeador de próstata",
+      "Higiene y Limpieza Anal": "Higiene y limpieza anal",
+      "Lubricantes": "Lubricante íntimo",
+      "Aceites y Velas de Masaje": "Aceite de masaje sensual",
+      "Estimulantes y Retardantes": "Gel estimulante",
+      "Afrodisíacos": "Afrodisíaco erótico",
+      "Comestibles": "Comestible de placer",
+      "Feromonas": "Estimulante con feromonas",
+      "Esposas y Ataduras": "Accesorios BDSM",
+      "Arneses": "Arnés erótico",
+      "Fustas y Azotadores": "Fusta / Azotador erótico",
+      "Mobiliario sexual": "Mobiliario erótico",
+      "Antifaces y Mordazas": "Antifaz / Mordaza BDSM",
+      "Electroestimulación": "Electroestimulador erótico",
+      "Kits": "Kit erótico BDSM",
+      "Suelo Pélvico": "Ejercitador de suelo pélvico",
+      "Dilatadores": "Dilatador íntimo",
+      "Higiene y Limpieza": "Limpiador de juguetes",
+      "Salud Menstrual": "Copa / Salud íntima menstrual",
+      "Preservativos": "Preservativo de látex",
+      "Conjuntos": "Conjunto de lencería",
+      "Bodys": "Body de encaje sensual",
+      "Picardías y Camisones": "Picardías / Camisón sensual",
+      "Medias y Ligueros": "Medias y liguero sexy",
+      "Pezoneras": "Pezoneras sensuales",
+      "Lencería Comestible": "Lencería de placer comestible",
+      "Tangas y panties": "Tanga / Panty de encaje",
+      "Suspensorios y calzoncillos": "Lencería masculina sexy",
+      "Disfraces": "Disfraz erótico sensual"
+    };
+
+    function getProductStimulationType(p) {
+      if (p.stimulationType) return p.stimulationType;
+      const sub1 = p.subcategory || '';
+      const sub2 = p.subcategory2 || '';
+      if (sub1 !== 'Succionadores y Estimuladores' && sub2 !== 'Succionadores y Estimuladores') {
+        return null;
+      }
+      const n = (p.name || '').toLowerCase();
+      const d = (p.description || '').toLowerCase();
+      const isSuction = 
+        n.includes('succión') || n.includes('succion') || n.includes('succionador') || 
+        n.includes('satisfyer') || n.includes('air pulse') || n.includes('pulsos de aire') || 
+        n.includes('sona') || n.includes('waves') || n.includes('ondas sonicas') || 
+        n.includes('ondas sónicas') || d.includes('ondas de presión') || d.includes('ondas de presion') ||
+        d.includes('pulsos de aire') || d.includes('tecnología de aire') || d.includes('tecnologia de aire') ||
+        d.includes('estimulación sin contacto') || d.includes('estimulacion sin contacto') ||
+        d.includes('ondas sónicas') || d.includes('ondas sonicas') || d.includes('ondas de sonido') ||
+        d.includes('ondas sónica') || d.includes('onda sónica');
+      return isSuction ? 'Succionadores' : 'Estimuladores';
+    }
+
+    function getProductSubtitle(p) {
+      if (p.shortDescription) return p.shortDescription;
+      const sub = p.subcategory;
+      if (sub && subcategorySubtitles[sub]) {
+        if (sub === 'Succionadores y Estimuladores') {
+          const stim = getProductStimulationType(p);
+          return stim === 'Succionadores' ? 'Succionador de clítoris' : 'Estimulador de clítoris';
+        }
+        return subcategorySubtitles[sub];
+      }
+      const sub2 = p.subcategory2;
+      if (sub2 && subcategorySubtitles[sub2]) {
+        if (sub2 === 'Succionadores y Estimuladores') {
+          const stim = getProductStimulationType(p);
+          return stim === 'Succionadores' ? 'Succionador de clítoris' : 'Estimulador de clítoris';
+        }
+        return subcategorySubtitles[sub2];
+      }
+      if (p.category) {
+        const cat = p.category.toLowerCase();
+        return cat.charAt(0).toUpperCase() + cat.slice(1);
+      }
+      return "Boutique erótica";
+    }
+
+    // Helper para formatear categorías a Camel Case
+    function formatCategoryName(str) {
+      if (!str) return '';
+      const words = str.toLowerCase().split(' ');
+      const formattedWords = words.map((word, index) => {
+        const lowerWords = ['y', 'e', 'o', 'u', 'de', 'del', 'con', 'para', 'en'];
+        if (lowerWords.includes(word) && index > 0) {
+          return word;
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      });
+      return formattedWords.join(' ');
+    }
+
+    // Helper para normalizar cadenas para comparaciones robustas sin acentos ni espacios extra
+    function normalizeCategory(str) {
+      if (!str) return '';
+      return str.trim()
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // Algoritmo de distancia de Levenshtein para tolerancia a erratas
+    function levenshtein(a, b) {
+      const matrix = [];
+      for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+      for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+      for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+          if (b.charAt(i - 1) === a.charAt(j - 1)) {
+            matrix[i][j] = matrix[i - 1][j - 1];
+          } else {
+            matrix[i][j] = Math.min(
+              matrix[i - 1][j - 1] + 1,
+              matrix[i][j - 1] + 1,
+              matrix[i - 1][j] + 1
+            );
+          }
+        }
+      }
+      return matrix[b.length][a.length];
+    }
+
+    function includesWholeWord(text, word) {
+      const escapedWord = word.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      const regex = new RegExp('(?:^|[^a-záéíóúüñ])' + escapedWord + 's?(?:$|[^a-záéíóúüñ])', 'i');
+      return regex.test(text);
+    }
+
+    // Comprobar coincidencia fuzzy
+    function matchProductFuzzy(product, query) {
+      if (!query) return true;
+      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+      if (queryWords.length === 0) return true;
+      
+      const synonyms = {
+        "product-limpiador-anal-negro": ["pera", "enema", "ducha anal", "irrigador", "limpiador anal", "limpiado anal"]
+      };
+      
+      const stopWords = ['de', 'la', 'en', 'para', 'con', 'por', 'una', 'del', 'como', 'las', 'los', 'un', 'unos', 'unas', 'y', 'o', 'este', 'esta', 'todo', 'todos'];
+      
+      const subcategory = getProductSubcategory(product);
+      const name = (product.name || '').toLowerCase();
+      const description = (product.description || '').toLowerCase();
+      const category = (product.category || '').toLowerCase();
+      const tags = (synonyms[product.id] || []).join(' ');
+      
+      const primaryFields = [name, category, subcategory, tags].join(' ').toLowerCase();
+      const primaryWords = primaryFields.split(/[\s,.:;?!()""']+/).filter(w => w.length >= 2);
+
+      return queryWords.every(qw => {
+        const matchPrimary = primaryWords.some(pw => {
+          if (pw.includes(qw)) return true;
+          if (qw.length < 4) return pw === qw;
+          if (stopWords.includes(pw) || stopWords.includes(qw)) return false;
+          const maxEdits = qw.length <= 6 ? 1 : 2;
+          return levenshtein(qw, pw) <= maxEdits;
+        });
+        if (matchPrimary) return true;
+        
+        const isCategoryQuery = ['lencería', 'lenceria', 'juguete', 'juguetes', 'cosmética', 'cosmetica', 'bdsm', 'salud', 'bienestar'].includes(qw);
+        if (isCategoryQuery) return false;
+        
+        return includesWholeWord(description, qw);
+      });
+    }
+
+    // Resaltar coincidencias de forma inteligente
+    function highlightText(text, query) {
+      if (!query) return text;
+      const queryWords = query.toLowerCase().split(/\s+/).filter(w => w.length >= 2);
+      if (queryWords.length === 0) return text;
+
+      const textWords = text.split(/(\s+)/);
+      
+      const highlightedWords = textWords.map(part => {
+        if (/^\s+$/.test(part)) return part;
+        const cleanWord = part.toLowerCase().replace(/[,.:;?!()""']/g, '');
+        
+        const matches = queryWords.some(qw => {
+          if (cleanWord.includes(qw) || qw.includes(cleanWord)) return true;
+          if (qw.length < 4) return cleanWord === qw;
+          const maxEdits = qw.length <= 6 ? 1 : 2;
+          return levenshtein(qw, cleanWord) <= maxEdits;
+        });
+
+        if (matches) {
+          return `<mark class="search-highlight">${part}</mark>`;
+        }
+        return part;
+      });
+
+      return highlightedWords.join('');
+    }
+
+    // Clasificar productos en subcategorías de forma determinista y extensible
+    function getProductSubcategory(product) {
+      if (product && product.subcategory) return product.subcategory;
+      
+      const idMap = {
+        "prod-1": "Efecto Calor",
+        "prod-2": "Efecto Calor",
+        "prod-3": "Cuidado Natural",
+        "prod-4": "Aceites de Masaje",
+        "prod-5": "Aceites de Masaje",
+        "prod-6": "Velas de Masaje",
+        "prod-7": "Masculinos",
+        "prod-8": "Masculinos",
+        "prod-9": "Vibradores",
+        "prod-10": "Vibradores",
+        "prod-11": "Vibradores",
+        "prod-12": "Vibradores",
+        "prod-13": "Vibradores",
+        "prod-14": "Vibradores",
+        "prod-15": "Vibradores",
+        "prod-16": "Vibradores",
+        "prod-17": "Parejas",
+        "prod-18": "Vibradores",
+        "prod-19": "Plugs",
+        "prod-20": "Plugs",
+        "prod-21": "Plugs",
+        "prod-22": "Plugs",
+        "prod-23": "Anal",
+        "prod-24": "Plugs",
+        "prod-25": "Plugs",
+        "prod-26": "Plugs",
+        "prod-27": "Plugs",
+        "prod-28": "Plugs",
+        "prod-29": "Plugs",
+        "prod-30": "Plugs"
+      };
+      
+      if (idMap[product.id]) return idMap[product.id];
+      
+      const name = (product.name || '').toLowerCase();
+      const desc = (product.description || '').toLowerCase();
+      const cat = (product.category || '').toUpperCase();
+      
+      if (cat.includes('JUGUETES')) {
+        if (name.includes('babydoll') || name.includes('corset') || name.includes('tanga') || name.includes('teddy') || name.includes('medias') || name.includes('peignoir') || name.includes('lencería') || name.includes('lingerie') || name.includes('liguero') || name.includes('bodystocking') || name.includes('bodystockin') || name.includes('body con') || desc.includes('lencería penthouse') || desc.includes('colección penthouse') || name.includes('pezoneras') || name.includes('body crotchless')) {
+          return 'Lencería';
+        }
+        if (name.includes('plug')) return 'Plugs';
+        if (name.includes('beads') || name.includes('anal') || name.includes('bolas anales')) return 'Anal';
+        if (name.includes('pareja') || name.includes('doble')) return 'Parejas';
+        if (name.includes('masculino') || name.includes('hombre') || name.includes('pene') || name.includes('perineal') || name.includes('próstata')) return 'Masculinos';
+        return 'Vibradores';
+      }
+      if (cat.includes('COSMÉTICA') || cat.includes('COSMETICA') || cat.includes('SENSORIAL')) {
+        if (name.includes('calor') || desc.includes('calor')) return 'Efecto Calor';
+        if (name.includes('vela')) return 'Velas de Masaje';
+        return 'Aceites de Masaje';
+      }
+      if (cat.includes('BDSM')) {
+        return 'Bondage';
+      }
+      if (cat.includes('SALUD') || cat.includes('BIENESTAR') || cat.includes('ÍNTIMA') || cat.includes('INTIMA')) {
+        return 'Cuidado Natural';
+      }
+      return 'Otros';
+    }
+
+    const subcategoriesData = {
+      "JUGUETES": ["Vibradores", "Succionadores y Estimuladores", "Dildos", "Para Parejas", "Para Pene", "Control remoto", "Juegos y regalos"],
+      "LENCERÍA": ["Conjuntos", "Bodys", "Picardías y Camisones", "Medias y Ligueros", "Pezoneras", "Lencería Comestible", "Tangas y panties", "Suspensorios y calzoncillos", "Disfraces"],
+      "ANAL": ["Plugs", "Vibradores Anales", "Dildos", "Prostáticos", "Higiene y Limpieza Anal"],
+      "COSMÉTICA": ["Lubricantes", "Aceites y Velas de Masaje", "Estimulantes y Retardantes", "Afrodisíacos", "Comestibles", "Feromonas"],
+      "BDSM": ["Esposas y Ataduras", "Arneses", "Fustas y Azotadores", "Mobiliario sexual", "Antifaces y Mordazas", "Electroestimulación", "Kits"],
+      "BIENESTAR": ["Suelo Pélvico", "Dilatadores", "Higiene y Limpieza", "Salud Menstrual", "Preservativos"]
+    };
+
+    // Configurar scrollRestoration a manual para controlar la restauración del scroll nosotros mismos
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Cargar estado inicial (priorizando sessionStorage para conservar filtros al volver de PDP)
+    let currentCategory = 'all';
+    let currentSubcategory = 'all';
+    let currentQuery = '';
+    let currentSort = 'default';
+    let currentPage = 1;
+    let savedScrollY = 0;
+
+    const sessionStateText = sessionStorage.getItem('applesex_catalog_state');
+    let sessionState = null;
+    if (sessionStateText) {
+      try {
+        sessionState = JSON.parse(sessionStateText);
+      } catch (e) {}
+    }
+
+    const savedState = window.history.state;
+    const activeState = sessionState || savedState;
+
+    if (activeState) {
+      currentCategory = activeState.category || 'all';
+      currentSubcategory = activeState.subcategory || 'all';
+      currentQuery = activeState.query || '';
+      currentSort = activeState.sort || 'default';
+      currentPage = activeState.page || 1;
+      savedScrollY = activeState.scrollY || 0;
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlCategory = urlParams.get('category');
+      const urlSubcategory = urlParams.get('subcategory');
+      if (urlCategory) {
+        currentCategory = urlCategory;
+      }
+      if (urlSubcategory) {
+        currentSubcategory = urlSubcategory;
+      }
+    }
+
+    function saveCatalogState() {
+      const state = {
+        category: currentCategory,
+        subcategory: currentSubcategory,
+        query: currentQuery,
+        sort: currentSort,
+        page: currentPage,
+        scrollY: window.scrollY
+      };
+      sessionStorage.setItem('applesex_catalog_state', JSON.stringify(state));
+    }
+    const ITEMS_PER_PAGE = 16;
+    const paginationContainer = document.getElementById('catalog-pagination-container');
+
+    const gridSearchInput = document.getElementById('grid-search-input');
+    const clearGridSearchBtn = document.getElementById('clear-grid-search-btn');
+    const sortSelect = document.getElementById('grid-sort-select');
+    const productsGrid = document.getElementById('main-products-grid');
+    const noProductsBox = document.getElementById('no-products-found');
+    const counterText = document.getElementById('grid-counter-text');
+    const resetFiltersBtn = document.getElementById('reset-grid-filters-btn');
+    const triggerHeroSearchBtn = document.getElementById('trigger-hero-search-btn');
+    const subcategoryWrapper = document.getElementById('subcategory-filter-wrapper');
+    const subcategoryChips = document.getElementById('subcategory-filter-chips');
+
+    // Inicializar valores de inputs en el DOM a partir del estado actual (si se restauró)
+    if (gridSearchInput) {
+      gridSearchInput.value = currentQuery;
+    }
+    if (clearGridSearchBtn) {
+      clearGridSearchBtn.style.display = currentQuery ? 'inline-flex' : 'none';
+    }
+    if (sortSelect) {
+      sortSelect.value = currentSort;
+    }
+
+    // Botón del Hero para abrir el buscador global
+    if (triggerHeroSearchBtn) {
+      triggerHeroSearchBtn.addEventListener('click', () => {
+        document.getElementById('open-search-modal-btn')?.click();
+      });
+    }
+
+    // Actualizar la interfaz de subcategorías desplegables con transiciones
+    function updateSubcategoriesUI() {
+      if (!subcategoryWrapper || !subcategoryChips) return;
+
+      const normalizedCurrentCat = normalizeCategory(currentCategory);
+      let subCats = [];
+      for (const [key, val] of Object.entries(subcategoriesData)) {
+        if (normalizeCategory(key) === normalizedCurrentCat) {
+          subCats = val;
+          break;
+        }
+      }
+
+      if (!subCats || subCats.length === 0) {
+        // Ocultar y contraer
+        subcategoryChips.style.opacity = '0';
+        subcategoryChips.style.transform = 'translateY(-8px)';
+        subcategoryWrapper.style.height = '0px';
+        return;
+      }
+
+      // Generar los chips HTML
+      let html = `
+        <button class="grid-sub-cat-btn ${currentSubcategory === 'all' ? 'active' : ''}" data-subcat="all">
+          Todos los artículos
+        </button>
+      `;
+
+      subCats.forEach(sub => {
+        html += `
+          <button class="grid-sub-cat-btn ${currentSubcategory === sub ? 'active' : ''}" data-subcat="${sub}">
+            ${sub}
+          </button>
+        `;
+      });
+
+      subcategoryChips.innerHTML = html;
+
+      // Click listeners para subcategorías
+      subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(subBtn => {
+        subBtn.addEventListener('click', (e) => {
+          subcategoryChips.querySelectorAll('.grid-sub-cat-btn').forEach(b => b.classList.remove('active'));
+          const target = e.currentTarget;
+          target.classList.add('active');
+          currentSubcategory = target.getAttribute('data-subcat') || 'all';
+          currentPage = 1;
+          renderProducts();
+
+          // Scroll suave al inicio del catálogo al cambiar de subcategoría
+          document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // Transición suave: calcular scrollHeight
+      subcategoryWrapper.style.height = 'auto';
+      const height = subcategoryChips.scrollHeight + 'px';
+      subcategoryWrapper.style.height = '0px';
+      
+      // Forzar repaint para que se aplique la transición
+      subcategoryWrapper.offsetHeight;
+
+      subcategoryWrapper.style.height = height;
+      subcategoryChips.style.opacity = '1';
+      subcategoryChips.style.transform = 'translateY(0)';
+    }
+
+    // Filtrar por categoría principal
+    document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+        const target = e.currentTarget;
+        target.classList.add('active');
+        currentCategory = target.getAttribute('data-category') || 'all';
+        currentSubcategory = 'all'; // Restablecer subcategoría
+        currentPage = 1;
+        
+        updateSubcategoriesUI();
+        renderProducts();
+
+        // Scroll suave al inicio del catálogo al cambiar de categoría principal
+        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+
+    // Búsqueda en vivo
+    if (gridSearchInput && clearGridSearchBtn) {
+      gridSearchInput.addEventListener('input', () => {
+        currentQuery = gridSearchInput.value.trim().toLowerCase();
+        clearGridSearchBtn.style.display = currentQuery ? 'inline-flex' : 'none';
+        currentPage = 1;
+        renderProducts();
+      });
+
+      clearGridSearchBtn.addEventListener('click', () => {
+        gridSearchInput.value = '';
+        currentQuery = '';
+        clearGridSearchBtn.style.display = 'none';
+        currentPage = 1;
+        renderProducts();
+        gridSearchInput.focus();
+      });
+    }
+
+    // Ordenación
+    if (sortSelect) {
+      sortSelect.addEventListener('change', () => {
+        currentSort = sortSelect.value;
+        currentPage = 1;
+        renderProducts();
+      });
+    }
+
+    // Resetear filtros
+    if (resetFiltersBtn) {
+      resetFiltersBtn.addEventListener('click', () => {
+        currentCategory = 'all';
+        currentSubcategory = 'all';
+        currentQuery = '';
+        currentSort = 'default';
+        currentPage = 1;
+        if (gridSearchInput) gridSearchInput.value = '';
+        if (clearGridSearchBtn) clearGridSearchBtn.style.display = 'none';
+        if (sortSelect) sortSelect.value = 'default';
+
+        document.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector('.cat-filter-btn[data-category="all"]')?.classList.add('active');
+
+        updateSubcategoriesUI();
+        renderProducts();
+      });
+    }
+
+    function renderProducts() {
+      if (!productsGrid || !counterText || !noProductsBox) return;
+
+      // Sincronizar parámetros de la URL sin recargar la página (como si se hubiese buscado en el navegador)
+      const url = new URL(window.location.href);
+      if (currentCategory && currentCategory !== 'all') {
+        url.searchParams.set('category', currentCategory);
+      } else {
+        url.searchParams.delete('category');
+      }
+      if (currentSubcategory && currentSubcategory !== 'all') {
+        url.searchParams.set('subcategory', currentSubcategory);
+      } else {
+        url.searchParams.delete('subcategory');
+      }
+      window.history.replaceState({
+        category: currentCategory,
+        subcategory: currentSubcategory,
+        query: currentQuery,
+        sort: currentSort,
+        page: currentPage,
+        scrollY: window.scrollY
+      }, '', url.toString());
+
+      saveCatalogState();
+
+      // Actualizar dinámicamente el título y descripción del catálogo
+      const catalogTitle = document.getElementById('catalog-title');
+      const catalogDesc = document.getElementById('catalog-desc');
+      if (catalogTitle && catalogDesc) {
+        if (currentCategory === 'all') {
+          catalogTitle.textContent = 'Recomendaciones';
+          catalogDesc.textContent = 'Una cuidada selección de nuestros mejores artículos eróticos y bienestar íntimo para disfrutar a solas o en pareja.';
+        } else {
+          const formattedCat = formatCategoryName(currentCategory);
+          if (currentSubcategory && currentSubcategory !== 'all') {
+            catalogTitle.textContent = `${formattedCat}: ${currentSubcategory}`;
+          } else {
+            catalogTitle.textContent = `Todos los artículos de ${formattedCat}`;
+          }
+          
+          if (currentCategory === 'JUGUETES') {
+            catalogDesc.textContent = 'Explora nuestra amplia colección de juguetes eróticos diseñados para el placer a solas o en pareja.';
+          } else if (currentCategory === 'COSMÉTICA SENSORIAL') {
+            catalogDesc.textContent = 'Aceites, velas y geles con fragancias y texturas únicas para despertar tus sentidos.';
+          } else if (currentCategory === 'BDSM') {
+            catalogDesc.textContent = 'Atrévete a explorar nuevas sensaciones con nuestra gama de bondage y accesorios.';
+          } else if (currentCategory === 'SALUD ÍNTIMA') {
+            catalogDesc.textContent = 'Productos para el cuidado personal y bienestar íntimo, formulados para tu salud y protección.';
+          } else {
+            catalogDesc.textContent = `Todos los artículos de la categoría ${formattedCat}.`;
+          }
+        }
+      }
+
+      // Actualizar texto de los chips de categoría
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        const catName = btn.getAttribute('data-category');
+        if (catName === 'all') {
+          btn.textContent = 'Ver todo';
+        } else {
+          btn.textContent = formatCategoryName(catName);
+        }
+      });
+
+      // 1. Filtrar con soporte fuzzy y subcategorías
+      let filtered = initialProducts.filter(p => {
+        const matchCat = currentCategory === 'all' || normalizeCategory(p.category) === normalizeCategory(currentCategory);
+        if (!matchCat) return false;
+        
+        const matchSubcat = currentSubcategory === 'all' || getProductSubcategory(p) === currentSubcategory;
+        if (!matchSubcat) return false;
+        
+        return matchProductFuzzy(p, currentQuery);
+      });
+
+      // 2. Ordenar con soporte robusto para valores numéricos
+      if (currentSort === 'default') {
+        filtered.sort((a, b) => {
+          const featA = a.isFeatured ? 1 : 0;
+          const featB = b.isFeatured ? 1 : 0;
+          if (featA !== featB) {
+            return featB - featA;
+          }
+          return (a.name || '').localeCompare(b.name || '');
+        });
+      } else if (currentSort === 'price-asc') {
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.price) || 0;
+          const priceB = parseFloat(b.price) || 0;
+          return priceA - priceB;
+        });
+      } else if (currentSort === 'price-desc') {
+        filtered.sort((a, b) => {
+          const priceA = parseFloat(a.price) || 0;
+          const priceB = parseFloat(b.price) || 0;
+          return priceB - priceA;
+        });
+      } else if (currentSort === 'name-asc') {
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      }
+
+      // 3. Paginación
+      const totalItems = filtered.length;
+      const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+      if (totalItems === 0) {
+        productsGrid.style.display = 'none';
+        noProductsBox.style.display = 'block';
+        counterText.innerHTML = `Mostrando <strong style="color: var(--primary);">0</strong> de <strong>${initialProducts.length}</strong> productos`;
+        if (paginationContainer) paginationContainer.innerHTML = '';
+        return;
+      }
+
+      // Ajustar página activa si está fuera de límites
+      if (currentPage > totalPages) {
+        currentPage = Math.max(1, totalPages);
+      }
+
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+      const paginatedProducts = filtered.slice(startIndex, endIndex);
+
+      productsGrid.style.display = 'grid';
+      noProductsBox.style.display = 'none';
+      counterText.innerHTML = `Mostrando <strong style="color: var(--accent);">${startIndex + 1}-${endIndex}</strong> de <strong style="color: var(--accent);">${totalItems}</strong> productos`;
+
+      productsGrid.innerHTML = paginatedProducts.map(product => {
+        const highlightedTitle = highlightText(product.name, currentQuery);
+        const subtitle = getProductSubtitle(product);
+        const highlightedDesc = highlightText(subtitle, currentQuery);
+
+        return `
+          <article class="product-card">
+            ${product.oldPrice ? `
+              <span style="position: absolute; top: 16px; left: 16px; background-color: var(--primary); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; z-index: 10;">
+                Oferta
+              </span>
+            ` : ''}
+
+            <a href="/producto/${product.slug}" class="product-image-container" aria-label="Ver detalles de ${product.name}">
+              <img 
+                src="${product.image}" 
+                alt="${product.name}"
+                class="product-image-zoom"
+                loading="lazy"
+              />
+            </a>
+
+            <div class="product-card-body" style="padding: 22px; display: flex; flex-direction: column; flex-grow: 1;">
+              <span style="color: var(--accent); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; margin-bottom: 8px;">${product.category}</span>
+              <a href="/producto/${product.slug}" style="color: inherit; text-decoration: none;">
+                <h3 style="font-size: 1.15rem; margin-bottom: 10px; line-height: 1.3; font-weight: 700; transition: color 0.2s;" class="product-title-link">${highlightedTitle}</h3>
+              </a>
+              <p style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.4; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8em;">
+                ${highlightedDesc}
+              </p>
+              
+              <div class="product-card-footer" style="display: flex; align-items: center; justify-content: center; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: baseline; gap: 8px; justify-content: center; width: 100%;">
+                  ${product.oldPrice ? `
+                    <span style="font-size: 0.95rem; text-decoration: line-through; color: var(--text-secondary); font-weight: 500;">${product.oldPrice}€</span>
+                  ` : ''}
+                  <span style="font-size: 1.35rem; font-weight: 800; color: var(--primary); font-family: var(--font-title);">${product.price}€</span>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        `;
+      }).join('');
+
+      // Renderizar controles de paginación
+      renderPaginationControls(totalPages);
+    }
+
+    function renderPaginationControls(totalPages) {
+      if (!paginationContainer) return;
+
+      if (totalPages <= 1) {
+        paginationContainer.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+
+      // Botón Anterior
+      html += `
+        <button 
+          class="pagination-btn pagination-arrow" 
+          ${currentPage === 1 ? 'disabled' : ''} 
+          data-page="${currentPage - 1}"
+          aria-label="Página anterior"
+        >
+          &larr;
+        </button>
+      `;
+
+      // Contenedor scrollable de números (ruleta interactiva)
+      html += `<div class="pagination-numbers-scroll" id="pagination-scroll-container">`;
+      for (let i = 1; i <= totalPages; i++) {
+        html += `
+          <button 
+            class="pagination-btn ${i === currentPage ? 'active' : ''}" 
+            data-page="${i}"
+            aria-label="Ir a la página ${i}"
+          >
+            ${i}
+          </button>
+        `;
+      }
+      html += `</div>`;
+
+      // Botón Siguiente
+      html += `
+        <button 
+          class="pagination-btn pagination-arrow" 
+          ${currentPage === totalPages ? 'disabled' : ''} 
+          data-page="${currentPage + 1}"
+          aria-label="Página siguiente"
+        >
+          &rarr;
+        </button>
+      `;
+
+      paginationContainer.innerHTML = html;
+
+      // Autocentrar el botón activo dentro de la ruleta scrollable sin provocar scroll vertical en la página
+      const activeBtn = paginationContainer.querySelector('.pagination-btn.active');
+      const scrollContainer = paginationContainer.querySelector('#pagination-scroll-container');
+      if (activeBtn && scrollContainer) {
+        setTimeout(() => {
+          const parentLeft = scrollContainer.getBoundingClientRect().left;
+          const btnLeft = activeBtn.getBoundingClientRect().left;
+          const relativeLeft = btnLeft - parentLeft + scrollContainer.scrollLeft;
+          const targetScrollLeft = relativeLeft - (scrollContainer.clientWidth / 2) + (activeBtn.clientWidth / 2);
+          scrollContainer.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
+        }, 50);
+      }
+
+      // Escuchar eventos en los botones de paginación
+      paginationContainer.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget;
+          const page = parseInt(target.getAttribute('data-page') || '1');
+          
+          if (page !== currentPage && page >= 1 && page <= totalPages) {
+            currentPage = page;
+            renderProducts();
+            
+            // Scroll suave al inicio del catálogo
+            document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Inicializar la primera renderización al cargar la página o restaurar estado
+    const categoryToHighlight = currentCategory;
+    if (categoryToHighlight && categoryToHighlight !== 'all') {
+      const normalizedCat = normalizeCategory(categoryToHighlight);
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        const normalizedBtnCat = normalizeCategory(btn.getAttribute('data-category'));
+        if (normalizedBtnCat === normalizedCat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    } else {
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        const catName = btn.getAttribute('data-category');
+        if (catName === 'all') {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    updateSubcategoriesUI();
+    renderProducts();
+
+    // Restaurar scroll si hay un estado previo (historial o sessionStorage)
+    if (savedScrollY > 0) {
+      setTimeout(() => {
+        window.scrollTo(0, savedScrollY);
+      }, 100);
+    } else if (urlCategory) {
+      // Scroll automático al catálogo si viene con categoría desde URL (navegación limpia)
+      setTimeout(() => {
+        document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+
+    // Guardar posición del scroll en el historial de forma debouncada
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        saveCatalogState();
+
+        const url = new URL(window.location.href);
+        const currentState = window.history.state || {};
+        window.history.replaceState({
+          ...currentState,
+          category: currentCategory,
+          subcategory: currentSubcategory,
+          query: currentQuery,
+          sort: currentSort,
+          page: currentPage,
+          scrollY: window.scrollY
+        }, '', url.toString());
+      }, 150);
+    }, { passive: true });
+
+    // Escuchar eventos personalizados del menú hamburguesa / navegación global
+    window.addEventListener('filter-category-subcategory', (e) => {
+      const { category, subcategory } = e.detail;
+      currentCategory = category || 'all';
+      currentSubcategory = subcategory || 'all';
+      currentPage = 1;
+
+      // Actualizar clases activas en los botones de categoría principal
+      const normalizedCurrentCat = normalizeCategory(currentCategory);
+      document.querySelectorAll('.cat-filter-btn').forEach(btn => {
+        const normalizedBtnCat = normalizeCategory(btn.getAttribute('data-category'));
+        if (normalizedBtnCat === normalizedCurrentCat) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      updateSubcategoriesUI();
+      renderProducts();
+
+      // Scroll suave al catálogo
+      document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+    });
+
     // Evento del botón de añadir al carrito del Hero
     document.querySelector('.hero-add-cart-btn')?.addEventListener('click', (e) => {
       const target = e.currentTarget;
@@ -1003,51 +2237,10 @@ function formatCategoryName(str) {
       }, 1500);
     });
 
-    // Lógica para añadir productos de la parrilla de recomendados al carrito
-    document.addEventListener('click', (e) => {
-      const target = e.target.closest('.add-to-cart-btn');
-      if (!target) return;
-
-      const id = target.getAttribute('data-id');
-      const name = target.getAttribute('data-name');
-      const price = parseFloat(target.getAttribute('data-price') || '0');
-      const image = target.getAttribute('data-image');
-
-      if (!id || !name) return;
-
-      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const existingItem = cart.find(item => item.id === id);
-
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ id, name, price, image, quantity: 1 });
-      }
-
-      localStorage.setItem('cart', JSON.stringify(cart));
-      window.dispatchEvent(new Event('cart-updated'));
-
-      const origText = target.textContent || 'Comprar';
-      target.textContent = '✓';
-      target.style.backgroundColor = 'var(--success)';
-      target.style.borderColor = 'var(--success)';
-
-      setTimeout(() => {
-        target.textContent = origText;
-        target.style.backgroundColor = '';
-        target.style.borderColor = '';
-      }, 1500);
-    });
-
-    // Abrir el catálogo completo al pulsar el CTA principal
-    document.getElementById('open-catalog-full-btn')?.addEventListener('click', () => {
-      document.getElementById('nav-catalogo-link')?.click();
-    });
-
     // Copiar cupón en Hero
     document.getElementById('copy-hero-promo-btn')?.addEventListener('click', (e) => {
       const targetBtn = e.currentTarget;
-      const code = targetBtn.getAttribute('data-code') || 'REBAJAS15';
+      const code = targetBtn.getAttribute('data-code') || 'APPLESEX20';
       
       navigator.clipboard.writeText(code).then(() => {
         const orig = targetBtn.textContent || 'Copiar';
@@ -1061,5 +2254,6 @@ function formatCategoryName(str) {
         }, 2000);
       });
     });
+
   </script>
 </Layout>

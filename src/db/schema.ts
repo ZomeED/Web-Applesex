@@ -48,6 +48,8 @@ export const orders = sqliteTable('orders', {
   total: real('total').notNull(),
   status: text('status').notNull().default('pending'), // 'pending', 'paid', 'shipped', 'cancelled'
   stripeSessionId: text('stripe_session_id').unique(),
+  promoCode: text('promo_code'), // Código promocional utilizado
+  discountAmount: real('discount_amount'), // Importe descontado
   createdAt: text('created_at').default('CURRENT_TIMESTAMP'),
 });
 
@@ -55,7 +57,8 @@ export const orders = sqliteTable('orders', {
 export const orderItems = sqliteTable('order_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   orderId: text('order_id').references(() => orders.id),
-  productId: integer('product_id').references(() => products.id),
+  productId: text('product_id').notNull(), // Almacenamos el ID del CMS (Sanity) o local como TEXT
+  productName: text('product_name').notNull(), // Guardamos el nombre para historial estático
   quantity: integer('quantity').notNull(),
-  price: real('price').notNull(),
+  price: real('price').notNull(), // Precio de compra
 });

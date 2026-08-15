@@ -1,0 +1,6 @@
+Cuando decidas subir los cambios a producción e indexar oficialmente el sitio:  
+                                                                                  
+  1. Ve a Google Search Console y registra tu dominio.                            
+  2. Envía la dirección de tu sitemap (https://tu-dominio-o-cloudflare.pages.     
+  dev/sitemap-index.xml) para forzar a Google a rastrear todas tus páginas y      
+  productos de inmediato.

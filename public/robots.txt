@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Deshabilitar rastreo en el panel de administración
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /api/admin/
+Disallow: /api/admin/*
+
+Sitemap: https://applesex-ecommerce.pages.dev/sitemap-index.xml

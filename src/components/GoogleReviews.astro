@@ -1,0 +1,812 @@
+---
+// Componente de Reseñas de Google para Applesex
+// Ordenador y Móvil: Carrusel en fila única con deslizamiento automático suave y controles interactivos.
+
+const reviews = [
+  {
+    name: "Beatriz Soler Martínez",
+    initials: "BS",
+    avatarClass: "avatar-bs",
+    avatarUrl: "https://lh3.googleusercontent.com/a/ACg8ocKoHmlpFiLXsRxwS8gOdJgyvUOnc0-W3t70TYFR6xyEaAswUA=w36-h36-p-rp-mo-ba12-br100",
+    status: "★ Local Guide",
+    text: '"La chica de la tienda te aconseja perfectamente, productos de gran calidad y precios muy buenos. La página web también funciona de maravilla. Sin duda siempre que tenga que comprar un producto iré a esta tienda."',
+    date: "Hace 1 año",
+    featured: true
+  },
+  {
+    name: "Álvaro Vidal",
+    initials: "AV",
+    avatarClass: "avatar-av",
+    avatarUrl: "https://lh3.googleusercontent.com/a-/ALV-UjXgCJzmx5Z2FxIA6h1-YIK8SVbBwM0P1vxioFWJWb87g67ZCkdR=s64-c-rp-mo-ba12-br100",
+    status: "★ Local Guide",
+    text: '"La chica fue muy amable y nos aconsejo bien sobre los diferentes productos. Buenos precios y si no le queda algún producto en tienda lo pide sin problema."',
+    date: "Hace 9 meses",
+    featured: false
+  },
+  {
+    name: "Mariangeles",
+    initials: "M",
+    avatarClass: "avatar-mz",
+    avatarUrl: "https://lh3.googleusercontent.com/a-/ALV-UjUjsnpbzJvHyVJIEk1U9gRoj3M_YAfWnLmPv5TMiVz8JNEDDbyR=s64-c-rp-mo-br100",
+    status: "✓ Cliente verificado",
+    text: '"Es una tienda pequeña, pero tienen de todo. Además, la chica que lo lleva te aconseja genial, con un trato cercano y muy profesional. Recomendado al 100%"',
+    date: "Hace 1 año",
+    featured: false
+  },
+  {
+    name: "Luis García",
+    initials: "LG",
+    avatarClass: "avatar-lg",
+    avatarUrl: "https://lh3.googleusercontent.com/a-/ALV-UjWTdl8h68RsPO82VJGAY30QbjIvJuOeWNEiAlZ2D7hwz3OOrE7D=s64-c-rp-mo-ba12-br100",
+    status: "★ Local Guide",
+    text: '"Te explican todo al detalle por lo que la atención es de 10. Diferentes modos de pago. Gracias"',
+    date: "Hace 5 meses",
+    featured: false
+  },
+  {
+    name: "maje",
+    initials: "MJ",
+    avatarClass: "avatar-mj",
+    avatarUrl: "https://lh3.googleusercontent.com/a/ACg8ocJn6G4sUm4Ji1XRBIRMrcm6gEJj86SFkth_DrNhj1cmTp5Zxw=w36-h36-p-rp-mo-ba12-br100",
+    status: "★ Local Guide",
+    text: '"Me encanta esta tienda porque te asesoran muy bien y siempre encuentro lo que busco"',
+    date: "Hace 1 año",
+    featured: false
+  },
+  {
+    name: "Emilio J. González",
+    initials: "EG",
+    avatarClass: "avatar-eg",
+    avatarUrl: "https://lh3.googleusercontent.com/a-/ALV-UjXNnnllbUK1xwcjDzel6I6F8KH0k1_kqVIs7kaec3kFcZka3dVA=w36-h36-p-rp-mo-br100",
+    status: "★ Local Guide",
+    text: '"El trato personal inmejorable. Te aconsejan, te sugieren y te ayudan en la compra. La gerente es de lo más profesional que te puedes encontrar. Me lo recomendaron y lo recomendaré, un 10."',
+    date: "Hace 1 año",
+    featured: false
+  },
+  {
+    name: "Clara Espinosa",
+    initials: "CE",
+    avatarClass: "avatar-ce",
+    avatarUrl: "https://lh3.googleusercontent.com/a/ACg8ocK0i56RcF2RB9wUepRQAjigWgGe_S1oR2HOih0OZGLRKd0cmg=w36-h36-p-rp-mo-ba12-br100",
+    status: "★ Local Guide",
+    text: '"Muy buena tienda, y gran atención. 100% recomendable"',
+    date: "Hace 1 año",
+    featured: false
+  }
+];
+---
+
+<section id="opiniones" class="reviews-section">
+  <div class="container">
+    
+    <!-- Encabezado de la sección -->
+    <div class="reviews-header">
+      <span class="reviews-badge">CLIENTES SATISFECHOS</span>
+      <h2 class="reviews-title">Nuestra prioridad es tu confianza</h2>
+      <p class="reviews-subtitle">
+        <span class="desktop-only-text">Nuestra prioridad es guiarte en tu bienestar. Destacamos por un asesoramiento experto y cercano, seleccionando solo marcas internacionales de la máxima&nbsp;calidad.</span>
+        <span class="mobile-only-text">Te guiamos en tu bienestar con asesoramiento cercano, atención excelente y marcas de máxima&nbsp;calidad.</span>
+      </p>
+      
+      <!-- Resumen global de Google (Clicable) -->
+      <a 
+        href="https://www.google.com/maps/search/?api=1&query=Applesex+Churra+Murcia" 
+        target="_blank" 
+        rel="noopener noreferrer" 
+        class="google-rating-summary-link"
+        title="Ver todas las opiniones en Google Maps"
+      >
+        <div class="google-rating-summary">
+          <div class="google-brand">
+            <svg class="google-icon" viewBox="0 0 24 24" width="24" height="24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            <span class="google-text">Google</span>
+          </div>
+          <div class="rating-info">
+            <span class="rating-number">4.8</span>
+            <div class="stars">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg class="star-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+              ))}
+            </div>
+            <span class="reviews-count">(57 opiniones en Google)</span>
+            <svg class="external-link-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+          </div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Contenedor del Deslizador (Slider Wrapper) -->
+    <div class="reviews-slider-wrapper">
+      
+      <!-- Flechas de navegación (Visibles en Escritorio) -->
+      <button class="slider-arrow prev" aria-label="Reseña anterior">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </button>
+
+      <button class="slider-arrow next" aria-label="Reseña siguiente">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+
+      <!-- Rejilla en Fila Única (Slider) -->
+      <div class="reviews-grid">
+        
+        {reviews.map((review) => (
+          <div class={`review-card ${review.featured ? 'featured' : ''}`}>
+            <div class="review-card-header">
+              
+              <!-- Avatar: Imagen o Iniciales -->
+              <div class={`user-avatar ${review.avatarUrl ? 'has-img' : review.avatarClass}`}>
+                {review.avatarUrl ? (
+                  <img src={review.avatarUrl} alt={review.name} class="avatar-img" referrerpolicy="no-referrer" />
+                ) : (
+                  review.initials
+                )}
+              </div>
+              
+              <div class="user-meta">
+                <h4 class="user-name">{review.name}</h4>
+                <span class="review-status">{review.status}</span>
+              </div>
+              
+              <div class="review-stars">
+                {Array.from({ length: 5 }).map(() => (
+                  <svg class="star-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
+                ))}
+              </div>
+            </div>
+            
+            <p class="review-text">{review.text}</p>
+            <span class="review-date">{review.date}</span>
+          </div>
+        ))}
+
+      </div>
+
+      <!-- Indicadores de posición (Pills / Dots) -->
+      <div class="slider-dots">
+        {reviews.map((_, idx) => (
+          <button class={`slider-dot ${idx === 0 ? 'active' : ''}`} data-index={idx} aria-label={`Ir a la reseña ${idx + 1}`}></button>
+        ))}
+      </div>
+
+    </div>
+
+    <!-- Los botones de acción se han removido a favor de hacer clicable el resumen superior de Google -->
+
+  </div>
+</section>
+
+<!-- Script de deslizamiento automático suave activo en todos los dispositivos -->
+<script>
+  function setupReviewsSlider() {
+    const grid = document.querySelector('.reviews-grid') as HTMLElement;
+    const cards = document.querySelectorAll('.review-card');
+    const dots = document.querySelectorAll('.slider-dot');
+    const prevBtn = document.querySelector('.slider-arrow.prev') as HTMLButtonElement;
+    const nextBtn = document.querySelector('.slider-arrow.next') as HTMLButtonElement;
+    
+    if (!grid || cards.length === 0) return;
+
+    let autoplayTimer: number | undefined;
+    let isHovered = false;
+    let currentSlideIndex = 0;
+
+    // Obtener ancho de tarjeta + separación
+    function getSlideWidth() {
+      if (cards.length === 0) return 0;
+      const card = cards[0] as HTMLElement;
+      const style = window.getComputedStyle(grid);
+      const gap = parseFloat(style.gap || '24');
+      return card.offsetWidth + gap;
+    }
+
+    // Actualizar indicador activo
+    function updateActiveIndicator() {
+      dots.forEach((dot, idx) => {
+        if (idx === currentSlideIndex) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
+    // Desplazarse al index actual de forma programática
+    function scrollToCurrentSlide() {
+      const slideWidth = getSlideWidth();
+      grid.scrollTo({
+        left: currentSlideIndex * slideWidth,
+        behavior: 'smooth'
+      });
+      updateActiveIndicator();
+    }
+
+    // Desplazarse al siguiente elemento del carrusel
+    function nextSlide() {
+      currentSlideIndex = (currentSlideIndex + 1) % cards.length;
+      scrollToCurrentSlide();
+    }
+
+    // Desplazarse al elemento anterior
+    function prevSlide() {
+      currentSlideIndex = (currentSlideIndex - 1 + cards.length) % cards.length;
+      scrollToCurrentSlide();
+    }
+
+    // Eventos de botones de dirección
+    prevBtn?.addEventListener('click', () => {
+      prevSlide();
+      resetAutoplay();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      nextSlide();
+      resetAutoplay();
+    });
+
+    // Navegar haciendo clic en los puntos (dots)
+    dots.forEach((dot, idx) => {
+      dot.addEventListener('click', () => {
+        currentSlideIndex = idx;
+        scrollToCurrentSlide();
+        resetAutoplay();
+      });
+    });
+
+    // Detectar scroll (tanto manual por arrastre, momentum, inercia o táctil)
+    let scrollTimeout: number;
+    grid.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = window.setTimeout(() => {
+        const slideWidth = getSlideWidth();
+        if (slideWidth > 0) {
+          const calculatedIndex = Math.round(grid.scrollLeft / slideWidth);
+          // Asegurar que el índice esté dentro del rango de tarjetas
+          const targetIndex = Math.max(0, Math.min(calculatedIndex, cards.length - 1));
+          if (currentSlideIndex !== targetIndex) {
+            currentSlideIndex = targetIndex;
+          }
+          updateActiveIndicator();
+        }
+      }, 80); // Rápida respuesta táctil al finalizar la inercia del scroll
+    });
+
+    // Control de Autoplay
+    function startAutoplay() {
+      autoplayTimer = window.setInterval(() => {
+        if (!isHovered) {
+          nextSlide();
+        }
+      }, 4500); // Avanzar cada 4.5 segundos
+    }
+
+    // Detener autoplay
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+      }
+    }
+
+    // Reiniciar temporizador
+    function resetAutoplay() {
+      stopAutoplay();
+      startAutoplay();
+    }
+
+    // Pausar con interacción en Escritorio
+    const wrapper = document.querySelector('.reviews-slider-wrapper');
+    wrapper?.addEventListener('mouseenter', () => {
+      isHovered = true;
+    });
+    wrapper?.addEventListener('mouseleave', () => {
+      isHovered = false;
+      resetAutoplay();
+    });
+
+    // Soporte táctil móvil (pausa mientras arrastran con el dedo)
+    grid.addEventListener('touchstart', () => {
+      isHovered = true;
+    }, { passive: true });
+    grid.addEventListener('touchend', () => {
+      isHovered = false;
+      resetAutoplay();
+    }, { passive: true });
+
+    // Iniciar autoplay al cargar
+    startAutoplay();
+
+    // Resetear en caso de cambio de tamaño de ventana (resize)
+    window.addEventListener('resize', () => {
+      scrollToCurrentSlide();
+    });
+  }
+
+  // Ejecución segura
+  document.addEventListener('DOMContentLoaded', setupReviewsSlider);
+  document.addEventListener('astro:page-load', setupReviewsSlider);
+</script>
+
+<style>
+  .reviews-section {
+    padding: 90px 0;
+    background: #ffffff;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .reviews-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 50px auto;
+  }
+
+  .reviews-badge {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    display: inline-block;
+    margin-bottom: 12px;
+    background: rgba(216, 75, 140, 0.06);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .reviews-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    line-height: 1.2;
+    margin-bottom: 14px;
+    font-family: var(--font-title);
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+
+  .reviews-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  .desktop-only-text {
+    display: inline;
+  }
+
+  .mobile-only-text {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .desktop-only-text {
+      display: none;
+    }
+    .mobile-only-text {
+      display: inline;
+    }
+  }
+
+  /* Puntuación Global */
+  .google-rating-summary-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+    border-radius: 50px;
+    margin-bottom: 24px;
+  }
+
+  .google-rating-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fdfafb;
+    border: 1px solid var(--border-color);
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(216, 75, 140, 0.02);
+    transition: var(--transition-smooth);
+  }
+
+  .google-rating-summary-link:hover .google-rating-summary {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(216, 75, 140, 0.12);
+    background: #ffffff;
+  }
+
+  .external-link-icon {
+    color: var(--text-secondary);
+    opacity: 0.5;
+    transition: var(--transition-smooth);
+    margin-left: 6px;
+  }
+
+  .google-rating-summary-link:hover .external-link-icon {
+    color: var(--primary);
+    opacity: 1;
+    transform: translate(1px, -1px);
+  }
+
+  .google-brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-right: 1px solid var(--border-color);
+    padding-right: 14px;
+    margin-right: 14px;
+  }
+
+  .google-text {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #5f6368;
+    font-family: var(--font-title);
+  }
+
+  .rating-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .rating-number {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-family: var(--font-title);
+  }
+
+  .stars {
+    display: flex;
+    color: #ff9e0b;
+  }
+
+  .star-icon {
+    flex-shrink: 0;
+  }
+
+  .reviews-count {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  /* Contenedor del Deslizador */
+  .reviews-slider-wrapper {
+    position: relative;
+    margin-bottom: 48px;
+    padding: 0 40px; /* Margen lateral para albergar las flechas en escritorio */
+  }
+
+  /* Rejilla Fila Única (Carrusel para todos los dispositivos) */
+  .reviews-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -webkit-overflow-scrolling: touch;
+    gap: 24px;
+    padding: 10px 5px 20px 5px;
+  }
+  
+  .reviews-grid::-webkit-scrollbar {
+    display: none; /* Ocultar en Chrome/Safari */
+  }
+
+  /* Flechas de navegación (Escritorio) */
+  .slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    transition: var(--transition-smooth);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .slider-arrow:hover {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 6px 20px rgba(216, 75, 140, 0.3);
+  }
+
+  .slider-arrow.prev {
+    left: -10px;
+  }
+
+  .slider-arrow.next {
+    right: -10px;
+  }
+
+  /* Tarjeta de Reseña individual */
+  .review-card {
+    flex: 0 0 calc(33.333% - 16px); /* 3 opiniones por pantalla en ordenadores */
+    scroll-snap-align: start;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: var(--shadow-premium);
+    transition: var(--transition-smooth);
+    position: relative;
+  }
+
+  .review-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary);
+    box-shadow: 0 12px 30px rgba(216, 75, 140, 0.08);
+  }
+
+  /* Tarjeta destacada */
+  .review-card.featured {
+    background: linear-gradient(180deg, #ffffff 0%, #fdf9fb 100%);
+    border-color: rgba(216, 75, 140, 0.4);
+    box-shadow: 0 10px 35px rgba(216, 75, 140, 0.05);
+  }
+  
+  .review-card.featured::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent-hover));
+    border-radius: 10px 10px 0 0;
+  }
+
+  .review-card-header {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* Avatar contenedor */
+  .user-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-family: var(--font-title);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid var(--border-color);
+  }
+  
+  .user-avatar.has-img {
+    background: #f7f7fa;
+    border-color: var(--border-color);
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Colores para las iniciales del avatar */
+  .avatar-av { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+  .avatar-bs { background: linear-gradient(135deg, #e45b9a, #c43b7a); }
+  .avatar-mz { background: linear-gradient(135deg, #10b981, #047857); }
+  .avatar-lg { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+  .avatar-mj { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .avatar-eg { background: linear-gradient(135deg, #8b5cf6, #5b21b6); }
+  .avatar-ce { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+  .user-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Permite truncar texto */
+  }
+
+  .user-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .review-status {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .review-stars {
+    display: flex;
+    color: #ff9e0b;
+  }
+
+  .review-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin: 0 0 20px 0;
+    font-style: italic;
+    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .review-date {
+    font-size: 0.78rem;
+    color: #a3a1ad;
+    font-weight: 500;
+    align-self: flex-start;
+  }
+
+  /* Puntos Indicadores */
+  .slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border-color);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    padding: 0;
+  }
+
+  .slider-dot.active {
+    background: var(--primary);
+    width: 24px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(216, 75, 140, 0.2);
+  }
+
+  /* Acciones de Reseñas */
+  .reviews-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .review-action-btn {
+    min-width: 250px;
+    padding: 14px 28px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 12px;
+  }
+
+  /* Breakpoints: Vista Tablet / Móvil */
+  @media (max-width: 992px) {
+    .review-card {
+      flex: 0 0 calc(50% - 12px); /* 2 opiniones por pantalla en tablets */
+    }
+    .reviews-slider-wrapper {
+      padding: 0 30px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .reviews-section {
+      padding: 60px 0;
+    }
+    
+    .reviews-header {
+      margin-bottom: 36px;
+    }
+
+    .reviews-slider-wrapper {
+      padding: 0;
+    }
+
+    /* Ocultar flechas en móvil */
+    .slider-arrow {
+      display: none;
+    }
+
+    .reviews-grid {
+      margin-left: -24px;
+      margin-right: -24px;
+      padding-left: 24px;
+      padding-right: 24px;
+      gap: 16px;
+    }
+
+    .review-card {
+      flex: 0 0 85%; /* 1 sola reseña visible + una pequeña parte de la siguiente */
+      scroll-snap-align: center;
+      padding: 24px;
+      transform: none !important;
+    }
+
+    .review-card.featured::before {
+      left: 24px;
+      right: 24px;
+    }
+
+    .review-action-btn {
+      width: 100%;
+      min-width: 0;
+    }
+    
+    .reviews-actions {
+      gap: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .review-card {
+      flex: 0 0 90%;
+    }
+    .google-rating-summary {
+      flex-direction: column;
+      gap: 8px;
+      border-radius: 20px;
+      padding: 14px 20px;
+    }
+    .google-brand {
+      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+      padding-right: 0;
+      margin-right: 0;
+      padding-bottom: 6px;
+      margin-bottom: 2px;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
