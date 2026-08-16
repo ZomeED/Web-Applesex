@@ -12,7 +12,7 @@ interface Props {
 
 const { title, description, image, hideWhatsApp = false, hideHeaderFooter = false } = Astro.props;
 
-const shareImage = image || '/og_share_banner.jpg';
+const shareImage = image || '/favicon.png';
 const absoluteShareImage = new URL(shareImage, Astro.url).href;
 
 let announcementText = '¡Inauguración! <strong>20% Dto.</strong> en toda la web con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">APPLESEX20</strong>';
@@ -52,7 +52,7 @@ if (isSanityConfigured()) {
     <meta property="og:image:secure_url" content={absoluteShareImage} />
     <meta property="og:locale" content="es_ES" />
     
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title ? `${title} | AppleSex` : "Boutique Erótica Premium y Bienestar Íntimo | AppleSex"} />
     <meta name="twitter:description" content={description || "Encuentra juguetes eróticos, cosmética sensual y lencería premium. Envíos 100% discretos y confidenciales en 24h o recogida en 2h en Murcia."} />
     <meta name="twitter:image" content={absoluteShareImage} />
