@@ -227,7 +227,7 @@ if (isSanityConfigured()) {
              </div>
 
              <!-- Tipo de Estimulación (Solo visible para Juguetes > Succionadores y Estimuladores) -->
-             <div id="modal-filter-stimulation-section" class="filter-section" style="margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); display: none;">
+             <div id="modal-filter-stimulation-section" class="filter-section" style="display: none !important;">
                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                  <h4 style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-title); margin: 0;">Tipo de Estimulación</h4>
                  <button type="button" id="toggle-filter-stimulation" style="background: transparent; border: none; font-size: 0.68rem; color: var(--primary); cursor: pointer; font-weight: 700; outline: none; transition: opacity 0.2s;">Contraer ↑</button>
@@ -335,7 +335,7 @@ if (isSanityConfigured()) {
           </div>
 
           <!-- Tipo de Estimulación (Solo visible para Juguetes > Succionadores y Estimuladores en móvil) -->
-          <div id="mobile-filter-stimulation-section" class="filter-section" style="margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); display: none;">
+          <div id="mobile-filter-stimulation-section" class="filter-section" style="display: none !important;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
               <h4 style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--font-title);">Tipo de Estimulación</h4>
             </div>
@@ -1949,10 +1949,17 @@ if (isSanityConfigured()) {
       };
 
       function getProductStimulationType(p) {
-        if (p.stimulationType) return p.stimulationType;
+        if (!p) return null;
+        
+        // 1. Clasificación directa por sub-subcategoría
+        if (p.subcategory2 === 'succionadores' || p.secondSubcategory2 === 'succionadores') return 'Succionadores';
+        if (p.subcategory2 === 'estimuladores' || p.secondSubcategory2 === 'estimuladores') return 'Estimuladores';
+
+        // Fallback: Autodetectar por palabras clave si el producto pertenece a la subcategoría
         const sub1 = p.subcategory || '';
-        const sub2 = p.subcategory2 || '';
-        if (sub1 !== 'Succionadores y Estimuladores' && sub2 !== 'Succionadores y Estimuladores') {
+        const sub2 = p.secondSubcategory || '';
+        const subLegacy = p.subcategory2 || '';
+        if (sub1 !== 'Succionadores y Estimuladores' && sub2 !== 'Succionadores y Estimuladores' && subLegacy !== 'Succionadores y Estimuladores') {
           return null;
         }
         const n = (p.name || '').toLowerCase();
@@ -1971,6 +1978,8 @@ if (isSanityConfigured()) {
 
       function getProductSubtitle(p) {
         if (p.shortDescription) return p.shortDescription;
+        
+        // 1. Check primary subcategory
         const sub = p.subcategory;
         if (sub && subcategorySubtitles[sub]) {
           if (sub === 'Succionadores y Estimuladores') {
@@ -1979,6 +1988,18 @@ if (isSanityConfigured()) {
           }
           return subcategorySubtitles[sub];
         }
+        
+        // 2. Check secondary subcategory
+        const subSec = p.secondSubcategory;
+        if (subSec && subcategorySubtitles[subSec]) {
+          if (subSec === 'Succionadores y Estimuladores') {
+            const stim = getProductStimulationType(p);
+            return stim === 'Succionadores' ? 'Succionador de clítoris' : 'Estimulador de clítoris';
+          }
+          return subcategorySubtitles[subSec];
+        }
+
+        // 3. Fallback to subcategory2 (legacy)
         const sub2 = p.subcategory2;
         if (sub2 && subcategorySubtitles[sub2]) {
           if (sub2 === 'Succionadores y Estimuladores') {
@@ -1987,6 +2008,7 @@ if (isSanityConfigured()) {
           }
           return subcategorySubtitles[sub2];
         }
+
         if (p.category) {
           const cat = p.category.toLowerCase();
           return cat.charAt(0).toUpperCase() + cat.slice(1);
@@ -1995,6 +2017,14 @@ if (isSanityConfigured()) {
       }
 
       const SUB_SUBCATEGORIES_MAP = {
+        "Succionadores y Estimuladores": {
+          title: "Tipo de Estimulación",
+          options: ["succionadores", "estimuladores"],
+          labels: {
+            "succionadores": "Succionadores (Ondas de Presión)",
+            "estimuladores": "Estimuladores (Vibración de Clítoris)"
+          }
+        },
         "Vibradores": {
           title: "Tipo de Vibrador",
           options: ["vibradores", "minivibradores", "realistas", "doble estimulación", "varitas"],
@@ -2095,6 +2125,13 @@ if (isSanityConfigured()) {
         if (subsub === 'cristal') return hasWord(combined, 'cristal') || hasWord(combined, 'vidrio') || hasWord(combined, 'glass');
         if (subsub === 'metal') return hasWord(combined, 'metal') || hasWord(combined, 'acero') || hasWord(combined, 'aluminio');
         if (subsub === 'silicona') return hasWord(combined, 'silicona') || hasWord(combined, 'silexpan') || hasWord(combined, 'silicone');
+        
+        if (subsub === 'succionadores') {
+          return hasWord(combined, 'succión') || hasWord(combined, 'succion') || hasWord(combined, 'satisfyer') || hasWord(combined, 'sona') || hasWord(combined, 'pulsos') || hasWord(combined, 'aire');
+        }
+        if (subsub === 'estimuladores') {
+          return hasWord(combined, 'estimulación') || hasWord(combined, 'estimulacion') || hasWord(combined, 'vibrador') || hasWord(combined, 'bala') || hasWord(combined, 'vibración');
+        }
         
         if (subsub === 'realistas' || subsub === 'realista') {
           return hasWord(combined, 'realista') || hasWord(combined, 'realistas') || hasWord(combined, 'realismo') || hasWord(combined, 'vena') || hasWord(combined, 'venas') || hasWord(combined, 'testículo') || hasWord(combined, 'testículos') || hasWord(combined, 'testiculo') || hasWord(combined, 'testiculos');
@@ -3284,74 +3321,7 @@ if (isSanityConfigured()) {
       }
 
       function renderSidebarStimulation() {
-        const destopStimSection = document.getElementById('modal-filter-stimulation-section');
-        const mobileStimSection = document.getElementById('mobile-filter-stimulation-section');
-        const desktopStimList = document.getElementById('modal-sidebar-stimulation-list');
-        const mobileStimList = document.getElementById('mobile-sidebar-stimulation-list');
-
-        const isSuctionSubcatActive = 
-          (activeCategory.toUpperCase() === 'JUGUETES') && (
-            activeSubcategory === 'Succionadores y Estimuladores' ||
-            selectedSubcategories.includes('Succionadores y Estimuladores')
-          );
-
-        if (!isSuctionSubcatActive) {
-          if (destopStimSection) destopStimSection.style.display = 'none';
-          if (mobileStimSection) mobileStimSection.style.display = 'none';
-          selectedStimulations = [];
-          return;
-        }
-
-        if (destopStimSection) destopStimSection.style.display = 'block';
-        if (mobileStimSection) mobileStimSection.style.display = 'block';
-
-        const options = ['Estimuladores', 'Succionadores'];
-        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        let html = '';
-
-        options.forEach(opt => {
-          const count = allProducts.filter(p => {
-            const matchesOtherFilters = productMatchesFilters(p, query, { excludeStimulation: true });
-            return matchesOtherFilters && getProductStimulationType(p) === opt;
-          }).length;
-
-          const isChecked = selectedStimulations.includes(opt);
-          html += `
-            <label style="display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--text-secondary); cursor: pointer; user-select: none; margin-bottom: 2px;">
-              <span style="display: flex; align-items: center; gap: 6px;">
-                <input type="checkbox" class="sidebar-stimulation-checkbox" value="${opt}" ${isChecked ? 'checked' : ''} style="width: 14px; height: 14px; accent-color: var(--primary); cursor: pointer;" />
-                <span>${opt}</span>
-              </span>
-              <span style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.7;">(${count})</span>
-            </label>
-          `;
-        });
-
-        withFocusPreservation(() => {
-          if (desktopStimList) desktopStimList.innerHTML = html;
-          if (mobileStimList) mobileStimList.innerHTML = html;
-
-          // Listeners para checkboxes
-          document.querySelectorAll('.sidebar-stimulation-checkbox').forEach(cb => {
-            cb.addEventListener('change', (e) => {
-              const target = e.target as HTMLInputElement;
-              const val = target.value;
-              if (target.checked) {
-                if (!selectedStimulations.includes(val)) {
-                  selectedStimulations.push(val);
-                }
-              } else {
-                selectedStimulations = selectedStimulations.filter(x => x !== val);
-              }
-
-              document.querySelectorAll(`.sidebar-stimulation-checkbox[value="${val}"]`).forEach(el => {
-                (el as HTMLInputElement).checked = target.checked;
-              });
-
-              renderSearchResults();
-            });
-          });
-        });
+        // Unificado en el flujo general de sub-subcategorías (eliminado)
       }
 
       const toggleStimulationBtn = document.getElementById('toggle-filter-stimulation');

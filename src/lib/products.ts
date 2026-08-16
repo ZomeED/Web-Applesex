@@ -15,7 +15,6 @@ export interface Product {
   stock?: number;
   brand?: string;
   shortDescription?: string;
-  stimulationType?: 'Estimuladores' | 'Succionadores';
   isFeatured?: boolean;
 }
 
@@ -506,7 +505,6 @@ export async function getAllProducts(): Promise<Product[]> {
         "secondSubcategory2": coalesce(secondSubcategory2->name, secondSubcategory2->title, secondSubcategory2),
         stock,
         brand,
-        stimulationType,
         isFeatured
       }`;
       const sanityProducts = await sanityClient.fetch(query);
