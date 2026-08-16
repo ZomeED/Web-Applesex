@@ -100,6 +100,12 @@ const productSchema = JSON.stringify({
     "itemCondition": "https://schema.org/NewCondition"
   }
 });
+
+const whatsappNumber = "34690127039";
+const messageText = `¡Hola! Tengo una duda sobre este producto:
+${product.name}
+Enlace: https://applesex-ecommerce.pages.dev/producto/${product.slug}`;
+const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(messageText)}`;
 ---
 
 <Layout title={product.name} description={product.description} hideWhatsApp={true}>
@@ -243,7 +249,7 @@ const productSchema = JSON.stringify({
               <strong class="wa-title">¿Dudas sobre este producto?</strong>
               <span class="wa-subtitle">Atención 100% confidencial por WhatsApp</span>
             </div>
-            <a href="https://wa.me/34690127039" target="_blank" class="btn btn-secondary wa-btn" style="display: flex; gap: 6px; align-items: center;">
+            <a href={whatsappUrl} target="_blank" class="btn btn-secondary wa-btn" style="display: flex; gap: 6px; align-items: center;">
               <img src="/images/WhatsApp.svg" alt="WhatsApp" style="width: 14px; height: 14px; display: block;" />
               Consultar
             </a>
