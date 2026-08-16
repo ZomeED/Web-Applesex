@@ -2307,6 +2307,8 @@ if (isSanityConfigured()) {
         if (hasBrandWord(name, 'lelo') || hasBrandWord(desc, 'lelo') || slug.includes('lelo')) return 'Lelo';
         if (hasBrandWord(name, 'shunga') || hasBrandWord(desc, 'shunga') || slug.includes('shunga')) return 'Shunga';
         if (hasBrandWord(name, 'silexd') || hasBrandWord(desc, 'silexd') || hasBrandWord(name, 'silexpan') || hasBrandWord(desc, 'silexpan') || slug.includes('silexd') || slug.includes('silexpan')) return 'SilexD';
+        if (hasBrandWord(name, 'pretty love') || hasBrandWord(desc, 'pretty love') || slug.includes('pretty-love') || slug.includes('prettylove')) return 'Pretty Love';
+        if (hasBrandWord(name, 'fleshlight') || hasBrandWord(desc, 'fleshlight') || slug.includes('fleshlight')) return 'Fleshlight';
         
         return 'Otros';
       }
@@ -3339,7 +3341,7 @@ if (isSanityConfigured()) {
       }
 
       function renderSidebarBrands() {
-        const brands = ['Satisfyer', 'Lelo', 'Shunga', 'SilexD'];
+        const brands = ['Satisfyer', 'Lelo', 'Shunga', 'SilexD', 'Pretty Love', 'Fleshlight'];
         const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
         let html = '';
