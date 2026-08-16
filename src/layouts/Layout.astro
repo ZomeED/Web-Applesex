@@ -2374,7 +2374,9 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         document.body.style.overflow = 'hidden';
         document.body.classList.add('modal-open-mobile');
         setTimeout(() => {
-          if (searchInput) searchInput.focus();
+          if (searchInput && window.innerWidth >= 768) {
+            searchInput.focus();
+          }
         }, 100);
         updatePriceSliderTracks();
         renderSidebarFilters();
