@@ -110,7 +110,7 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
             inputmode="search"
           />
           <button id="modal-clear-input" class="search-clear-btn" style="display: none;" title="Limpiar texto">✕</button>
-          <button id="close-search-modal-btn" class="search-close-btn" aria-label="Cerrar buscador">Cerrar ✕</button>
+          <button id="close-search-modal-btn" class="search-close-btn" aria-label="Cerrar buscador"><span class="close-text-desktop">Cerrar </span>✕</button>
         </div>
 
         <!-- Barra de Filtros Rápidos por Categoría (Scroll Táctil Suave) -->
@@ -1136,6 +1136,30 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
       }
       .search-clear-btn + .search-close-btn {
         margin-left: 8px; /* Espacio extra de seguridad para evitar clics accidentales al limpiar texto */
+      }
+
+      @media (max-width: 768px) {
+        .close-text-desktop {
+          display: none;
+        }
+        .search-close-btn {
+          background: transparent !important;
+          border: none !important;
+          color: var(--text-secondary) !important;
+          padding: 6px !important;
+          font-size: 1.4rem !important;
+          font-weight: 300 !important;
+          min-height: auto !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+        }
+        .search-close-btn:active {
+          color: var(--primary) !important;
+          background: transparent !important;
+        }
+        .search-clear-btn {
+          display: none !important;
+        }
       }
 
       /* Categorías Chips con Scroll Táctil */
