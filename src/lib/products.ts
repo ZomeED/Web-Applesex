@@ -502,7 +502,6 @@ export async function getAllProducts(): Promise<Product[]> {
         "category": coalesce(category->name, category->title, category),
         "subcategory": coalesce(subcategory->name, subcategory->title, subcategory),
         "subcategory2": coalesce(subcategory2->name, subcategory2->title, subcategory2),
-        material,
         characteristics,
         stock,
         brand,
