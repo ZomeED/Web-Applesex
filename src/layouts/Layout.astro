@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { sanityClient, isSanityConfigured } from '../db/sanity';
 
 interface Props {
   title: string;
@@ -9,6 +10,19 @@ interface Props {
 }
 
 const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = Astro.props;
+
+let announcementText = '¡Inauguración! <strong>20% Dto.</strong> en toda la web con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">APPLESEX20</strong>';
+
+if (isSanityConfigured()) {
+  try {
+    const settings = await sanityClient.fetch(`*[_type == "homepageSettings"][0] { announcementText }`);
+    if (settings && settings.announcementText) {
+      announcementText = settings.announcementText;
+    }
+  } catch (error) {
+    console.warn('Error loading announcement text from Sanity:', error);
+  }
+}
 ---
 
 <!doctype html>
@@ -34,8 +48,7 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
     <!-- Barra de Anuncios Superior Elegante y Descartable -->
     {!hideHeaderFooter && (
       <div id="promo-announcement-bar" style="background: linear-gradient(90deg, #c43b7a, #ed6daa); color: white; padding: 8px 20px; font-size: 0.82rem; font-weight: 500; text-align: center; display: flex; align-items: center; justify-content: center; position: relative; z-index: 101; transition: var(--transition-smooth);">
-        <span id="promo-text-content" style="flex-grow: 1; padding-right: 18px;">
-          Inauguramos nuestra nueva web: <strong>20% de descuento</strong> en toda la tienda con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">APPLESEX20</strong>
+        <span id="promo-text-content" style="flex-grow: 1; padding-right: 18px;" set:html={announcementText}>
         </span>
         <button id="close-promo-bar" style="background: transparent; border: none; color: white; cursor: pointer; font-size: 1.1rem; padding: 4px 8px; display: inline-flex; align-items: center; position: absolute; right: 10px;" aria-label="Cerrar aviso">
           ✕
@@ -3582,16 +3595,19 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         });
       }
 
-      if (copyPromoBtn && promoTextEl) {
-        copyPromoBtn.addEventListener('click', () => {
-          const code = 'APPLESEX20';
-          navigator.clipboard.writeText(code).then(() => {
-            const originalHTML = promoTextEl.innerHTML;
-            promoTextEl.innerHTML = `Código <strong>${code}</strong> copiado al portapapeles`;
-            setTimeout(() => {
-              promoTextEl.innerHTML = originalHTML;
-            }, 2500);
-          });
+      if (promoTextEl) {
+        promoTextEl.addEventListener('click', (e: any) => {
+          const copyBtn = e.target.closest('#copy-promo-code');
+          if (copyBtn) {
+            const code = copyBtn.textContent ? copyBtn.textContent.trim() : 'APPLESEX20';
+            navigator.clipboard.writeText(code).then(() => {
+              const originalHTML = promoTextEl.innerHTML;
+              promoTextEl.innerHTML = `Código <strong>${code}</strong> copiado al portapapeles`;
+              setTimeout(() => {
+                promoTextEl.innerHTML = originalHTML;
+              }, 2500);
+            });
+          }
         });
       }
 
