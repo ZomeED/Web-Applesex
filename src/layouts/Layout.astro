@@ -1138,6 +1138,12 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         margin-left: 8px; /* Espacio extra de seguridad para evitar clics accidentales al limpiar texto */
       }
 
+      .search-load-more-container button:hover {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+      }
+
       @media (max-width: 768px) {
         .close-text-desktop {
           display: none;
@@ -1870,6 +1876,7 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
       let selectedCharacteristics: string[] = [];
       let selectedStimulations: string[] = [];
       let activeSubSubCategory = 'all';
+      let visibleResultsLimit = 24;
 
       const subcategorySubtitles = {
         "Vibradores": "Vibrador estimulador",
@@ -2404,6 +2411,8 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         document.body.style.overflow = 'hidden';
         document.body.classList.add('modal-open-mobile');
         
+        visibleResultsLimit = 24; // Resetear límite al abrir el buscador
+
         // Registrar estado en el historial para controlar el botón atrás físico de móviles
         if (window.history.state?.modal !== 'search') {
           window.history.pushState({ modal: 'search' }, '');
@@ -2784,13 +2793,19 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         clearInputBtn.addEventListener('click', () => {
           searchInput.value = '';
           clearInputBtn.style.display = 'none';
+          visibleResultsLimit = 24; // Resetear límite al limpiar
           renderSearchResults();
           searchInput.focus();
         });
 
+        let searchInputTimeout: any;
         searchInput.addEventListener('input', () => {
           clearInputBtn.style.display = searchInput.value.trim() ? 'inline-flex' : 'none';
-          renderSearchResults();
+          clearTimeout(searchInputTimeout);
+          searchInputTimeout = setTimeout(() => {
+            visibleResultsLimit = 24; // Resetear límite al escribir
+            renderSearchResults();
+          }, 150); // Debounce de 150ms para evitar lagueo al escribir
         });
       }
 
@@ -3466,7 +3481,8 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         const filteredCountEl = document.getElementById('modal-filtered-count');
         if (filteredCountEl) filteredCountEl.textContent = filtered.length.toString();
 
-        resultsGrid.innerHTML = filtered.map(p => {
+        const visibleProducts = filtered.slice(0, visibleResultsLimit);
+        let gridHtml = visibleProducts.map(p => {
           let highlightedTitle = highlightText(p.name, query);
           let subtitle = getProductSubtitle(p);
           let highlightedDesc = highlightText(subtitle, query);
@@ -3494,6 +3510,29 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
             </article>
           `;
         }).join('');
+
+        if (filtered.length > visibleResultsLimit) {
+          const remainingCount = filtered.length - visibleResultsLimit;
+          gridHtml += `
+            <div class="search-load-more-container" style="grid-column: 1 / -1; display: flex; justify-content: center; padding: 24px 0 40px 0; width: 100%;">
+              <button id="search-load-more-btn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 12px 28px; border-radius: 50px; cursor: pointer; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-primary); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                Ver más productos (+${remainingCount})
+              </button>
+            </div>
+          `;
+        }
+
+        resultsGrid.innerHTML = gridHtml;
+
+        if (filtered.length > visibleResultsLimit) {
+          const loadMoreBtn = document.getElementById('search-load-more-btn');
+          if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', () => {
+              visibleResultsLimit += 24;
+              renderSearchResults();
+            });
+          }
+        }
 
         saveSearchState();
       }
