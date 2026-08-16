@@ -719,11 +719,6 @@ import Layout from '../layouts/Layout.astro';
         gap: 20px;
         justify-content: flex-end;
       }
-      .cart-item-total-price {
-        flex-grow: 0;
-        padding-right: 0;
-        min-width: 80px;
-      }
     }
   </style>
 
@@ -732,7 +727,7 @@ import Layout from '../layouts/Layout.astro';
     let cart: any[] = [];
     let currentStep = 1;
     let activeCoupon = '';
-    let couponDiscountAmount = 0; // Flat discount amount
+    let couponDiscountPercent = 0; // 20% discount percentage
 
     // Elementos DOM
     const listEl = document.getElementById('cart-items-list');
@@ -749,13 +744,13 @@ import Layout from '../layouts/Layout.astro';
     function loadCart() {
       cart = JSON.parse(localStorage.getItem('cart') || '[]');
       activeCoupon = localStorage.getItem('appliedCoupon') || '';
-      couponDiscountAmount = activeCoupon.toUpperCase() === 'APPLESEX20' ? 20.00 : 0.00;
+      couponDiscountPercent = activeCoupon.toUpperCase() === 'APPLESEX20' ? 0.20 : 0.00;
       
       // Inicializar campos de cupones
       if (activeCoupon) {
         if (couponInput) couponInput.value = activeCoupon;
         if (couponInputMobile) couponInputMobile.value = activeCoupon;
-        showCouponFeedback(true, `Cupón "${activeCoupon}" aplicado: -20€ Dto.`);
+        showCouponFeedback(true, `Cupón "${activeCoupon}" aplicado: -20% Dto.`);
       }
 
       renderCart();
@@ -784,15 +779,30 @@ import Layout from '../layouts/Layout.astro';
       containerEl.style.display = 'grid';
       emptyEl.style.display = 'none';
 
+      const hasDiscount = activeCoupon.toUpperCase() === 'APPLESEX20';
+
       // Renderizar listado principal (Paso 1)
-      listEl.innerHTML = cart.map(item => `
+      listEl.innerHTML = cart.map(item => {
+        const itemSubtotal = item.price * item.quantity;
+        const itemDiscountedUnitPrice = hasDiscount ? item.price * 0.80 : item.price;
+        const itemDiscountedSubtotal = itemDiscountedUnitPrice * item.quantity;
+
+        return `
         <div class="cart-item-row">
           <img src="${item.image}" alt="${item.name}" class="cart-item-image" />
           
           <div class="cart-item-details">
             <h4 class="cart-item-title">${item.name}</h4>
             ${item.variant ? `<span class="cart-item-variant">Var: ${item.variant}</span>` : ''}
-            <span class="cart-item-unit-price">Precio unitario: ${item.price.toFixed(2)}€</span>
+            <span class="cart-item-unit-price">
+              Precio unitario: 
+              ${hasDiscount ? `
+                <span style="text-decoration: line-through; color: var(--text-secondary); margin-right: 4px;">${item.price.toFixed(2)}€</span>
+                <span style="color: var(--primary); font-weight: 700;">${itemDiscountedUnitPrice.toFixed(2)}€</span>
+              ` : `
+                <span>${item.price.toFixed(2)}€</span>
+              `}
+            </span>
           </div>
 
           <div class="cart-item-actions">
@@ -805,7 +815,12 @@ import Layout from '../layouts/Layout.astro';
 
             <!-- Precio Acumulado -->
             <div class="cart-item-total-price">
-              <span>${(item.price * item.quantity).toFixed(2)}€</span>
+              ${hasDiscount ? `
+                <span style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.82rem; font-weight: 500; display: block; line-height: 1.2;">${itemSubtotal.toFixed(2)}€</span>
+                <span style="color: var(--primary); font-weight: 800; display: block; font-size: 1.05rem; line-height: 1.2;">${itemDiscountedSubtotal.toFixed(2)}€</span>
+              ` : `
+                <span>${itemSubtotal.toFixed(2)}€</span>
+              `}
             </div>
 
             <!-- Botón Eliminar -->
@@ -817,7 +832,8 @@ import Layout from '../layouts/Layout.astro';
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       // Re-vincular eventos
       const bindEvents = (parent: HTMLElement) => {
@@ -859,8 +875,8 @@ import Layout from '../layouts/Layout.astro';
     // Calcular Totales Financieros Dinámicamente para ambos resúmenes (Móvil y Escritorio)
     function calculateTotals() {
       const subtotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-      const discount = activeCoupon.toUpperCase() === 'APPLESEX20' ? Math.min(subtotal, 20.00) : 0.00;
-      const discountedSubtotal = Math.max(0, subtotal - discount);
+      const discount = activeCoupon.toUpperCase() === 'APPLESEX20' ? subtotal * 0.20 : 0.00;
+      const discountedSubtotal = subtotal - discount;
 
       const deliveryMethod = (document.querySelector('input[name="delivery_method"]:checked') as HTMLInputElement)?.value;
       let shippingCost = 0;
@@ -882,6 +898,8 @@ import Layout from '../layouts/Layout.astro';
         if (discount > 0) {
           discountRow.style.display = 'flex';
           discountVal.textContent = `-${discount.toFixed(2)}€`;
+          const label = discountRow.querySelector('.row-label');
+          if (label) label.textContent = `Descuento (20% ${activeCoupon})`;
         } else {
           discountRow.style.display = 'none';
         }
@@ -902,6 +920,8 @@ import Layout from '../layouts/Layout.astro';
         if (discount > 0) {
           discountRowMob.style.display = 'flex';
           discountValMob.textContent = `-${discount.toFixed(2)}€`;
+          const labelMob = discountRowMob.querySelector('.row-label');
+          if (labelMob) labelMob.textContent = `Descuento (20% ${activeCoupon})`;
         } else {
           discountRowMob.style.display = 'none';
         }
@@ -935,19 +955,19 @@ import Layout from '../layouts/Layout.astro';
       });
     });
 
-    // Sincronización y Validación de Cupones en Escritorio y Móvil (Flat 20.00€ Dto.)
+    // Sincronización y Validación de Cupones en Escritorio y Móvil (20% Dto.)
     function applyCouponCode(code: string) {
       if (code === 'APPLESEX20') {
         activeCoupon = code;
-        couponDiscountAmount = 20.00;
+        couponDiscountPercent = 0.20;
         localStorage.setItem('appliedCoupon', code);
         
         // Sincronizar inputs
         if (couponInput) couponInput.value = code;
         if (couponInputMobile) couponInputMobile.value = code;
         
-        showCouponFeedback(true, '¡Cupón "APPLESEX20" aplicado correctamente! -20€ Dto.');
-        calculateTotals();
+        showCouponFeedback(true, '¡Cupón "APPLESEX20" aplicado correctamente! -20% Dto.');
+        renderCart(); // Re-renderizar para aplicar los descuentos visuales en cada artículo!
       } else {
         showCouponFeedback(false, 'El cupón introducido no es válido o ha expirado.');
       }
