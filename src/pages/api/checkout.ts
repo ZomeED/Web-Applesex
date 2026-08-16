@@ -20,34 +20,43 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const productsList = await getAllProducts();
     const productsMap = new Map(productsList.map(p => [p.id, p]));
 
-    // Calcular el total y preparar line items para Stripe
+    // 1. Calcular subtotal primero
     let subtotal = 0;
-    const lineItemsForStripe: Array<{ price_data: any; quantity: number }> = [];
-
     for (const item of items) {
       const dbProduct = productsMap.get(item.id);
       if (dbProduct) {
         subtotal += dbProduct.price * item.quantity;
-        
-        const finalUnitPrice = hasDiscount ? dbProduct.price * 0.80 : dbProduct.price;
-
-        lineItemsForStripe.push({
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: dbProduct.name + (hasDiscount ? ' (20% Dto. APPLESEX20)' : ''),
-            },
-            unit_amount: Math.round(finalUnitPrice * 100), // En céntimos
-          },
-          quantity: item.quantity,
-        });
       } else {
         return new Response(JSON.stringify({ error: `Producto no encontrado: ${item.id}` }), { status: 400 });
       }
     }
 
-    const discountAmount = hasDiscount ? subtotal * 0.20 : 0;
-    const discountedSubtotal = subtotal - discountAmount;
+    const discountAmount = hasDiscount ? Math.min(subtotal, 20.00) : 0;
+    const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+
+    // Factor de descuento proporcional para Stripe
+    const discountFactor = subtotal > 0 ? discountedSubtotal / subtotal : 1.0;
+
+    // 2. Preparar line items para Stripe
+    const lineItemsForStripe: Array<{ price_data: any; quantity: number }> = [];
+
+    for (const item of items) {
+      const dbProduct = productsMap.get(item.id);
+      if (dbProduct) {
+        const finalUnitPrice = dbProduct.price * discountFactor;
+
+        lineItemsForStripe.push({
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: dbProduct.name + (hasDiscount ? ' (Desc. APPLESEX20)' : ''),
+            },
+            unit_amount: Math.round(finalUnitPrice * 100), // En céntimos
+          },
+          quantity: item.quantity,
+        });
+      }
+    }
 
     // Coste de envío
     let shippingCost = 0;

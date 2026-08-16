@@ -3832,7 +3832,7 @@ if (isSanityConfigured()) {
           if (mobilePriceMaxSliderVal) mobilePriceMaxSliderVal.textContent = activeMaxPrice === 150 ? 'Sin límite' : activeMaxPrice + '€';
         }
 
-        if (savedSearchState.isOpen && modalBackdrop && !window.location.pathname.includes('/producto/')) {
+        if (savedSearchState.isOpen && modalBackdrop && !window.location.pathname.includes('/producto/') && !window.location.pathname.includes('/carrito')) {
           productsLoadedPromise.then(() => {
             modalBackdrop.style.display = 'flex';
             document.body.style.overflow = 'hidden';
