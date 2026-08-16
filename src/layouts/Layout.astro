@@ -12,7 +12,7 @@ interface Props {
 
 const { title, description, image, hideWhatsApp = false, hideHeaderFooter = false } = Astro.props;
 
-const shareImage = image || '/logo.png';
+const shareImage = image || '/og_share_banner.jpg';
 const absoluteShareImage = new URL(shareImage, Astro.url).href;
 
 let announcementText = '¡Inauguración! <strong>20% Dto.</strong> en toda la web con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">APPLESEX20</strong>';
@@ -3787,6 +3787,27 @@ if (isSanityConfigured()) {
           scrollY: resultsGridEl ? resultsGridEl.scrollTop : 0
         };
         sessionStorage.setItem('applesex_search_state', JSON.stringify(state));
+
+        // Sincronización de URL en tiempo real
+        if (!window.location.pathname.includes('/carrito') && !window.location.pathname.includes('/producto/')) {
+          const params = new URLSearchParams();
+          if (state.isOpen) {
+            params.set('search', 'open');
+            if (state.query.trim()) params.set('q', state.query.trim());
+            if (state.category && state.category !== 'all') params.set('cat', state.category);
+            if (state.subcategory && state.subcategory !== 'all') params.set('sub', state.subcategory);
+            if (state.subSubCategory && state.subSubCategory !== 'all') params.set('subsub', state.subSubCategory);
+            if (state.sort && state.sort !== 'default') params.set('sort', state.sort);
+            if (state.minPrice > 0) params.set('min', state.minPrice.toString());
+            if (state.maxPrice < 150) params.set('max', state.maxPrice.toString());
+            if (state.selectedBrands.length > 0) params.set('brands', state.selectedBrands.join(','));
+            if (state.selectedMaterials.length > 0) params.set('materials', state.selectedMaterials.join(','));
+            if (state.selectedCharacteristics.length > 0) params.set('chars', state.selectedCharacteristics.join(','));
+            if (state.selectedStimulations.length > 0) params.set('stim', state.selectedStimulations.join(','));
+          }
+          const newRelativePathQuery = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+          history.replaceState(null, '', newRelativePathQuery);
+        }
       }
 
       if (resultsGrid) {
@@ -3799,13 +3820,36 @@ if (isSanityConfigured()) {
         }, { passive: true });
       }
 
-      // Cargar estado guardado del buscador modal al iniciar la página
-      const savedSearchStateText = sessionStorage.getItem('applesex_search_state');
+      // Cargar estado guardado (Soporte para URL compartible)
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasUrlParams = urlParams.has('search') || urlParams.has('q') || urlParams.has('cat') || urlParams.has('sub') || urlParams.has('brands') || urlParams.has('materials');
+      
       let savedSearchState = null;
-      if (savedSearchStateText) {
-        try {
-          savedSearchState = JSON.parse(savedSearchStateText);
-        } catch (e) {}
+      if (hasUrlParams) {
+        savedSearchState = {
+          isOpen: true,
+          category: urlParams.get('cat') || 'all',
+          selectedCategories: urlParams.get('cat') && urlParams.get('cat') !== 'all' ? [urlParams.get('cat')] : [],
+          subcategory: urlParams.get('sub') || 'all',
+          subSubCategory: urlParams.get('subsub') || 'all',
+          selectedSubcategories: urlParams.get('sub') && urlParams.get('sub') !== 'all' ? [urlParams.get('sub')] : [],
+          selectedBrands: urlParams.get('brands') ? urlParams.get('brands').split(',') : [],
+          selectedMaterials: urlParams.get('materials') ? urlParams.get('materials').split(',') : [],
+          selectedCharacteristics: urlParams.get('chars') ? urlParams.get('chars').split(',') : [],
+          selectedStimulations: urlParams.get('stim') ? urlParams.get('stim').split(',') : [],
+          minPrice: urlParams.has('min') ? parseInt(urlParams.get('min') || '0', 10) : 0,
+          maxPrice: urlParams.has('max') ? parseInt(urlParams.get('max') || '150', 10) : 150,
+          sort: urlParams.get('sort') || 'default',
+          query: urlParams.get('q') || '',
+          scrollY: 0
+        };
+      } else {
+        const savedSearchStateText = sessionStorage.getItem('applesex_search_state');
+        if (savedSearchStateText) {
+          try {
+            savedSearchState = JSON.parse(savedSearchStateText);
+          } catch (e) {}
+        }
       }
 
       if (savedSearchState) {
