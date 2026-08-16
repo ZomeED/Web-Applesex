@@ -8,11 +8,13 @@ import { eq } from 'drizzle-orm';
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const body = await request.json();
-    const { name, email, deliveryMethod, address, items } = body;
+    const { name, email, deliveryMethod, address, items, couponCode } = body;
 
     if (!items || items.length === 0) {
       return new Response(JSON.stringify({ error: 'El carrito está vacío' }), { status: 400 });
     }
+
+    const hasDiscount = couponCode && couponCode.toUpperCase() === 'APPLESEX20';
 
     // Obtener catálogo dinámico (de Sanity o Local)
     const productsList = await getAllProducts();
@@ -27,13 +29,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
       if (dbProduct) {
         subtotal += dbProduct.price * item.quantity;
         
+        const finalUnitPrice = hasDiscount ? dbProduct.price * 0.80 : dbProduct.price;
+
         lineItemsForStripe.push({
           price_data: {
             currency: 'eur',
             product_data: {
-              name: dbProduct.name,
+              name: dbProduct.name + (hasDiscount ? ' (20% Dto. APPLESEX20)' : ''),
             },
-            unit_amount: Math.round(dbProduct.price * 100), // En céntimos
+            unit_amount: Math.round(finalUnitPrice * 100), // En céntimos
           },
           quantity: item.quantity,
         });
@@ -42,10 +46,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     }
 
+    const discountAmount = hasDiscount ? subtotal * 0.20 : 0;
+    const discountedSubtotal = subtotal - discountAmount;
+
     // Coste de envío
     let shippingCost = 0;
     if (deliveryMethod === 'envio') {
-      shippingCost = subtotal >= 50 ? 0 : 4.95;
+      shippingCost = discountedSubtotal >= 50 ? 0 : 4.95;
       
       if (shippingCost > 0) {
         lineItemsForStripe.push({
@@ -61,7 +68,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       }
     }
 
-    const totalOrder = subtotal + shippingCost;
+    const totalOrder = discountedSubtotal + shippingCost;
 
     // Obtener variables de entorno (Cloudflare Bindings)
     const env = locals.runtime?.env;
