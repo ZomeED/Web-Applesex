@@ -24,3 +24,7 @@ Thumbs.db
 # Temporary import files and scratch folder
 productos_importados_*.csv
 scratch/
+
+# Nest Sanity Studio folder (independent repository)
+sanity/
+
