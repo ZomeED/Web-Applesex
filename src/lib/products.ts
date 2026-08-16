@@ -6,10 +6,10 @@ export interface Product {
   price: number;
   oldPrice?: number;
   category: string;
-  subcategory?: string; // Clasificación secundaria
-  subcategory2?: string | null; // Segunda subcategoría opcional
-  material?: string;     // Atributo de material
-  characteristics?: string[]; // Etiquetas de filtrado avanzado
+  subcategory?: string; // Primera subcategoría
+  subcategory2?: string | null; // Primera sub-subcategoría
+  secondSubcategory?: string | null; // Segunda subcategoría
+  secondSubcategory2?: string | null; // Segunda sub-subcategoría
   image: string;
   images?: string[];
   stock?: number;
@@ -502,7 +502,8 @@ export async function getAllProducts(): Promise<Product[]> {
         "category": coalesce(category->name, category->title, category),
         "subcategory": coalesce(subcategory->name, subcategory->title, subcategory),
         "subcategory2": coalesce(subcategory2->name, subcategory2->title, subcategory2),
-        characteristics,
+        "secondSubcategory": coalesce(secondSubcategory->name, secondSubcategory->title, secondSubcategory),
+        "secondSubcategory2": coalesce(secondSubcategory2->name, secondSubcategory2->title, secondSubcategory2),
         stock,
         brand,
         stimulationType,

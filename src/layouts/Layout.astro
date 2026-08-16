@@ -2077,11 +2077,16 @@ if (isSanityConfigured()) {
 
       function productMatchesSubSub(p, subcat, subsub) {
         if (!p) return false;
-        const name = (p.name || '').toLowerCase();
-        const desc = (p.description || '').toLowerCase();
-        const mat = (p.material || '').toLowerCase();
-        const tags = (p.characteristics || []).map(x => x.toLowerCase());
-        const combined = `${name} ${desc}`;
+        // 1. Exact match in the hierarchical subcategory/sub-subcategory fields
+        if (p.subcategory === subcat && p.subcategory2 === subsub) return true;
+        if (p.secondSubcategory === subcat && p.secondSubcategory2 === subsub) return true;
+
+         // Fallback for legacy text matching or characteristics (if any remain)
+         const name = (p.name || '').toLowerCase();
+         const desc = (p.description || '').toLowerCase();
+         const mat = (p.material || '').toLowerCase();
+         const tags = (p.characteristics || []).map(x => x.toLowerCase());
+         const combined = `${name} ${desc}`;
 
         // 1. Exact match in material or characteristics
         if (mat === subsub || tags.includes(subsub)) return true;
@@ -2719,7 +2724,7 @@ if (isSanityConfigured()) {
         subCats.forEach(sub => {
            const count = allProducts.filter(p => {
              const matchesOtherFilters = productMatchesFilters(p, query, { excludeSubcategory: true });
-             const matchesSub = p.subcategory === sub || p.subcategory2 === sub;
+             const matchesSub = p.subcategory === sub || p.secondSubcategory === sub || p.subcategory2 === sub;
              return matchesOtherFilters && matchesSub;
            }).length;
           html += `
@@ -2878,13 +2883,14 @@ if (isSanityConfigured()) {
 
         // 2. Subcategory (top category chip and sidebar category checklist)
         if (!options.excludeSubcategory) {
-          const matchSubcat = activeSubcategory === 'all' || p.subcategory === activeSubcategory || p.subcategory2 === activeSubcategory;
+          const matchSubcat = activeSubcategory === 'all' || p.subcategory === activeSubcategory || p.secondSubcategory === activeSubcategory || p.subcategory2 === activeSubcategory;
           if (!matchSubcat) return false;
 
           if (selectedSubcategories.length > 0) {
             const sub1 = p.subcategory || null;
-            const sub2 = p.subcategory2 || null;
-            const hasMatch = selectedSubcategories.includes(sub1) || (sub2 && selectedSubcategories.includes(sub2));
+            const sub2 = p.secondSubcategory || null;
+            const subLegacy = p.subcategory2 || null;
+            const hasMatch = selectedSubcategories.includes(sub1) || selectedSubcategories.includes(sub2) || (subLegacy && selectedSubcategories.includes(subLegacy));
             if (!hasMatch) return false;
           }
         }
@@ -2897,10 +2903,11 @@ if (isSanityConfigured()) {
           if (!productMatchesSubSub(p, subcatKey, activeSubSubCategory)) return false;
         }
 
-        // 4. Characteristics (checkboxes)
+        // 4. Characteristics (checkboxes / Sub-subcategories)
         if (!options.excludeCharacteristics && selectedCharacteristics.length > 0) {
           const pSub1 = p.subcategory || 'Vibradores';
-          const pSub2 = p.subcategory2 || null;
+          const pSub2 = p.secondSubcategory || null;
+          const pSubLegacy = p.subcategory2 || null;
 
           const pSub1SelectedChars = selectedCharacteristics.filter(c => {
             const subMap = SUB_SUBCATEGORIES_MAP[pSub1];
@@ -2910,12 +2917,17 @@ if (isSanityConfigured()) {
             const subMap = SUB_SUBCATEGORIES_MAP[pSub2];
             return subMap && subMap.options.includes(c);
           }) : [];
+          const pSubLegacySelectedChars = pSubLegacy ? selectedCharacteristics.filter(c => {
+            const subMap = SUB_SUBCATEGORIES_MAP[pSubLegacy];
+            return subMap && subMap.options.includes(c);
+          }) : [];
 
-          const totalSelectedChars = [...pSub1SelectedChars, ...pSub2SelectedChars];
+          const totalSelectedChars = [...pSub1SelectedChars, ...pSub2SelectedChars, ...pSubLegacySelectedChars];
           if (totalSelectedChars.length > 0) {
             const matchesAny = totalSelectedChars.some(c => {
               if (pSub1SelectedChars.includes(c) && productMatchesSubSub(p, pSub1, c)) return true;
               if (pSub2 && pSub2SelectedChars.includes(c) && productMatchesSubSub(p, pSub2, c)) return true;
+              if (pSubLegacy && pSubLegacySelectedChars.includes(c) && productMatchesSubSub(p, pSubLegacy, c)) return true;
               return false;
             });
             if (!matchesAny) return false;
@@ -3010,7 +3022,7 @@ if (isSanityConfigured()) {
           subCats.forEach(sub => {
             const count = allProducts.filter(p => {
               const matchesOtherFilters = productMatchesFilters(p, query, { excludeSubcategory: true });
-              const matchesSub = p.subcategory === sub || p.subcategory2 === sub;
+              const matchesSub = p.subcategory === sub || p.secondSubcategory === sub || p.subcategory2 === sub;
               return matchesOtherFilters && matchesSub;
             }).length;
             
@@ -3187,7 +3199,7 @@ if (isSanityConfigured()) {
           data.options.forEach(item => {
             const count = allProducts.filter(p => {
               const matchesOtherFilters = productMatchesFilters(p, query, { excludeCharacteristics: true });
-              const matchesSubcat = p.subcategory === subcatKey || p.subcategory2 === subcatKey;
+              const matchesSubcat = p.subcategory === subcatKey || p.secondSubcategory === subcatKey || p.subcategory2 === subcatKey;
               const matchesItem = productMatchesSubSub(p, subcatKey, item);
               return matchesOtherFilters && matchesSubcat && matchesItem;
             }).length;
