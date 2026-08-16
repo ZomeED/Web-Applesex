@@ -108,7 +108,7 @@ Enlace: https://applesex-ecommerce.pages.dev/producto/${product.slug}`;
 const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(messageText)}`;
 ---
 
-<Layout title={product.name} description={product.description} hideWhatsApp={true}>
+<Layout title={product.name} description={product.description} image={product.image} hideWhatsApp={true}>
   <!-- Marcado de Datos Estructurados de Producto (Product JSON-LD) -->
   <script type="application/ld+json" set:html={productSchema}></script>
   <!-- Migas de Pan / Breadcrumbs Compactos Mobile-First -->

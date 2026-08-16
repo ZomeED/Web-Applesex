@@ -5,11 +5,15 @@ import { sanityClient, isSanityConfigured } from '../db/sanity';
 interface Props {
   title: string;
   description: string;
+  image?: string;
   hideWhatsApp?: boolean;
   hideHeaderFooter?: boolean;
 }
 
-const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = Astro.props;
+const { title, description, image, hideWhatsApp = false, hideHeaderFooter = false } = Astro.props;
+
+const shareImage = image || '/logo.png';
+const absoluteShareImage = new URL(shareImage, Astro.url).href;
 
 let announcementText = '¡Inauguración! <strong>20% Dto.</strong> en toda la web con el código <strong id="copy-promo-code" style="text-decoration: underline; color: #ffffff; cursor: pointer; padding: 2px 6px; border: 1px dashed #ffffff; border-radius: 4px; margin-left: 4px; display: inline-block;" title="Haz clic para copiar">APPLESEX20</strong>';
 
@@ -39,10 +43,19 @@ if (isSanityConfigured()) {
     <meta name="description" content={description || "Descubre Applesex, tu tienda online de juguetes eróticos con más de 10 años de experiencia. Explora nuestro amplio catálogo y encuentra los productos perfectos para ti. ¡Compra hoy y disfruta de una experiencia única!"} />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#d60068" />
-    <meta property="og:title" content={title ? `${title} | AppleSex` : "Tienda Online de Juguetes Eróticos - Applsex | AppleSex"} />
-    <meta property="og:description" content={description || "Descubre Applesex, tu tienda online de juguetes eróticos con más de 10 años de experiencia. Explora nuestro amplio catálogo y encuentra los productos perfectos para ti. ¡Compra hoy y disfruta de una experiencia única!"} />
+    <meta property="og:title" content={title ? `${title} | AppleSex` : "Boutique Erótica Premium y Bienestar Íntimo | AppleSex"} />
+    <meta property="og:description" content={description || "Encuentra juguetes eróticos, cosmética sensual y lencería premium. Envíos 100% discretos y confidenciales en 24h o recogida en 2h en Murcia."} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:site_name" content="AppleSex" />
+    <meta property="og:image" content={absoluteShareImage} />
+    <meta property="og:image:secure_url" content={absoluteShareImage} />
     <meta property="og:locale" content="es_ES" />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title ? `${title} | AppleSex` : "Boutique Erótica Premium y Bienestar Íntimo | AppleSex"} />
+    <meta name="twitter:description" content={description || "Encuentra juguetes eróticos, cosmética sensual y lencería premium. Envíos 100% discretos y confidenciales en 24h o recogida en 2h en Murcia."} />
+    <meta name="twitter:image" content={absoluteShareImage} />
   </head>
   <body>
     <!-- Barra de Anuncios Superior Elegante y Descartable -->
