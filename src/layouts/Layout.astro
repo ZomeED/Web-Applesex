@@ -3788,14 +3788,20 @@ if (isSanityConfigured()) {
         };
         sessionStorage.setItem('applesex_search_state', JSON.stringify(state));
 
-        // Sincronización de URL en tiempo real
+        // Sincronización de URL en tiempo real (Soporta multi-selección de categorías y subcategorías)
         if (!window.location.pathname.includes('/carrito') && !window.location.pathname.includes('/producto/')) {
           const params = new URLSearchParams();
           if (state.isOpen) {
             params.set('search', 'open');
             if (state.query.trim()) params.set('q', state.query.trim());
+            
+            // Guardar categorías y subcategorías activas y seleccionadas
             if (state.category && state.category !== 'all') params.set('cat', state.category);
+            if (state.selectedCategories.length > 0) params.set('cats', state.selectedCategories.join(','));
+            
             if (state.subcategory && state.subcategory !== 'all') params.set('sub', state.subcategory);
+            if (state.selectedSubcategories.length > 0) params.set('subs', state.selectedSubcategories.join(','));
+            
             if (state.subSubCategory && state.subSubCategory !== 'all') params.set('subsub', state.subSubCategory);
             if (state.sort && state.sort !== 'default') params.set('sort', state.sort);
             if (state.minPrice > 0) params.set('min', state.minPrice.toString());
@@ -3820,19 +3826,52 @@ if (isSanityConfigured()) {
         }, { passive: true });
       }
 
-      // Cargar estado guardado (Soporte para URL compartible)
+      // Cargar estado guardado (Soporte avanzado para URL compartible con jerarquías)
       const urlParams = new URLSearchParams(window.location.search);
-      const hasUrlParams = urlParams.has('search') || urlParams.has('q') || urlParams.has('cat') || urlParams.has('sub') || urlParams.has('brands') || urlParams.has('materials');
+      const hasUrlParams = urlParams.has('search') || urlParams.has('q') || urlParams.has('cat') || urlParams.has('sub') || urlParams.has('cats') || urlParams.has('subs') || urlParams.has('brands') || urlParams.has('materials');
       
       let savedSearchState = null;
       if (hasUrlParams) {
+        const catParam = urlParams.get('cat');
+        const catsParam = urlParams.get('cats');
+        const subParam = urlParams.get('sub');
+        const subsParam = urlParams.get('subs');
+
+        let restoredCategories = [];
+        if (catsParam) {
+          restoredCategories = catsParam.split(',');
+        } else if (catParam && catParam !== 'all') {
+          restoredCategories = [catParam];
+        }
+
+        let restoredSubcategories = [];
+        if (subsParam) {
+          restoredSubcategories = subsParam.split(',');
+        } else if (subParam && subParam !== 'all') {
+          restoredSubcategories = [subParam];
+        }
+
+        let activeCat = 'all';
+        if (restoredCategories.length === 1) {
+          activeCat = restoredCategories[0];
+        } else if (catParam) {
+          activeCat = catParam;
+        }
+
+        let activeSub = 'all';
+        if (restoredSubcategories.length === 1) {
+          activeSub = restoredSubcategories[0];
+        } else if (subParam) {
+          activeSub = subParam;
+        }
+
         savedSearchState = {
           isOpen: true,
-          category: urlParams.get('cat') || 'all',
-          selectedCategories: urlParams.get('cat') && urlParams.get('cat') !== 'all' ? [urlParams.get('cat')] : [],
-          subcategory: urlParams.get('sub') || 'all',
+          category: activeCat,
+          selectedCategories: restoredCategories,
+          subcategory: activeSub,
           subSubCategory: urlParams.get('subsub') || 'all',
-          selectedSubcategories: urlParams.get('sub') && urlParams.get('sub') !== 'all' ? [urlParams.get('sub')] : [],
+          selectedSubcategories: restoredSubcategories,
           selectedBrands: urlParams.get('brands') ? urlParams.get('brands').split(',') : [],
           selectedMaterials: urlParams.get('materials') ? urlParams.get('materials').split(',') : [],
           selectedCharacteristics: urlParams.get('chars') ? urlParams.get('chars').split(',') : [],
@@ -3894,6 +3933,11 @@ if (isSanityConfigured()) {
             modalBackdrop.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             updatePriceSliderTracks();
+            
+            // Sincronizar y renderizar los chips superiores de categoría y subcategoría
+            updateTopChipsActiveState();
+            updateModalSubcategoriesUI();
+
             renderSidebarFilters();
             renderSidebarMaterialsAndCharacteristics();
             renderSidebarStimulation();
