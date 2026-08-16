@@ -102,7 +102,7 @@ const productSchema = JSON.stringify({
 });
 ---
 
-<Layout title={product.name} description={product.description}>
+<Layout title={product.name} description={product.description} hideWhatsApp={true}>
   <!-- Marcado de Datos Estructurados de Producto (Product JSON-LD) -->
   <script type="application/ld+json" set:html={productSchema}></script>
   <!-- Migas de Pan / Breadcrumbs Compactos Mobile-First -->
