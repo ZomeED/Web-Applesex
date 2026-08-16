@@ -2373,6 +2373,12 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         modalBackdrop.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         document.body.classList.add('modal-open-mobile');
+        
+        // Registrar estado en el historial para controlar el botón atrás físico de móviles
+        if (window.history.state?.modal !== 'search') {
+          window.history.pushState({ modal: 'search' }, '');
+        }
+
         setTimeout(() => {
           if (searchInput && window.innerWidth >= 768) {
             searchInput.focus();
@@ -2391,8 +2397,24 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         modalBackdrop.style.display = 'none';
         document.body.style.overflow = '';
         document.body.classList.remove('modal-open-mobile');
+        
+        // Limpiar el estado de historial si se cierra manualmente (botón Cerrar o X)
+        if (window.history.state?.modal === 'search') {
+          window.history.back();
+        }
+        
         saveSearchState();
       }
+
+      // Escuchar el evento popstate para cerrar el buscador al pulsar el botón atrás físico/sistema en móvil
+      window.addEventListener('popstate', (e) => {
+        if (modalBackdrop && modalBackdrop.style.display === 'flex' && e.state?.modal !== 'search') {
+          modalBackdrop.style.display = 'none';
+          document.body.style.overflow = '';
+          document.body.classList.remove('modal-open-mobile');
+          saveSearchState();
+        }
+      });
 
       if (openModalBtn) {
         openModalBtn.addEventListener('click', () => {
@@ -2754,7 +2776,7 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
       function productMatchesFilters(p, query, options = {}) {
         // 1. Category (multi-select check list or top chip shortcut)
         let matchCat = true;
-        if (selectedCategories.length > 0) {
+        if (!options.excludeCategory && selectedCategories.length > 0) {
           matchCat = selectedCategories.map(c => c.toUpperCase()).includes(p.category.toUpperCase());
         }
         if (!matchCat) return false;
