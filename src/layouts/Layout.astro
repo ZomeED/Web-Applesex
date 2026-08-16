@@ -1138,10 +1138,9 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         margin-left: 8px; /* Espacio extra de seguridad para evitar clics accidentales al limpiar texto */
       }
 
-      .search-load-more-container button:hover {
-        background: var(--primary) !important;
-        color: white !important;
-        border-color: var(--primary) !important;
+      @keyframes spin-search-loader {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
       }
 
       @media (max-width: 768px) {
@@ -1877,6 +1876,7 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
       let selectedStimulations: string[] = [];
       let activeSubSubCategory = 'all';
       let visibleResultsLimit = 24;
+      let searchIntersectionObserver: any = null;
 
       const subcategorySubtitles = {
         "Vibradores": "Vibrador estimulador",
@@ -3385,6 +3385,13 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
       // Renderizar resultados con resaltado de coincidencias
       function renderSearchResults() {
         if (!resultsGrid || !resultsCount) return;
+        
+        // Limpiar observadores de scroll anteriores para evitar fugas de memoria
+        if (searchIntersectionObserver) {
+          searchIntersectionObserver.disconnect();
+          searchIntersectionObserver = null;
+        }
+
         const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
         // Filtrar productos con soporte fuzzy y subcategoría
@@ -3512,25 +3519,31 @@ const { title, description, hideWhatsApp = false, hideHeaderFooter = false } = A
         }).join('');
 
         if (filtered.length > visibleResultsLimit) {
-          const remainingCount = filtered.length - visibleResultsLimit;
           gridHtml += `
-            <div class="search-load-more-container" style="grid-column: 1 / -1; display: flex; justify-content: center; padding: 24px 0 40px 0; width: 100%;">
-              <button id="search-load-more-btn" class="btn btn-secondary" style="font-size: 0.85rem; padding: 12px 28px; border-radius: 50px; cursor: pointer; border: 1px solid var(--border-color); background: #ffffff; color: var(--text-primary); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
-                Ver más productos (+${remainingCount})
-              </button>
+            <div id="search-infinite-scroll-trigger" style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; padding: 24px 0 40px 0; width: 100%; min-height: 50px;">
+              <span class="search-scroll-spinner" style="width: 24px; height: 24px; border: 2.5px solid rgba(216, 75, 140, 0.2); border-top-color: var(--primary); border-radius: 50%; display: inline-block; animation: spin-search-loader 0.8s linear infinite;"></span>
             </div>
           `;
         }
 
         resultsGrid.innerHTML = gridHtml;
 
+        // Configurar el observador de intersección para scroll infinito
         if (filtered.length > visibleResultsLimit) {
-          const loadMoreBtn = document.getElementById('search-load-more-btn');
-          if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', () => {
-              visibleResultsLimit += 24;
-              renderSearchResults();
+          const triggerEl = document.getElementById('search-infinite-scroll-trigger');
+          if (triggerEl) {
+            searchIntersectionObserver = new IntersectionObserver((entries) => {
+              if (entries[0].isIntersecting) {
+                visibleResultsLimit += 24;
+                renderSearchResults();
+              }
+            }, {
+              // Observamos dentro del contenedor scrollable de resultados
+              root: document.querySelector('.search-results-content') || null,
+              // rootMargin de 150px carga el lote siguiente antes de que el usuario llegue abajo del todo
+              rootMargin: '150px',
             });
+            searchIntersectionObserver.observe(triggerEl);
           }
         }
 
